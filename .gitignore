@@ -5,3 +5,5 @@ dist/
 # local stand-in for the Turso database
 reports.local.db*
 .vercel/
+
+.vercel
