@@ -627,7 +627,7 @@ const faqs = [
 	}
 	.hero-title {
 		margin-top: 32px;
-		font-size: clamp(52px, 8.4vw, 120px);
+		font-size: clamp(48px, 6.4vw, 100px);
 		line-height: 0.98;
 	}
 	.hero-title .line {
@@ -659,7 +659,8 @@ const faqs = [
 	}
 	.stage {
 		position: relative;
-		margin-top: 88px;
+		max-width: 1240px;
+		margin: 80px auto 0;
 		perspective: 1800px;
 	}
 	.screen {
@@ -848,7 +849,7 @@ const faqs = [
 	}
 	.reel-item {
 		margin: 0;
-		width: min(52vw, 760px);
+		width: min(38vw, 580px);
 	}
 	.reel-frame {
 		position: relative;
@@ -942,20 +943,25 @@ const faqs = [
 	}
 	.feat-wide {
 		grid-column: 1 / -1;
-		flex-direction: row;
-		flex-wrap: wrap;
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
 		align-items: center;
-		gap: 40px;
-		padding: 48px;
+		gap: 48px;
+		padding: 44px;
 	}
+	/* The three small cards share one set of rows (visual, title, copy) so
+	   their pictures, headings and text line up whatever the copy length. */
 	.feat-sm {
 		grid-column: span 2;
+		grid-row: span 3;
+		display: grid;
+		grid-template-rows: subgrid;
 		gap: 0;
-		padding: 28px;
+		padding: 26px;
 	}
 	.feat-sm h3 {
-		margin-top: 26px;
-		font-size: 22px;
+		margin-top: 24px;
+		font-size: 21px;
 	}
 	.feat-sm .lede {
 		font-size: 16px;
@@ -979,19 +985,19 @@ const faqs = [
 		margin: 0;
 		font-family: var(--font-display);
 		font-weight: 600;
-		font-size: 26px;
+		font-size: 24px;
 		letter-spacing: -0.02em;
 		line-height: 1.15;
 	}
 	.feat-wide h3 {
-		font-size: 34px;
+		font-size: 30px;
 	}
 	.feat .lede {
 		margin: 12px 0 0;
 	}
 	.feat-copy {
-		flex: 1 1 320px;
 		min-width: 0;
+		max-width: 480px;
 	}
 	.chips {
 		display: flex;
@@ -1007,13 +1013,12 @@ const faqs = [
 		border: 1px solid var(--line);
 	}
 	.feat-wide .feat-shot {
-		flex: 2 1 520px;
 		min-width: 0;
 		margin-top: 0;
 	}
 	.feat-shot :global(img) {
 		width: 100%;
-		transform: scale(1.08);
+		transform: scale(1.06);
 		will-change: transform;
 	}
 
@@ -1165,6 +1170,9 @@ const faqs = [
 		.feat-sm {
 			grid-column: 1 / -1;
 		}
+		.feat-wide {
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
 	@media (max-width: 600px) {
 		.feat,
@@ -1178,8 +1186,8 @@ const faqs = [
 		padding-block: 220px 40px;
 	}
 	.statement-text {
-		max-width: 1700px;
-		font-size: clamp(36px, 5.6vw, 104px);
+		max-width: 1300px;
+		font-size: clamp(34px, 4.6vw, 80px);
 		line-height: 1.06;
 		letter-spacing: -0.035em;
 	}
@@ -1201,7 +1209,7 @@ const faqs = [
 	}
 	.quote blockquote {
 		margin: 0;
-		font-size: clamp(30px, 3.8vw, 50px);
+		font-size: clamp(28px, 3.2vw, 44px);
 		font-weight: 500;
 		line-height: 1.15;
 		letter-spacing: -0.025em;
@@ -1237,7 +1245,7 @@ const faqs = [
 	}
 	.tut-title {
 		margin-top: 16px;
-		font-size: clamp(34px, 4vw, 52px);
+		font-size: clamp(32px, 3.4vw, 46px);
 		line-height: 1.04;
 		letter-spacing: -0.03em;
 	}

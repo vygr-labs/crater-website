@@ -29,10 +29,10 @@
 	--font-body: "Onest", system-ui, sans-serif;
 	--font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-	/* Near edge to edge: a small gutter, no centred column. The cap only
-	   stops lines getting absurd on ultrawide screens. */
-	--gutter: clamp(16px, 2.6vw, 48px);
-	--wrap: 2200px;
+	/* Edge to edge on a laptop with a small gutter. On big monitors the
+	   content stops at --wrap so nothing gets blown up past its natural size. */
+	--gutter: clamp(16px, 2.6vw, 40px);
+	--wrap: 1520px;
 	--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 	color-scheme: dark;
 }
@@ -142,7 +142,7 @@ a {
 }
 
 .h2 {
-	font-size: clamp(38px, 5vw, 64px);
+	font-size: clamp(34px, 3.9vw, 54px);
 	line-height: 1.02;
 	letter-spacing: -0.03em;
 }
