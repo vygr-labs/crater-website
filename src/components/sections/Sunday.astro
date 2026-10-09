@@ -49,7 +49,11 @@ const steps = [
 					<span class="sunday-live"><span class="dot"></span>LIVE</span>
 				</div>
 				<div class="sunday-clock" aria-hidden="true">
-					<span class="sunday-clock-bar"><span data-sunday-bar></span></span>
+					<span class="sunday-clock-bar">
+						<span class="sc-fill" data-sunday-bar></span>
+						{steps.map((_, i) => <i class="sc-stop" data-sunday-stop style={`--at: ${(i / steps.length) * 100}%`} />)}
+						<span class="sc-head" data-sunday-head></span>
+					</span>
 					<span class="sunday-clock-t" data-sunday-time>9:50</span>
 				</div>
 			</div>
@@ -110,7 +114,8 @@ const steps = [
 		transform: scaleY(1);
 	}
 	.step-time {
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 13px;
 		padding-top: 4px;
 		color: var(--ink-3);
@@ -185,7 +190,8 @@ const steps = [
 		background: rgb(0 0 0 / 0.55);
 		backdrop-filter: blur(6px);
 		color: #f26b5b;
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 12px;
 		letter-spacing: 0.08em;
 	}
@@ -207,26 +213,61 @@ const steps = [
 		gap: 16px;
 		margin-top: 20px;
 	}
+	/* Same scrubber as the reel: a stop where each step begins and a
+	   glowing head on the line. */
 	.sunday-clock-bar {
 		position: relative;
 		flex: 1;
 		height: 2px;
+		margin-left: 4px;
 		border-radius: 2px;
 		background: var(--line);
-		overflow: hidden;
 	}
-	.sunday-clock-bar span {
+	.sc-fill {
 		position: absolute;
 		inset: 0;
-		background: linear-gradient(90deg, var(--brand), var(--gold));
+		border-radius: inherit;
+		background: var(--brand);
+		box-shadow: 0 0 12px var(--glow);
 		transform: scaleX(0);
 		transform-origin: left;
 	}
+	.sc-stop {
+		position: absolute;
+		left: var(--at);
+		top: 50%;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--bg);
+		border: 1.5px solid var(--line-strong);
+		transform: translate(-50%, -50%);
+		transition:
+			background-color 0.3s ease,
+			border-color 0.3s ease;
+	}
+	.sc-stop.is-on {
+		background: var(--brand);
+		border-color: var(--brand);
+	}
+	.sc-head {
+		position: absolute;
+		left: 0;
+		top: 50%;
+		width: 12px;
+		height: 12px;
+		margin: -6px 0 0 -6px;
+		border-radius: 50%;
+		background: var(--brand);
+		box-shadow:
+			0 0 0 5px var(--brand-wash),
+			0 0 18px var(--glow);
+	}
 	.sunday-clock-t {
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 14px;
 		color: var(--ink-2);
-		font-variant-numeric: tabular-nums;
 	}
 
 	/* Without the pinned scroll every step simply reads open. */

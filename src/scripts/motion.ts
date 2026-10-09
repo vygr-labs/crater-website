@@ -5,7 +5,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { setupKeys, setupMicro, setupOpen, setupScreens, setupSunday, setupSwitch, setupThemes } from "./sections";
+import { setupKeys, setupMicro, setupOpen, setupRequest, setupScreens, setupSunday, setupSwitch, setupThemes } from "./sections";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -194,12 +194,32 @@ function run() {
 				end: () => "+=" + distance(),
 				scrub: 0.7,
 				invalidateOnRefresh: true,
-				anticipatePin: 1,
 				// Pins measure first so every trigger below sees their spacers.
 				refreshPriority: 2,
 			},
 		});
-		gsap.to("[data-reel-bar]", { scaleX: 1, ease: "none", scrollTrigger: { trigger: section, start: "top top", end: () => "+=" + distance(), scrub: true } });
+		// The scrubber under the reel: the line fills, the head rides it, and
+		// each stop lights once its slide has come into view.
+		const bar = $("[data-reel-bar]")!;
+		const head = $("[data-reel-head]")!;
+		const steps = $$("[data-reel-step]");
+		const last = steps.length - 1;
+		const prog = { p: 0 };
+		gsap.to(prog, {
+			p: 1,
+			ease: "none",
+			scrollTrigger: { trigger: section, start: "top top", end: () => "+=" + distance(), scrub: 0.7 },
+			onUpdate: () => {
+				const p = prog.p;
+				gsap.set(bar, { scaleX: p });
+				gsap.set(head, { left: `${p * 100}%` });
+				const now = Math.round(p * last);
+				steps.forEach((s, i) => {
+					s.classList.toggle("is-on", p >= i / last - 0.001);
+					s.classList.toggle("is-now", i === now);
+				});
+			},
+		});
 		// Each slide's picture drifts inside its frame as it crosses.
 		$$(".reel-frame img").forEach((img) =>
 			gsap.fromTo(
@@ -213,10 +233,11 @@ function run() {
 	/* ── Longer sections, in page order below the reel ─────────────────── */
 	setupSunday(mm);
 	setupScreens();
-	setupThemes(finePointer);
+	setupThemes(mm);
 	setupKeys();
 	setupSwitch();
 	setupOpen();
+	setupRequest();
 	setupMicro(finePointer);
 
 	/* ── Feature pictures drift inside their cards ───────────────────── */

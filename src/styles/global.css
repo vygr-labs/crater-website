@@ -27,11 +27,13 @@
 
 	--font-display: "Funnel Display", "Onest", system-ui, sans-serif;
 	--font-body: "Onest", system-ui, sans-serif;
-	--font-mono: "JetBrains Mono", ui-monospace, monospace;
 
 	/* Edge to edge on a laptop with a small gutter. On big monitors the
 	   content stops at --wrap so nothing gets blown up past its natural size. */
 	--gutter: clamp(16px, 2.6vw, 40px);
+	/* Content sits a little inside the floating nav, roughly in line with
+	   the logo, so the nav always reads as the widest thing on the page. */
+	--inset: clamp(0px, 1.8vw, 28px);
 	--wrap: 1520px;
 	--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 	color-scheme: dark;
@@ -70,6 +72,9 @@
 
 html {
 	-webkit-text-size-adjust: 100%;
+	/* Clipping only body is not enough on phones: the browser still widens
+	   the layout to fit the hero glow, and the fixed nav stretches with it. */
+	overflow-x: clip;
 }
 
 html.lenis,
@@ -121,16 +126,18 @@ a {
 	width: 100%;
 	max-width: var(--wrap);
 	margin-inline: auto;
-	padding-inline: var(--gutter);
+	padding-inline: calc(var(--gutter) + var(--inset));
 }
 
 .eyebrow {
 	margin: 0;
-	font-family: var(--font-mono);
+	font-family: var(--font-body);
+	font-variant-numeric: tabular-nums;
 	font-size: 13px;
+	font-weight: 600;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
-	color: var(--brand);
+	color: var(--ink-2);
 }
 
 .display {
@@ -235,7 +242,8 @@ a {
 	gap: 6px;
 	padding: 4px 10px;
 	border-radius: 6px;
-	font-family: var(--font-mono);
+	font-family: var(--font-body);
+	font-variant-numeric: tabular-nums;
 	font-size: 12px;
 	font-weight: 500;
 	letter-spacing: 0.06em;
@@ -313,28 +321,10 @@ a {
 	inset: 0 0 auto;
 	z-index: 60;
 	height: 2px;
-	background: linear-gradient(90deg, var(--brand), var(--gold));
+	background: var(--brand);
 	transform: scaleX(0);
 	transform-origin: left;
 	pointer-events: none;
-}
-
-/* Eyebrows open with a short rule that draws in ahead of the text. */
-.eyebrow::before {
-	content: "";
-	display: inline-block;
-	vertical-align: middle;
-	width: 18px;
-	height: 1px;
-	margin: -2px 10px 0 0;
-	background: currentColor;
-	transform: scaleX(0);
-	transform-origin: left;
-	transition: transform 0.9s var(--ease-out) 0.2s;
-}
-.eyebrow.is-in::before,
-html:not(.js) .eyebrow::before {
-	transform: scaleX(1);
 }
 
 /* Text links underline from the left. */
@@ -365,11 +355,8 @@ html:not(.js) .eyebrow::before {
 	.progress {
 		display: none;
 	}
-	.eyebrow::before {
-		transform: scaleX(1);
-		transition: none;
-	}
 	.btn-brand:hover svg {
 		animation: none;
 	}
 }
+

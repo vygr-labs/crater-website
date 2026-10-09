@@ -26,32 +26,41 @@ const points = [
 	</div>
 
 	<div class="switch-demo card" data-reveal="card" aria-label="Songs moving from an EasyWorship library into Crater" role="img">
-		<div class="lib lib-from">
-			<div class="lib-bar">
-				<span class="lib-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-				<span class="lib-name">EasyWorship</span>
-				<span class="lib-file">Songs.db</span>
+		<div class="lib-col">
+			<p class="lib-label"><span class="lib-tag">From</span>EasyWorship 6 or 7</p>
+			<div class="lib lib-from">
+				<div class="lib-bar">
+					<span class="lib-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+					<span class="lib-name">EasyWorship song library</span>
+					<span class="lib-file">Songs.db</span>
+				</div>
+				<div class="lib-cols" aria-hidden="true"><span>Title</span><span>Author</span></div>
+				<ul>
+					{songs.map(([t, a]) => <li data-from><span>{t}</span><small>{a}</small></li>)}
+				</ul>
 			</div>
-			<ul>
-				{songs.map(([t, a]) => <li data-from><span>{t}</span><small>{a}</small></li>)}
-			</ul>
 		</div>
 
 		<div class="switch-flow" aria-hidden="true">
 			<svg viewBox="0 0 120 40" preserveAspectRatio="none"><path d="M0 20 H120" /></svg>
 			<span class="switch-pct" data-switch-pct>0%</span>
+			<span class="switch-verb">Importing</span>
 		</div>
 
-		<div class="lib lib-to">
-			<div class="lib-bar">
-				<span class="lib-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-				<span class="lib-name">Crater</span>
-				<span class="lib-file lib-file-brand">Songs</span>
+		<div class="lib-col">
+			<p class="lib-label"><span class="lib-tag lib-tag-brand">To</span>Crater</p>
+			<div class="lib lib-to">
+				<div class="lib-bar">
+					<span class="lib-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+					<span class="lib-name">Crater songs</span>
+					<span class="lib-file lib-file-brand">Songs</span>
+				</div>
+				<div class="lib-cols" aria-hidden="true"><span>Title</span><span>Author</span><span>Sections</span></div>
+				<ul>
+					{songs.map(([t, a]) => <li data-to><span>{t}</span><small>{a}</small><em>V1 · C · V2</em></li>)}
+				</ul>
+				<div class="lib-progress"><span data-switch-bar></span></div>
 			</div>
-			<ul>
-				{songs.map(([t, a]) => <li data-to><span>{t}</span><small>{a}</small><em>V1 · C · V2</em></li>)}
-			</ul>
-			<div class="lib-progress"><span data-switch-bar></span></div>
 		</div>
 	</div>
 
@@ -84,9 +93,73 @@ const points = [
 		margin-top: 56px;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) 140px minmax(0, 1fr);
-		align-items: center;
+		align-items: stretch;
 		gap: 12px;
 		padding: clamp(20px, 3vw, 40px);
+	}
+	.lib-col {
+		display: flex;
+		flex-direction: column;
+	}
+	.lib-col .lib {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+	.lib-to .lib-progress {
+		margin-top: auto;
+	}
+	.lib-label {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin: 0 0 14px;
+		font-family: var(--font-display);
+		font-size: 20px;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+	}
+	.lib-tag {
+		padding: 3px 8px;
+		border-radius: 6px;
+		border: 1px solid var(--line-strong);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+	}
+	.lib-tag-brand {
+		border-color: var(--brand);
+		color: var(--brand);
+	}
+	/* Column headers make the left side read as EasyWorship's own song
+	   grid rather than a generic list. */
+	.lib-cols {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		padding: 8px 16px;
+		border-bottom: 1px solid var(--line);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
+		font-size: 10.5px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+	}
+	.lib-to .lib-cols {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+	}
+	.lib-from li {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		border-radius: 0;
+		border-bottom: 1px solid var(--line);
+	}
+	.lib-from li:last-child {
+		border-bottom: 0;
 	}
 	.lib {
 		border-radius: 14px;
@@ -117,7 +190,8 @@ const points = [
 	}
 	.lib-file {
 		margin-left: auto;
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 11px;
 		color: var(--ink-3);
 	}
@@ -152,7 +226,8 @@ const points = [
 	.lib li em {
 		margin-left: auto;
 		font-style: normal;
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 10.5px;
 		color: var(--brand);
 		flex: none;
@@ -170,6 +245,8 @@ const points = [
 	}
 	.switch-flow {
 		position: relative;
+		align-self: center;
+		margin-top: 34px;
 		height: 40px;
 		display: grid;
 		place-items: center;
@@ -194,13 +271,24 @@ const points = [
 			stroke-dashoffset: -12;
 		}
 	}
+	.switch-verb {
+		position: absolute;
+		top: calc(100% + 8px);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
+		font-size: 10.5px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+	}
 	.switch-pct {
 		position: relative;
 		padding: 4px 10px;
 		border-radius: 999px;
 		background: var(--card);
 		border: 1px solid var(--line-strong);
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 12px;
 		font-variant-numeric: tabular-nums;
 	}
@@ -237,6 +325,9 @@ const points = [
 		}
 		.switch-flow .switch-pct {
 			transform: rotate(-90deg);
+		}
+		.switch-verb {
+			display: none;
 		}
 		.switch-points {
 			grid-template-columns: repeat(2, minmax(0, 1fr));

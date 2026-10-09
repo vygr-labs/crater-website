@@ -1,6 +1,6 @@
 ---
-// The built-in themes, on one live slide. Hover or tap a swatch and the
-// slide restyles; left alone it walks through them while on screen.
+// The built-in themes, on one live slide. Scrolling walks through them,
+// and clicking a swatch jumps straight to one.
 // Colours are taken from Crater's own seeded themes.
 const themes = [
 	{ name: "Plum & Rose", kind: "Scripture and songs", bg: ["#110910", "#571f44", "#1a0c18", "#391528"], text: "#fcf3f5", accent: "#f29cac", muted: "#c9a3ad" },
@@ -203,11 +203,17 @@ const bgVars = (t: (typeof themes)[number]) => `--b1:${t.bg[0]};--b2:${t.bg[1]};
 	.slide-caption {
 		margin: 18px 0 0;
 		text-align: center;
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 13px;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
 		color: var(--ink-3);
+	}
+	@media (min-width: 901px) and (max-width: 1180px) {
+		.swatches {
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
 	@media (max-width: 900px) {
 		.themes-grid {

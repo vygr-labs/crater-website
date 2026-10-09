@@ -1,19 +1,20 @@
 ---
 // Keyboard first: real Crater shortcuts pressed in turn, with a small
 // projector answering each one. Keys and actions match the app's F1 list.
+// Clicking a shortcut in the list presses it on the demo.
 import Mark from "../Mark.astro";
 
-const list = [
-	[["Enter"], "Send the preview live"],
-	[["↑", "↓"], "Previous or next slide"],
-	[["PgUp", "PgDn"], "Jump between choruses"],
-	[["Ctrl", "K"], "Search everything"],
-	[["Ctrl", "L"], "Logo on and off"],
-	[["Ctrl", "C"], "Clear the text"],
-	[["Ctrl", "P"], "Play or pause the video"],
-	[["F1"], "Every shortcut, any time"],
+const list: [string[], string, string][] = [
+	[["Enter"], "Send the preview live", "live"],
+	[["↑", "↓"], "Previous or next slide", "step"],
+	[["PgUp", "PgDn"], "Jump between choruses", "chorus"],
+	[["Ctrl", "K"], "Search everything", "search"],
+	[["Ctrl", "L"], "Logo on and off", "logo"],
+	[["Ctrl", "C"], "Clear the text", "clear"],
+	[["Ctrl", "P"], "Play or pause the video", "video"],
+	[["F1"], "Every shortcut, any time", "help"],
 ];
-const board = ["Ctrl", "K", "L", "C", "↑", "↓", "Enter"];
+const board = ["Ctrl", "K", "L", "C", "P", "↑", "↓", "Enter"];
 ---
 
 <section id="keys" class="keys wrap" data-keys>
@@ -24,14 +25,16 @@ const board = ["Ctrl", "K", "L", "C", "↑", "↓", "Enter"];
 			<p class="lede" data-reveal="up">Eyes on the stage, hands on the keys. Everything that matters on a Sunday is one or two keys away.</p>
 			<ul class="klist">
 				{
-					list.map(([keys, label]) => (
+					list.map(([keys, label, act]) => (
 						<li data-reveal="row">
-							<span class="kc-group">
-								{(keys as string[]).map((k) => (
-									<kbd>{k}</kbd>
-								))}
-							</span>
-							<span>{label}</span>
+							<button type="button" class="krow" data-k-act={act}>
+								<span class="kc-group">
+									{keys.map((k) => (
+										<kbd>{k}</kbd>
+									))}
+								</span>
+								<span>{label}</span>
+							</button>
 						</li>
 					))
 				}
@@ -54,6 +57,32 @@ const board = ["Ctrl", "K", "L", "C", "↑", "↓", "Enter"];
 				<div class="kstate" data-k="v17">
 					<span class="kref">JOHN 3:17 · KJV</span>
 					<p>For God sent not his Son into the world to condemn the world; but that the world through him might be saved.</p>
+				</div>
+				<div class="kstate" data-k="verse">
+					<span class="kref">BLESSED ASSURANCE · VERSE 1</span>
+					<p>Blessed assurance, Jesus is mine! O what a foretaste of glory divine!</p>
+				</div>
+				<div class="kstate" data-k="chorus">
+					<span class="kref">BLESSED ASSURANCE · CHORUS</span>
+					<p>This is my story, this is my song, praising my Saviour all the day long.</p>
+				</div>
+				<div class="kstate kstate-video" data-k="video">
+					<span class="kvid-icon" data-k-vid-icon aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="currentColor"><path class="kvid-play" d="M8 5.5v13l11-6.5z"></path><path class="kvid-pause" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"></path></svg>
+					</span>
+					<span class="kvid-bar"><i></i></span>
+				</div>
+				<div class="kstate" data-k="help">
+					<div class="kpal khelp">
+						{
+							list.map(([keys, label]) => (
+								<span class="khelp-row">
+									<span>{label}</span>
+									<small>{keys.join(" ")}</small>
+								</span>
+							))
+						}
+					</div>
 				</div>
 				<div class="kstate kstate-logo" data-k="logo"><Mark size={64} /></div>
 				<span class="kcap" data-k-cap></span>
@@ -91,13 +120,39 @@ const board = ["Ctrl", "K", "L", "C", "↑", "↓", "Enter"];
 		gap: 4px 24px;
 	}
 	.klist li {
+		border-bottom: 1px solid var(--line);
+	}
+	.krow {
+		width: 100%;
 		display: flex;
 		align-items: center;
 		gap: 12px;
 		padding: 10px 0;
-		border-bottom: 1px solid var(--line);
+		border: 0;
+		background: none;
+		font: inherit;
 		font-size: 14.5px;
 		color: var(--ink-2);
+		text-align: left;
+		cursor: default;
+		transition: color 0.2s ease;
+	}
+	/* Only clickable once the demo script is running. */
+	.is-live .krow {
+		cursor: pointer;
+	}
+	.is-live .krow:hover,
+	.krow.is-now {
+		color: var(--ink);
+	}
+	.is-live .krow:hover kbd,
+	.krow.is-now kbd {
+		border-color: var(--brand);
+	}
+	.krow:focus-visible {
+		outline: 2px solid var(--brand);
+		outline-offset: 2px;
+		border-radius: 6px;
 	}
 	.kc-group {
 		display: inline-flex;
@@ -115,8 +170,10 @@ const board = ["Ctrl", "K", "L", "C", "↑", "↓", "Enter"];
 		border-bottom-width: 2px;
 		background: var(--card);
 		color: var(--ink);
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 12px;
+		transition: border-color 0.2s ease;
 	}
 	.kdemo {
 		padding: clamp(18px, 2.4vw, 32px);
@@ -162,11 +219,105 @@ const board = ["Ctrl", "K", "L", "C", "↑", "↓", "Enter"];
 		letter-spacing: 0.14em;
 		color: #f29cac;
 	}
+	/* What Ctrl L shows before a church picks its own logo: the Crater
+	   mark on a black matte, as on the projector. */
+	.kstate-logo {
+		background: #000;
+	}
 	.kstate-logo :global(.mark) {
 		width: 12cqw;
 		height: 12cqw;
 		--mark-body: #f4f6f8;
 		--brand: #2fd3e6;
+	}
+	/* A stand-in for a looping background video: slow drifting light, with
+	   a play or pause badge and a running progress bar. */
+	.kstate-video {
+		background:
+			radial-gradient(40% 60% at var(--vx, 30%) 40%, rgb(242 156 172 / 0.55), transparent 70%),
+			radial-gradient(50% 70% at calc(100% - var(--vx, 30%)) 70%, rgb(87 31 68 / 0.9), transparent 70%),
+			#1a0c18;
+		animation: kvid 6s ease-in-out infinite alternate;
+	}
+	@property --vx {
+		syntax: "<percentage>";
+		inherits: false;
+		initial-value: 30%;
+	}
+	@keyframes kvid {
+		to {
+			--vx: 70%;
+		}
+	}
+	.kvid-icon {
+		width: 9cqw;
+		height: 9cqw;
+		display: grid;
+		place-items: center;
+		border-radius: 50%;
+		background: rgb(0 0 0 / 0.45);
+		backdrop-filter: blur(6px);
+		opacity: 0;
+	}
+	.kvid-icon svg {
+		width: 45%;
+		height: 45%;
+	}
+	.kvid-bar {
+		position: absolute;
+		left: 6%;
+		right: 6%;
+		bottom: 4%;
+		height: 3px;
+		border-radius: 3px;
+		background: rgb(255 255 255 / 0.2);
+		overflow: hidden;
+	}
+	.kvid-bar i {
+		display: block;
+		height: 100%;
+		background: #fcf3f5;
+		transform-origin: left;
+		animation: kvid-run 12s linear infinite;
+	}
+	@keyframes kvid-run {
+		from {
+			transform: scaleX(0);
+		}
+		to {
+			transform: scaleX(1);
+		}
+	}
+	.kstate-video.is-paused,
+	.kstate-video.is-paused .kvid-bar i {
+		animation-play-state: paused;
+	}
+	.kstate-video .kvid-pause,
+	.kstate-video.is-paused .kvid-play {
+		display: none;
+	}
+	.kstate-video.is-paused .kvid-pause {
+		display: inline;
+	}
+	.kpal.khelp {
+		width: 84%;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 2px 14px;
+		font-size: 1.7cqw;
+	}
+	.khelp-row {
+		display: flex;
+		justify-content: space-between;
+		gap: 8px;
+		padding: 0.9cqw 0.6cqw;
+		border-bottom: 1px solid rgb(255 255 255 / 0.08);
+		color: #a6b0b4;
+	}
+	.khelp-row small {
+		font-size: 1em;
+		color: #eef2f3;
+		white-space: nowrap;
 	}
 	.kpal {
 		width: 62%;
@@ -189,7 +340,8 @@ const board = ["Ctrl", "K", "L", "C", "↑", "↓", "Enter"];
 		padding: 8px 10px;
 		border-radius: 8px;
 		background: rgb(255 255 255 / 0.06);
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 	}
 	.caret {
 		width: 1px;
@@ -211,7 +363,8 @@ const board = ["Ctrl", "K", "L", "C", "↑", "↓", "Enter"];
 		color: #a6b0b4;
 	}
 	.kpal-row small {
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 0.8em;
 	}
 	.kpal-row.is-hit {
@@ -227,7 +380,8 @@ const board = ["Ctrl", "K", "L", "C", "↑", "↓", "Enter"];
 		border-radius: 999px;
 		background: rgb(0 0 0 / 0.55);
 		backdrop-filter: blur(8px);
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 12px;
 		color: #eef2f3;
 		white-space: nowrap;
@@ -266,6 +420,13 @@ const board = ["Ctrl", "K", "L", "C", "↑", "↓", "Enter"];
 	/* Still state for reduced motion and no JS: show the verse. */
 	.kstate[data-k="v16"] {
 		opacity: 1;
+	}
+	/* Beside the demo on a small laptop, two columns squeeze each label
+	   onto three lines. One column reads better there. */
+	@media (min-width: 901px) and (max-width: 1240px) {
+		.klist {
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
 	@media (max-width: 900px) {
 		.keys-grid {

@@ -8,6 +8,7 @@ import Themes from "../components/sections/Themes.astro";
 import Keys from "../components/sections/Keys.astro";
 import Switch from "../components/sections/Switch.astro";
 import Open from "../components/sections/Open.astro";
+import Request from "../components/sections/Request.astro";
 
 import heroConsole from "../assets/shots/hero-console.webp";
 import projScripture from "../assets/shots/proj-scripture.webp";
@@ -224,7 +225,20 @@ const faqs = [
 						))
 					}
 				</div>
-				<div class="wrap reel-progress" aria-hidden="true"><span data-reel-bar></span></div>
+				<div class="wrap reel-progress" aria-hidden="true">
+					<div class="rp">
+						<span class="rp-fill" data-reel-bar></span>
+						{
+							reel.map((r, i) => (
+								<span class="rp-step" data-reel-step style={`--at: ${(i / (reel.length - 1)) * 100}%`}>
+									<i></i>
+									<span>{r.title}</span>
+								</span>
+							))
+						}
+						<span class="rp-head" data-reel-head></span>
+					</div>
+				</div>
 			</div>
 		</section>
 
@@ -380,6 +394,7 @@ const faqs = [
 		</section>
 
 		<Open />
+		<Request />
 
 		<!-- FAQ -->
 		<section id="faq" class="faq wrap">
@@ -731,7 +746,8 @@ const faqs = [
 		border-radius: 6px;
 		background: #c9372c;
 		color: #fff;
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 11px;
 		font-weight: 500;
 		letter-spacing: 0.08em;
@@ -796,9 +812,10 @@ const faqs = [
 	}
 
 	/* FACTS */
+	/* Four, then two by two, then one. Never three and a stray. */
 	.facts {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		grid-template-columns: repeat(4, minmax(0, 1fr));
 		margin-top: 0;
 	}
 	.fact {
@@ -823,7 +840,21 @@ const faqs = [
 		color: var(--ink-2);
 	}
 	@media (max-width: 960px) {
+		.facts {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
 		.fact + .fact {
+			border-left: 0;
+		}
+		.fact:nth-child(even) {
+			border-left: 1px solid var(--line);
+		}
+	}
+	@media (max-width: 520px) {
+		.facts {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.fact:nth-child(even) {
 			border-left: 0;
 		}
 	}
@@ -860,7 +891,7 @@ const faqs = [
 		display: flex;
 		gap: 28px;
 		width: max-content;
-		padding-inline: max(var(--gutter), calc((100vw - var(--wrap)) / 2 + var(--gutter)));
+		padding-inline: clamp(28px, 5.5vw, 104px);
 		will-change: transform;
 	}
 	.reel-item {
@@ -890,7 +921,8 @@ const faqs = [
 		font-size: 16px;
 	}
 	.reel-n {
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 12px;
 		color: var(--brand);
 	}
@@ -901,16 +933,84 @@ const faqs = [
 		margin-left: auto;
 		color: var(--ink-3);
 	}
+	/* A scrubber under the reel: one stop per slide, a lit line up to the
+	   one in view and a glowing head that rides the line. */
 	.reel-progress {
-		height: 2px;
+		padding-bottom: 26px;
 	}
-	.reel-progress span {
-		display: block;
-		height: 100%;
-		background: linear-gradient(90deg, var(--brand), var(--gold));
+	.rp {
+		position: relative;
+		height: 2px;
+		margin-inline: 6px;
+		background: var(--line);
+		border-radius: 2px;
+	}
+	.rp-fill {
+		position: absolute;
+		inset: 0;
+		background: var(--brand);
+		border-radius: inherit;
+		box-shadow: 0 0 12px var(--glow);
 		transform: scaleX(0);
 		transform-origin: left;
-		border-radius: 2px;
+	}
+	.rp-step {
+		position: absolute;
+		left: var(--at);
+		top: 50%;
+	}
+	.rp-step i {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--bg);
+		border: 1.5px solid var(--line-strong);
+		transform: translate(-50%, -50%);
+		transition:
+			background-color 0.3s ease,
+			border-color 0.3s ease;
+	}
+	.rp-step span {
+		position: absolute;
+		top: 12px;
+		left: 0;
+		transform: translateX(-50%);
+		white-space: nowrap;
+		font-size: 12.5px;
+		color: var(--ink-3);
+		transition: color 0.3s ease;
+	}
+	/* The fill comes before the stops and the head after them. */
+	.rp-step:nth-child(2) span {
+		transform: none;
+		left: -4px;
+	}
+	.rp-step:nth-last-child(2) span {
+		transform: translateX(-100%);
+		left: 4px;
+	}
+	.rp-step.is-on i {
+		background: var(--brand);
+		border-color: var(--brand);
+	}
+	.rp-step.is-now span {
+		color: var(--ink);
+	}
+	.rp-head {
+		position: absolute;
+		left: 0;
+		top: 50%;
+		width: 12px;
+		height: 12px;
+		margin: -6px 0 0 -6px;
+		border-radius: 50%;
+		background: var(--brand);
+		box-shadow:
+			0 0 0 5px var(--brand-wash),
+			0 0 18px var(--glow);
 	}
 	@media (max-width: 800px) {
 		.reel {
@@ -975,8 +1075,9 @@ const faqs = [
 		gap: 0;
 		padding: 26px;
 	}
-	.feat-sm h3 {
-		margin-top: 24px;
+	/* Two classes so this beats the .feat h3 reset further down. */
+	.feat.feat-sm h3 {
+		margin-top: 30px;
 		font-size: 21px;
 	}
 	.feat-sm .lede {
@@ -1101,7 +1202,8 @@ const faqs = [
 		align-items: center;
 		gap: 10px;
 		padding: 10px 12px;
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 11px;
 		letter-spacing: 0.08em;
 		color: #9aa5a9;
@@ -1303,7 +1405,8 @@ const faqs = [
 		color: var(--ink);
 	}
 	.tut-n {
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 12px;
 		color: var(--ink-3);
 		transition: color 0.3s ease;
@@ -1450,9 +1553,14 @@ const faqs = [
 		width: 100%;
 		margin-top: 56px;
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: 16px;
 		text-align: left;
+	}
+	@media (max-width: 680px) {
+		.platforms {
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
 	.platform {
 		position: relative;
@@ -1533,7 +1641,8 @@ const faqs = [
 		color: var(--ink);
 	}
 	.foot-h {
-		font-family: var(--font-mono);
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
 		font-size: 12px;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;

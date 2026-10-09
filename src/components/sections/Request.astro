@@ -1,0 +1,181 @@
+---
+// Feature requests. A request form fills itself in as the section scrolls
+// past, then sends. The example is rendered in full for no-JS and reduced
+// motion. The button goes to the request page.
+const REQUEST = "/request";
+const areas = ["Songs", "Scripture", "Stage display", "Streaming", "Media", "Something else"];
+const example = "Import songs from ProPresenter, the way EasyWorship songs come across.";
+---
+
+<section id="request" class="request wrap" data-request>
+	<div class="request-card card" data-reveal="card" data-spot>
+		<div class="request-copy">
+			<p class="eyebrow" data-reveal="up">Feature requests</p>
+			<h2 class="display h2" data-reveal="up">Missing something? <span class="hl" data-hl>Ask for it</span>.</h2>
+			<p class="lede" data-reveal="up">
+				Every church runs its Sunday a little differently. If Crater is missing something you need, tell us. Requests go straight to the people building it and shape what comes next.
+			</p>
+			<a href={REQUEST} class="btn btn-brand" data-magnetic data-reveal="up">
+				Request a feature
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+			</a>
+		</div>
+
+		<div class="rq" aria-label="A feature request being written and sent" role="img">
+			<div class="rq-field">
+				<span class="rq-label">What would help?</span>
+				<p class="rq-input"><span data-rq-typed>{example}</span><i class="rq-caret"></i></p>
+			</div>
+			<div class="rq-field">
+				<span class="rq-label">Which part of Crater?</span>
+				<ul class="rq-chips">
+					{areas.map((a) => <li data-rq-chip={a}>{a}</li>)}
+				</ul>
+			</div>
+			<div class="rq-foot">
+				<span class="rq-sent" data-rq-sent>
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>
+					Sent
+				</span>
+				<span class="rq-send" data-rq-send>Send request</span>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.request {
+		padding-top: 180px;
+	}
+	.request-card {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+		align-items: center;
+		gap: clamp(32px, 5vw, 80px);
+		padding: clamp(28px, 4vw, 64px);
+		overflow: hidden;
+		isolation: isolate;
+	}
+	.request-card::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background: radial-gradient(520px circle at var(--mx, 85%) var(--my, 0%), var(--brand-wash), transparent 60%);
+	}
+	.request-copy h2 {
+		margin-top: 16px;
+	}
+	.request-copy .lede {
+		margin: 20px 0 32px;
+		max-width: 500px;
+	}
+	.rq {
+		display: grid;
+		gap: 22px;
+		padding: clamp(20px, 2.4vw, 32px);
+		border-radius: 18px;
+		background: var(--bg-2);
+		border: 1px solid var(--line);
+	}
+	.rq-field {
+		display: grid;
+		gap: 10px;
+	}
+	.rq-label {
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--ink-2);
+	}
+	.rq-input {
+		min-height: 92px;
+		margin: 0;
+		padding: 14px 16px;
+		border-radius: 12px;
+		border: 1px solid var(--line-strong);
+		background: var(--card);
+		font-size: 15.5px;
+		line-height: 1.5;
+		color: var(--ink);
+	}
+	.rq-caret {
+		display: inline-block;
+		width: 1.5px;
+		height: 1.1em;
+		margin-left: 1px;
+		vertical-align: -0.15em;
+		background: var(--brand);
+		animation: rq-caret 1s steps(1) infinite;
+	}
+	@keyframes rq-caret {
+		50% {
+			opacity: 0;
+		}
+	}
+	.rq-chips {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.rq-chips li {
+		padding: 6px 12px;
+		border-radius: 999px;
+		border: 1px solid var(--line);
+		font-size: 13px;
+		color: var(--ink-3);
+		transition:
+			border-color 0.3s ease,
+			background-color 0.3s ease,
+			color 0.3s ease;
+	}
+	.rq-chips li.is-on {
+		border-color: var(--brand);
+		background: var(--brand-wash);
+		color: var(--brand);
+	}
+	.rq-foot {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 14px;
+	}
+	.rq-send {
+		padding: 10px 18px;
+		border-radius: 999px;
+		background: var(--line);
+		color: var(--ink-3);
+		font-size: 14px;
+		font-weight: 600;
+		transition:
+			background-color 0.3s ease,
+			color 0.3s ease,
+			transform 0.15s ease;
+	}
+	.rq-send.is-ready {
+		background: var(--brand);
+		color: var(--bg);
+	}
+	.rq-sent {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--brand);
+		opacity: 0;
+	}
+	@media (max-width: 900px) {
+		.request-card {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.rq-caret {
+			animation: none;
+		}
+	}
+</style>
