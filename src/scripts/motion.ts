@@ -342,7 +342,7 @@ function afterPaint(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timeli
 /* The hero: the words rise, the console lies back and settles as you
    scroll, the projector floats up past it and the sun keeps rising. */
 function setupHero(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timeline) {
-	const words = $$(".hero-title .w");
+	const words = $$(".hero-title .wi");
 	gsap.set(words, { yPercent: 110 });
 	gsap.set("[data-hero-in]", { y: 24, opacity: 0 });
 	gsap.set(".hero .sun", { yPercent: 30, scale: 0.6, opacity: 0 });

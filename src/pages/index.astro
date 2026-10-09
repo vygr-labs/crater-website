@@ -91,8 +91,8 @@ const faqs = [
 			<div class="sun" aria-hidden="true"></div>
 			<div class="hero-copy wrap">
 				<h1 class="display hero-title" aria-label="Put the Word on the wall.">
-					<span class="line"><span class="w">Put</span> <span class="w">the</span> <span class="w"><span class="hl" data-hl>Word</span></span></span>
-					<span class="line"><span class="w">on</span> <span class="w">the</span> <span class="w">wall.</span></span>
+					<span class="line"><span class="w"><span class="wi">Put</span></span> <span class="w"><span class="wi">the</span></span> <span class="w"><span class="wi"><span class="hl" data-hl>Word</span></span></span></span>
+					<span class="line"><span class="w"><span class="wi">on</span></span> <span class="w"><span class="wi">the</span></span> <span class="w"><span class="wi">wall.</span></span></span>
 				</h1>
 				<p class="hero-lede lede" data-hero-in>
 					Scripture, songs, media and sermon slides on the screen from one calm console. Free for every church, light enough for the laptop already in
@@ -470,12 +470,17 @@ const faqs = [
 	.hero-title .line {
 		display: block;
 	}
+	/* Each word is a window and the word inside rises through it. The
+	   window stays put, so the word is hidden until it comes up. */
 	.hero-title .w {
 		display: inline-block;
 		overflow: clip;
 		overflow-clip-margin: 0.12em;
 		padding-bottom: 0.06em;
 		vertical-align: top;
+	}
+	.hero-title .wi {
+		display: inline-block;
 	}
 	.hero-lede {
 		margin: 28px auto 0;

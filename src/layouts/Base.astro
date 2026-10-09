@@ -53,6 +53,25 @@ const image = new URL("/og.png", Astro.site);
 				addEventListener("load", function () {
 					if (!window.__motion) document.documentElement.classList.remove("js");
 				});
+				// Chrome restores a reload against an element it remembers, and the
+				// pinned scenes move that element, so a reload at the top landed
+				// halfway down the hero. Keep the position ourselves instead and put
+				// it back once the page has its full height.
+				if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+				var key = "crater-y:" + location.pathname;
+				addEventListener("pagehide", function () {
+					try {
+						sessionStorage.setItem(key, String(Math.round(scrollY)));
+					} catch (e) {}
+				});
+				addEventListener("load", function () {
+					var y = 0;
+					try {
+						y = +sessionStorage.getItem(key) || 0;
+						sessionStorage.removeItem(key);
+					} catch (e) {}
+					if (y && !location.hash) requestAnimationFrame(function () { scrollTo(0, y); });
+				});
 			})();
 		</script>
 
