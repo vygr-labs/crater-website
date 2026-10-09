@@ -1,0 +1,56 @@
+---
+import "../styles/global.css";
+
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<meta name="theme-color" content="#07090a" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:type" content="website" />
+		<meta name="twitter:card" content="summary_large_image" />
+
+		<!-- Theme before first paint: a stored choice wins, else dark. Crater
+		     is used in dark rooms, so dark is the default even on a light OS. -->
+		<script is:inline>
+			(function () {
+				var t = "dark";
+				try {
+					t = localStorage.getItem("crater-theme") || "dark";
+				} catch (e) {}
+				document.documentElement.setAttribute("data-theme", t);
+				document.documentElement.classList.add("js");
+			})();
+		</script>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;500;600;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+			rel="stylesheet"
+		/>
+	</head>
+	<body>
+		<div class="grain" aria-hidden="true"></div>
+		<slot />
+		<script>
+			import "../scripts/motion.ts";
+		</script>
+	</body>
+</html>

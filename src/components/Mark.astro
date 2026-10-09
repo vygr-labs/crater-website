@@ -1,0 +1,31 @@
+---
+// The Crater mark: a screen with a cyan sun rising from its lower edge.
+// Drawn inline so the body follows the theme (light on dark, ink on paper).
+interface Props {
+	size?: number;
+}
+const { size = 26 } = Astro.props;
+---
+
+<svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" class="mark">
+	<path fill="var(--mark-body)" d="M6 5H26A4 4 0 0 1 30 9V23A4 4 0 0 1 26 27H25.5A9.5 9.5 0 0 0 6.5 27H6A4 4 0 0 1 2 23V9A4 4 0 0 1 6 5Z"></path>
+	<path class="mark-sun" fill="var(--brand)" d="M10.5 27A5.5 5.5 0 0 1 21.5 27Z"></path>
+</svg>
+
+<style>
+	.mark {
+		flex: none;
+		overflow: visible;
+	}
+	.mark path {
+		transition: fill 0.5s ease;
+	}
+	.mark-sun {
+		transform-box: fill-box;
+		transform-origin: 50% 100%;
+		transition: transform 0.6s var(--ease-out);
+	}
+	:global(a:hover) > .mark .mark-sun {
+		transform: translateY(-2px) scale(1.12);
+	}
+</style>
