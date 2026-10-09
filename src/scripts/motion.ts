@@ -87,54 +87,8 @@ function run() {
 	const sweep = (el: HTMLElement, delay = 0) =>
 		gsap.fromTo(el, { "--p": "0%", "--s": 0 }, { "--p": "100%", "--s": 1, duration: 1.1, delay, ease: "power3.inOut" });
 
-	/* ── Hero intro ────────────────────────────────────────────────────── */
-	const words = $$(".hero-title .w");
-	gsap.set(words, { yPercent: 110 });
-	gsap.set("[data-hero-in]", { y: 24, opacity: 0 });
-	gsap.set(".hero .sun", { yPercent: 30, scale: 0.6, opacity: 0 });
-	gsap.set(".hero .arc", { opacity: 0, scale: 0.9 });
-	gsap.set("[data-screen]", { y: 140, rotateX: 28, scale: 0.9, opacity: 0 });
-	gsap.set("[data-float]", { y: 120, opacity: 0 });
-
-	const intro = gsap.timeline({ defaults: { ease: "expo.out" }, delay: 0.15 });
-	intro
-		.to(".hero .sun", { yPercent: 0, scale: 1, opacity: 1, duration: 2.4, ease: "power2.out" }, 0)
-		.to(".hero .arc", { opacity: 1, scale: 1, duration: 2, ease: "power2.out" }, 0.2)
-		.to(".pill", { y: 0, opacity: 1, duration: 1 }, 0.1)
-		.to(words, { yPercent: 0, duration: 1.3, stagger: 0.07 }, 0.2)
-		.add(() => {
-			const hl = $(".hero-title [data-hl]");
-			if (hl) sweep(hl);
-		}, 0.95)
-		.to(".hero-lede, .hero-ctas, .hero-note", { y: 0, opacity: 1, duration: 1.1, stagger: 0.08 }, 0.6)
-		.to("[data-screen]", { y: 0, opacity: 1, duration: 1.8 }, 0.75)
-		.to("[data-float]", { y: 0, opacity: 1, duration: 1.6 }, 1.15)
-		.fromTo(".screen-sheen", { backgroundPosition: "120% 0" }, { backgroundPosition: "-20% 0", duration: 1.8, ease: "power2.inOut" }, 1.3);
-
-	// Scroll: the console lies back and settles flat, the projector floats
-	// up past it, and the sun keeps rising behind.
-	gsap.fromTo(
-		"[data-screen]",
-		{ rotateX: 28, scale: 0.9 },
-		{
-			rotateX: 0,
-			scale: 1,
-			ease: "none",
-			scrollTrigger: { trigger: ".stage", start: "top 95%", end: "top 25%", scrub: 0.6 },
-			immediateRender: false,
-		},
-	);
-	gsap.to("[data-float]", {
-		yPercent: -40,
-		ease: "none",
-		scrollTrigger: { trigger: ".stage", start: "top 60%", end: "bottom top", scrub: 0.8 },
-	});
-	gsap.to(".hero .sun", {
-		yPercent: -18,
-		scale: 1.12,
-		ease: "none",
-		scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
-	});
+	/* ── Hero intro, on the home page ───────────────────────────────────── */
+	if ($(".hero")) setupHero(sweep);
 
 	/* ── Scroll reveals ────────────────────────────────────────────────── */
 	ScrollTrigger.batch('[data-reveal="up"]', {
@@ -181,7 +135,8 @@ function run() {
 	/* ── The reel: pinned, scrolls sideways ───────────────────────────── */
 	const mm = gsap.matchMedia();
 	mm.add("(min-width: 801px)", () => {
-		const section = $("[data-reel]")!;
+		const section = $("[data-reel]");
+		if (!section) return;
 		const track = $("[data-reel-track]")!;
 		const distance = () => track.scrollWidth - innerWidth;
 		const slide = gsap.to(track, {
@@ -258,11 +213,12 @@ function run() {
 		});
 
 	/* ── Download: a second sunrise, the wordmark climbs out ──────────── */
-	gsap.fromTo(
-		"[data-sun-2]",
-		{ yPercent: 35, scale: 0.6, opacity: 0 },
-		{ yPercent: 0, scale: 1, opacity: 1, ease: "none", scrollTrigger: { trigger: "#download", start: "top 85%", end: "center center", scrub: 0.8 } },
-	);
+	if ($("[data-sun-2]"))
+		gsap.fromTo(
+			"[data-sun-2]",
+			{ yPercent: 35, scale: 0.6, opacity: 0 },
+			{ yPercent: 0, scale: 1, opacity: 1, ease: "none", scrollTrigger: { trigger: "#download", start: "top 85%", end: "center center", scrub: 0.8 } },
+		);
 	gsap.fromTo(
 		"[data-wordmark]",
 		{ yPercent: 45, opacity: 0 },
@@ -329,6 +285,58 @@ function run() {
 	ScrollTrigger.sort();
 	addEventListener("load", () => ScrollTrigger.refresh());
 	document.fonts?.ready.then(() => ScrollTrigger.refresh());
+}
+
+/* The hero: the words rise, the console lies back and settles as you
+   scroll, the projector floats up past it and the sun keeps rising. */
+function setupHero(sweep: (el: HTMLElement, delay?: number) => gsap.core.Tween) {
+	const words = $$(".hero-title .w");
+	gsap.set(words, { yPercent: 110 });
+	gsap.set("[data-hero-in]", { y: 24, opacity: 0 });
+	gsap.set(".hero .sun", { yPercent: 30, scale: 0.6, opacity: 0 });
+	gsap.set(".hero .arc", { opacity: 0, scale: 0.9 });
+	gsap.set("[data-screen]", { y: 140, rotateX: 28, scale: 0.9, opacity: 0 });
+	gsap.set("[data-float]", { y: 120, opacity: 0 });
+
+	const intro = gsap.timeline({ defaults: { ease: "expo.out" }, delay: 0.15 });
+	intro
+		.to(".hero .sun", { yPercent: 0, scale: 1, opacity: 1, duration: 2.4, ease: "power2.out" }, 0)
+		.to(".hero .arc", { opacity: 1, scale: 1, duration: 2, ease: "power2.out" }, 0.2)
+		.to(".pill", { y: 0, opacity: 1, duration: 1 }, 0.1)
+		.to(words, { yPercent: 0, duration: 1.3, stagger: 0.07 }, 0.2)
+		.add(() => {
+			const hl = $(".hero-title [data-hl]");
+			if (hl) sweep(hl);
+		}, 0.95)
+		.to(".hero-lede, .hero-ctas, .hero-note", { y: 0, opacity: 1, duration: 1.1, stagger: 0.08 }, 0.6)
+		.to("[data-screen]", { y: 0, opacity: 1, duration: 1.8 }, 0.75)
+		.to("[data-float]", { y: 0, opacity: 1, duration: 1.6 }, 1.15)
+		.fromTo(".screen-sheen", { backgroundPosition: "120% 0" }, { backgroundPosition: "-20% 0", duration: 1.8, ease: "power2.inOut" }, 1.3);
+
+	// Scroll: the console lies back and settles flat, the projector floats
+	// up past it, and the sun keeps rising behind.
+	gsap.fromTo(
+		"[data-screen]",
+		{ rotateX: 28, scale: 0.9 },
+		{
+			rotateX: 0,
+			scale: 1,
+			ease: "none",
+			scrollTrigger: { trigger: ".stage", start: "top 95%", end: "top 25%", scrub: 0.6 },
+			immediateRender: false,
+		},
+	);
+	gsap.to("[data-float]", {
+		yPercent: -40,
+		ease: "none",
+		scrollTrigger: { trigger: ".stage", start: "top 60%", end: "bottom top", scrub: 0.8 },
+	});
+	gsap.to(".hero .sun", {
+		yPercent: -18,
+		scale: 1.12,
+		ease: "none",
+		scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
+	});
 }
 
 /* The go-live card: the slide waiting in preview flies across into live,

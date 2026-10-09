@@ -2,6 +2,8 @@
 import { Image } from "astro:assets";
 import Base from "../layouts/Base.astro";
 import Mark from "../components/Mark.astro";
+import { CHANNEL, DOCS, osIcon, playlists } from "../lib/site";
+import { getRelease, href } from "../lib/release";
 import Sunday from "../components/sections/Sunday.astro";
 import Screens from "../components/sections/Screens.astro";
 import Themes from "../components/sections/Themes.astro";
@@ -25,24 +27,12 @@ import consoleThemes from "../assets/shots/console-themes.webp";
 import consoleMedia from "../assets/shots/console-media.webp";
 import schedule from "../assets/shots/schedule.webp";
 
-const DOCS = "https://crater.voyagerlabs.tech/";
-const CHANNEL = "https://www.youtube.com/@craterbibleproject";
-const RELEASES = "https://github.com/vygr-labs/crater-v2/releases";
-const LATEST = `${RELEASES}/latest`;
-
-// Same ids and order as HelpLinks.cpp in the app.
-const yt = (id: string) => `https://www.youtube.com/playlist?list=${id}`;
-const playlists = [
-	["Getting started", "PLeTrWoINYOdc"],
-	["Scripture", "PLNO9VmlLIHvc"],
-	["Songs", "PLcyNZxoeJ3Jg"],
-	["Media and sermon slides", "PLBAJHRdNjqYQ"],
-	["Planning the service", "PLXZDtD0pzOe0"],
-	["Themes", "PLdevLN2YWRz4"],
-	["Screens and streaming", "PLeIJbC4poGcQ"],
-	["Settings and profiles", "PLegIh7LuDbIU"],
-	["Keyboard shortcuts", "PLaRLc4BRkAx0"],
-].map(([label, id], i) => ({ label, url: yt(id), n: String(i + 1).padStart(2, "0") }));
+const release = await getRelease();
+const platforms = [
+	{ name: "Windows", icon: osIcon.windows, note: "Installer for Windows 10 and 11", asset: release.assets.winSetup },
+	{ name: "macOS", icon: osIcon.mac, note: "Apple silicon and Intel", asset: release.assets.macDmg },
+	{ name: "Linux", icon: osIcon.linux, note: "AppImage for x86-64", asset: release.assets.linux },
+];
 
 const reel = [
 	{ img: projSongReel, title: "Songs", note: "Lyrics, verse by verse", alt: "It Is Well with My Soul on the projector" },
@@ -95,29 +85,6 @@ const faqs = [
 	title="Crater · Free worship projection for churches"
 	description="Free, open source worship projection software. Scripture, songs, media and sermon slides on the screen from one calm console. Windows, macOS and Linux."
 >
-	<div class="progress" aria-hidden="true"></div>
-	<header class="nav-wrap">
-		<nav class="nav" aria-label="Main">
-			<a href="#top" class="brand" aria-label="Crater home">
-				<Mark size={26} />
-				<span>Crater</span>
-			</a>
-			<div class="nav-links">
-				<a href="#features">Features</a>
-				<a href="#room">On screen</a>
-				<a href="#tutorials">Tutorials</a>
-				<a href={DOCS} target="_blank" rel="noopener">Docs</a>
-			</div>
-			<div class="nav-end">
-				<button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to light mode">
-					<svg class="i-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
-					<svg class="i-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11Z"></path></svg>
-				</button>
-				<a href="#download" class="nav-cta" data-magnetic>Download</a>
-			</div>
-		</nav>
-	</header>
-
 	<main>
 		<!-- HERO -->
 		<section id="top" class="hero">
@@ -186,12 +153,12 @@ const faqs = [
 				<span class="fact-l">On every machine, for good</span>
 			</div>
 			<div class="fact" data-reveal="up">
-				<span class="fact-n"><span data-count="1.5" data-decimals="1">1.5</span> s</span>
-				<span class="fact-l">From click to ready</span>
+				<span class="fact-n"><span data-count="14">14</span></span>
+				<span class="fact-l">Bible translations included</span>
 			</div>
 			<div class="fact" data-reveal="up">
 				<span class="fact-n"><span data-count="4">4</span> GB</span>
-				<span class="fact-l">Of RAM is plenty</span>
+				<span class="fact-l">Of RAM is all it needs</span>
 			</div>
 			<div class="fact" data-reveal="up">
 				<span class="fact-n"><span data-count="3">3</span></span>
@@ -427,180 +394,24 @@ const faqs = [
 				<h2 class="display download-title" data-reveal="up">Ready for <span class="hl" data-hl>Sunday</span>.</h2>
 				<p class="lede" data-reveal="up">Pick your computer, run the installer, open your first service. That is the whole setup.</p>
 				<div class="platforms">
-					<a href={LATEST} target="_blank" rel="noopener" class="platform" data-reveal="card" data-spot>
-						<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.5 4.5v7H3zM11.5 4.4 21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zM11.5 12.5H21V21l-9.5-1.4z"></path></svg>
-						<span class="p-name">Windows</span>
-						<span class="p-note">Installer for Windows 10 and 11</span>
-					</a>
-					<a href={LATEST} target="_blank" rel="noopener" class="platform" data-reveal="card" data-spot>
-						<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"></rect><path d="M8 21h8M12 17v4"></path></svg>
-						<span class="p-name">macOS</span>
-						<span class="p-note">Apple silicon and Intel</span>
-					</a>
-					<a href={LATEST} target="_blank" rel="noopener" class="platform" data-reveal="card" data-spot>
-						<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 17 6-6-6-6M12 19h8"></path></svg>
-						<span class="p-name">Linux</span>
-						<span class="p-note">AppImage for x86-64</span>
-					</a>
+					{
+						platforms.map((p) => (
+							<a href={href(p.asset)} class="platform" data-reveal="card" data-spot>
+								<Fragment set:html={p.icon} />
+								<span class="p-name">{p.name}</span>
+								<span class="p-note">{p.note}{p.asset && ` · ${p.asset.size}`}</span>
+							</a>
+						))
+					}
 				</div>
-				<p class="dl-note" data-reveal="up">About 200 MB · <a href={RELEASES} target="_blank" rel="noopener" class="u-link">All releases</a></p>
+				<p class="dl-note" data-reveal="up">{release.version && `${release.version} · `}<a href="/download" class="u-link">Other downloads and install help</a></p>
 			</div>
 		</section>
 	</main>
 
-	<footer class="footer">
-		<div class="wrap foot-top">
-			<div class="foot-brand">
-				<a href="#top" class="brand"><Mark size={24} /><span>Crater</span></a>
-				<p>Free, open source worship projection. Built for the church and given back to it.</p>
-			</div>
-			<div class="foot-cols">
-				<div>
-					<span class="foot-h">Product</span>
-					<a href="#features">Features</a>
-					<a href="#tutorials">Tutorials</a>
-					<a href="#download">Download</a>
-				</div>
-				<div>
-					<span class="foot-h">Project</span>
-					<a href={DOCS} target="_blank" rel="noopener">Documentation</a>
-					<a href="https://github.com/vygr-labs/crater-v2" target="_blank" rel="noopener">Source on GitHub</a>
-					<a href={CHANNEL} target="_blank" rel="noopener">YouTube</a>
-				</div>
-			</div>
-		</div>
-		<div class="wordmark" aria-hidden="true" data-wordmark>Crater</div>
-		<div class="wrap foot-bottom">
-			<span>Love and peace to you all by the mercies of our God.</span>
-			<span>© 2026 Crater</span>
-		</div>
-	</footer>
 </Base>
 
 <style>
-	/* NAV */
-	.nav-wrap {
-		position: fixed;
-		inset: 0 0 auto;
-		z-index: 50;
-		display: flex;
-		justify-content: center;
-		padding: 18px var(--gutter) 0;
-		pointer-events: none;
-	}
-	.nav {
-		pointer-events: auto;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 8px;
-		width: 100%;
-		max-width: calc(var(--wrap) - 2 * var(--gutter));
-		padding: 8px 8px 8px 18px;
-		border-radius: 999px;
-		background: var(--nav);
-		border: 1px solid var(--line);
-		backdrop-filter: blur(16px) saturate(1.4);
-		-webkit-backdrop-filter: blur(16px) saturate(1.4);
-		transition:
-			transform 0.6s var(--ease-out),
-			background-color 0.5s ease,
-			border-color 0.5s ease;
-	}
-	:global(.nav-hidden) .nav {
-		transform: translateY(-140%);
-	}
-	.brand {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		font-family: var(--font-display);
-		font-weight: 600;
-		font-size: 19px;
-		letter-spacing: -0.01em;
-	}
-	.nav-links {
-		display: flex;
-		gap: 4px;
-		font-size: 15px;
-		color: var(--ink-2);
-	}
-	.nav-links a {
-		position: relative;
-		padding: 10px 14px;
-		transition: color 0.25s ease;
-	}
-	.nav-links a::after {
-		content: "";
-		position: absolute;
-		left: 14px;
-		right: 14px;
-		bottom: 6px;
-		height: 1px;
-		background: currentColor;
-		transform: scaleX(0);
-		transform-origin: right;
-		transition: transform 0.45s var(--ease-out);
-	}
-	.nav-links a:hover {
-		color: var(--ink);
-	}
-	.nav-links a:hover::after {
-		transform: scaleX(1);
-		transform-origin: left;
-	}
-	.nav-end {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-	}
-	.theme-toggle {
-		position: relative;
-		width: 44px;
-		height: 44px;
-		border-radius: 999px;
-		border: 1px solid var(--line);
-		background: transparent;
-		color: var(--ink-2);
-		display: grid;
-		place-items: center;
-		cursor: pointer;
-		overflow: hidden;
-		transition: color 0.25s ease, border-color 0.25s ease;
-	}
-	.theme-toggle:hover {
-		color: var(--ink);
-		border-color: var(--line-strong);
-	}
-	.theme-toggle svg {
-		grid-area: 1 / 1;
-		transition:
-			transform 0.6s var(--ease-out),
-			opacity 0.4s ease;
-	}
-	:global([data-theme="dark"]) .i-moon,
-	:global([data-theme="light"]) .i-sun {
-		transform: translateY(140%) rotate(90deg);
-		opacity: 0;
-	}
-	.nav-cta {
-		display: inline-flex;
-		align-items: center;
-		height: 44px;
-		padding: 0 20px;
-		border-radius: 999px;
-		background: var(--ink);
-		color: var(--bg);
-		font-weight: 600;
-		font-size: 15px;
-		transition: transform 0.4s var(--ease-out), background-color 0.5s ease, color 0.5s ease;
-	}
-	@media (max-width: 720px) {
-		.nav-links {
-			display: none;
-		}
-	}
-
 	/* HERO */
 	.hero {
 		position: relative;
@@ -1601,74 +1412,4 @@ const faqs = [
 		color: var(--ink-2);
 	}
 
-	/* FOOTER */
-	.footer {
-		margin-top: 180px;
-		border-top: 1px solid var(--line);
-		padding-top: 56px;
-		overflow: hidden;
-	}
-	.foot-top {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 48px;
-		justify-content: space-between;
-	}
-	.foot-brand {
-		max-width: 340px;
-	}
-	.foot-brand p {
-		margin: 14px 0 0;
-		font-size: 15px;
-		color: var(--ink-3);
-	}
-	.foot-cols {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 64px;
-		font-size: 15px;
-	}
-	.foot-cols div {
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-	}
-	.foot-cols a {
-		color: var(--ink-2);
-		transition: color 0.25s ease;
-	}
-	.foot-cols a:hover {
-		color: var(--ink);
-	}
-	.foot-h {
-		font-family: var(--font-body);
-		font-variant-numeric: tabular-nums;
-		font-size: 12px;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		color: var(--ink-3);
-	}
-	.wordmark {
-		margin-top: 56px;
-		font-family: var(--font-display);
-		font-weight: 700;
-		font-size: clamp(120px, 27vw, 400px);
-		line-height: 0.8;
-		letter-spacing: -0.06em;
-		text-align: center;
-		color: transparent;
-		background: linear-gradient(180deg, var(--line-strong), transparent 85%);
-		-webkit-background-clip: text;
-		background-clip: text;
-		user-select: none;
-	}
-	.foot-bottom {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 12px;
-		justify-content: space-between;
-		padding-block: 24px 40px;
-		font-size: 14px;
-		color: var(--ink-3);
-	}
 </style>

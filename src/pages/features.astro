@@ -1,0 +1,383 @@
+---
+import { Image } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import PageHead from "../components/PageHead.astro";
+import Switch from "../components/sections/Switch.astro";
+import { DOCS } from "../lib/site";
+
+import consoleScripture from "../assets/shots/console-scripture.webp";
+import projStrongs from "../assets/shots/proj-strongs.webp";
+import projSongReel from "../assets/shots/proj-song-reel.webp";
+import consoleMedia from "../assets/shots/console-media.webp";
+import projSong from "../assets/shots/proj-song.webp";
+import schedule from "../assets/shots/schedule.webp";
+import projStage from "../assets/shots/proj-stage.webp";
+import projSongCyan from "../assets/shots/proj-song-cyan.webp";
+import consoleThemes from "../assets/shots/console-themes.webp";
+import projCountdown from "../assets/shots/proj-countdown.webp";
+
+// Every line here comes from the documentation, so it holds for the
+// current release. Docs paths are relative to the docs site.
+const areas = [
+	{
+		id: "scripture",
+		title: "Scripture",
+		lede: "Find any verse in seconds, whether you know the reference or only remember a few words.",
+		img: consoleScripture,
+		alt: "Scripture search results for John 3 16",
+		points: [
+			"Fourteen English translations included: AMPC, ASV, CEV, ESV, GNT, KJV, MSG, NASB2020, NIV, NKJV, NLT, RSV, TLV and TPT.",
+			'Type "jn 3 16", "1 cor 13 4" or "ps 23" and Crater goes straight there. Small spelling mistakes are fine.',
+			"Search by the words you remember when the reference slips your mind.",
+			'Ranges like "John 3:16-18" select together, and "jn 3:16 niv" switches translation as you type.',
+		],
+		docs: "features/scriptures/",
+	},
+	{
+		id: "strongs",
+		title: "Strong's",
+		lede: "Word studies without leaving the console.",
+		img: projStrongs,
+		alt: "A Strong's definition for agape on the projector",
+		points: [
+			"All 14,700 Strong's entries, Hebrew and Greek, with the original word, transliteration and definition.",
+			"A King James reader with each tagged word linked to its number.",
+			"Put a definition on the screen when the sermon turns on a word.",
+		],
+		docs: "features/strongs/",
+	},
+	{
+		id: "songs",
+		title: "Songs",
+		lede: "Your church's song library, ready verse by verse.",
+		img: projSongReel,
+		alt: "It Is Well with My Soul on the projector",
+		points: [
+			"Each section of a song is its own slide, labelled with its name, so a repeated chorus is one click away.",
+			"Favourites and collections keep this season's songs close.",
+			"Bold, italic, underline and colour on any words in a lyric.",
+			"Change a song for one service only and the library copy stays as it was.",
+			"Bring your songs across from EasyWorship 6 and 7, with authors, copyright and CCLI numbers.",
+		],
+		docs: "features/songs/",
+	},
+	{
+		id: "media",
+		title: "Media",
+		lede: "Announcement slides, countdown videos, sermon illustrations and backgrounds.",
+		img: consoleMedia,
+		alt: "The media library with a countdown in preview and live",
+		points: [
+			"Pictures in PNG, JPEG, GIF, BMP and WebP. Videos in MP4, MOV, M4V, WebM, MKV and AVI.",
+			"PDFs too, with each page becoming a slide.",
+			"Fit, crop, loop and mute for each item.",
+			"Your church logo one shortcut away, for the moments between.",
+		],
+		docs: "features/media/",
+	},
+	{
+		id: "presentations",
+		title: "Sermon slides",
+		lede: "Write the deck in Crater. The room sees the slides and the preacher sees the notes.",
+		img: projStage,
+		alt: "The stage display with the current slide, what comes next and a clock",
+		points: [
+			"Slide designs for a title, a section divider, title and content, two columns, a quote, a full picture or a blank slide.",
+			"Speaker notes that show on the stage monitor and never on the congregation's screen.",
+		],
+		docs: "features/presentations/",
+	},
+	{
+		id: "schedule",
+		title: "Order of service",
+		lede: "Plan it in the week and run it on Sunday.",
+		img: schedule,
+		alt: "The schedule with songs, a reading, sermon slides and a video in order",
+		points: [
+			"Songs, readings, media and slides in one list, in the order you'll use them.",
+			"Drag to reorder. It saves itself a few seconds after every change.",
+			"Keep schedules for later and load them again.",
+		],
+		docs: "features/schedules/",
+	},
+	{
+		id: "screens",
+		title: "Screens",
+		lede: "One screen works. Add more as the room needs them.",
+		img: projSong,
+		alt: "The first verse of Amazing Grace on the projector",
+		points: [
+			"A stage monitor for the platform, with the words large, speaker notes, what's next and a clock.",
+			"Mirror screens for a lobby TV or overflow room, each with its own theme.",
+			"Transitions from instant to a slow one second fade.",
+			"Cast the live screen to a TV or phone browser on the same network, with no cable.",
+			"With one display, the projection can sit full size behind the console while you prepare at home.",
+		],
+		docs: "features/outputs/",
+	},
+	{
+		id: "streaming",
+		title: "Streaming",
+		lede: "Send the screen into OBS, vMix or Streamlabs over NDI on Windows. No capture card.",
+		img: projSongCyan,
+		alt: "Lyrics on screen in the cyan theme",
+		points: [
+			"Streams even with no projector attached.",
+			"Give the stream its own look, like a lower third.",
+			"Hide pictures and video on the stream while lyrics and scripture still go out.",
+			"An on-demand mode for slow laptops that only sends a frame when something changes.",
+		],
+		docs: "features/ndi-streaming/",
+	},
+	{
+		id: "themes",
+		title: "Themes",
+		lede: "Backgrounds, fonts, colours and text position, set once and reused every week.",
+		img: consoleThemes,
+		alt: "The theme editor",
+		points: [
+			"Separate themes for songs, scripture and presentations.",
+			"A default theme for each screen, so the stage and the lobby can look different.",
+			"Export a theme as a single file and import one from another church.",
+		],
+		docs: "features/themes/",
+	},
+	{
+		id: "everyday",
+		title: "Every week",
+		lede: "The small things that make Sunday calm.",
+		img: projCountdown,
+		alt: "A countdown on the projector before the service",
+		points: [
+			"Works fully offline. No accounts, no analytics and no tracking.",
+			"The console speaks 21 languages and picks your computer's language by itself.",
+			"Updates are checked against a published SHA-256 checksum, and nothing installs until you click.",
+			"Updates keep your songs, themes, schedules, media and settings.",
+			"Keyboard shortcuts for everything that matters mid-service.",
+		],
+		docs: "reference/keyboard-shortcuts/",
+	},
+];
+---
+
+<Base title="Features · Crater" description="Everything Crater does: scripture, Strong's, songs, media, sermon slides, schedules, stage display, NDI streaming and themes.">
+	<main>
+		<PageHead lede="Scripture, songs, media and slides, with the screens and the stream around them. All of it free.">
+			Everything Crater <span class="hl" data-hl>does</span>.
+		</PageHead>
+
+		<div class="wrap fx">
+			<nav class="fx-index" aria-label="On this page">
+				<ul>
+					{areas.map((a) => <li><a href={`#${a.id}`}>{a.title}</a></li>)}
+				</ul>
+			</nav>
+			<div class="fx-list">
+				{
+					areas.map((a, i) => (
+						<section id={a.id} class="fx-item">
+							<div class="fx-copy" data-reveal="up">
+								<span class="fx-n">{String(i + 1).padStart(2, "0")}</span>
+								<h2 class="display fx-title">{a.title}</h2>
+								<p class="lede">{a.lede}</p>
+								<ul class="fx-points">
+									{a.points.map((p) => <li>{p}</li>)}
+								</ul>
+								<a href={DOCS + a.docs} target="_blank" rel="noopener" class="fx-more">
+									Read the guide
+									<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+								</a>
+							</div>
+							<div class="fx-shot" data-reveal="card" data-parallax-box>
+								<Image src={a.img} alt={a.alt} widths={[640, 1200]} sizes="(max-width: 900px) 100vw, 46vw" data-parallax />
+							</div>
+						</section>
+					))
+				}
+			</div>
+		</div>
+
+		<Switch />
+
+		<section class="wrap fx-end">
+			<div class="card fx-cta" data-reveal="card">
+				<h2 class="display h2">Something missing?</h2>
+				<p class="lede">Tell us what your Sunday needs. Requests go straight to the people building Crater.</p>
+				<div class="fx-cta-row">
+					<a href="/request" class="btn btn-brand" data-magnetic>Request a feature</a>
+					<a href="/download" class="btn btn-ghost" data-magnetic>Download Crater</a>
+				</div>
+			</div>
+		</section>
+	</main>
+</Base>
+
+<style>
+	.fx {
+		margin-top: 96px;
+		display: grid;
+		grid-template-columns: 200px minmax(0, 1fr);
+		gap: clamp(32px, 5vw, 80px);
+		align-items: start;
+	}
+	.fx-index {
+		position: sticky;
+		top: 110px;
+	}
+	.fx-index ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 2px;
+		border-left: 1px solid var(--line);
+	}
+	.fx-index a {
+		display: block;
+		padding: 7px 0 7px 16px;
+		margin-left: -1px;
+		border-left: 1px solid transparent;
+		font-size: 15px;
+		color: var(--ink-3);
+		transition:
+			color 0.25s ease,
+			border-color 0.25s ease;
+	}
+	.fx-index a:hover,
+	.fx-index a.is-now {
+		color: var(--ink);
+		border-color: var(--brand);
+	}
+	.fx-list {
+		display: grid;
+		gap: clamp(72px, 9vw, 140px);
+	}
+	.fx-item {
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+		gap: clamp(28px, 4vw, 64px);
+		align-items: center;
+		scroll-margin-top: 110px;
+	}
+	.fx-n {
+		font-variant-numeric: tabular-nums;
+		font-size: 13px;
+		color: var(--brand);
+	}
+	.fx-title {
+		margin-top: 10px;
+		font-size: clamp(30px, 3vw, 42px);
+		line-height: 1.05;
+		letter-spacing: -0.03em;
+	}
+	.fx-copy .lede {
+		margin: 14px 0 0;
+	}
+	.fx-points {
+		margin: 22px 0 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		gap: 12px;
+		font-size: 15.5px;
+		line-height: 1.5;
+		color: var(--ink-2);
+	}
+	.fx-points li {
+		position: relative;
+		padding-left: 22px;
+	}
+	.fx-points li::before {
+		content: "";
+		position: absolute;
+		left: 2px;
+		top: 0.62em;
+		width: 6px;
+		height: 6px;
+		border-radius: 1.5px;
+		background: var(--brand);
+		transform: rotate(45deg);
+	}
+	.fx-more {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		margin-top: 24px;
+		font-weight: 600;
+		font-size: 15px;
+		color: var(--brand);
+	}
+	.fx-more svg {
+		transition: transform 0.4s var(--ease-out);
+	}
+	.fx-more:hover svg {
+		transform: translateX(4px);
+	}
+	.fx-shot {
+		border-radius: 14px;
+		overflow: hidden;
+		border: 1px solid var(--line-strong);
+		box-shadow: 0 30px 80px -30px var(--shadow);
+	}
+	.fx-shot :global(img) {
+		width: 100%;
+		transform: scale(1.06);
+	}
+	.fx-item:nth-child(even) .fx-shot {
+		order: -1;
+	}
+	.fx-end {
+		padding-top: 160px;
+	}
+	.fx-cta {
+		padding: clamp(32px, 5vw, 72px);
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	.fx-cta .lede {
+		margin: 18px auto 0;
+		max-width: 520px;
+	}
+	.fx-cta-row {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 12px;
+		margin-top: 32px;
+	}
+	@media (max-width: 1180px) {
+		.fx {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.fx-index {
+			display: none;
+		}
+	}
+	@media (max-width: 900px) {
+		.fx-item {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.fx-item .fx-shot,
+		.fx-item:nth-child(even) .fx-shot {
+			order: -1;
+		}
+	}
+</style>
+
+<script>
+	// Light up the index entry for the section in view.
+	const links = Array.from(document.querySelectorAll<HTMLAnchorElement>(".fx-index a"));
+	const byId = new Map(links.map((a) => [a.hash.slice(1), a]));
+	const io = new IntersectionObserver(
+		(entries) =>
+			entries.forEach((e) => {
+				if (!e.isIntersecting) return;
+				links.forEach((a) => a.classList.remove("is-now"));
+				byId.get(e.target.id)?.classList.add("is-now");
+			}),
+		{ rootMargin: "-45% 0px -50% 0px" },
+	);
+	document.querySelectorAll(".fx-item").forEach((s) => io.observe(s));
+</script>

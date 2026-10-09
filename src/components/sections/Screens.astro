@@ -48,8 +48,8 @@ const outputs = [
 				<article class={`out out-${i}`} data-out>
 					<div class="out-shot">
 						<Image src={o.img} alt={o.alt} widths={[400, 640]} sizes="260px" />
-						<span class="out-tag">{o.tag}</span>
 					</div>
+					<span class="out-tag">{o.tag}</span>
 					<h3>{o.title}</h3>
 					<p>{o.body}</p>
 				</article>
@@ -173,18 +173,26 @@ const outputs = [
 		transform: translateY(-4px);
 		box-shadow: 0 20px 50px -20px var(--glow);
 	}
+	.out:hover .out-tag {
+		transform: translateY(calc(-50% - 4px));
+	}
 	.out-shot :global(img) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 	}
+	/* The tag sits on the frame's top edge so it never covers the slide. */
 	.out-tag {
 		position: absolute;
-		left: 8px;
-		top: 8px;
+		left: 10px;
+		top: 0;
+		z-index: 1;
+		transform: translateY(-50%);
 		padding: 2px 7px;
 		border-radius: 4px;
-		background: rgb(0 0 0 / 0.6);
+		background: #06090a;
+		border: 1px solid var(--line-strong);
+		transition: transform 0.5s var(--ease-out);
 		color: #2fd3e6;
 		font-family: var(--font-body);
 		font-variant-numeric: tabular-nums;
@@ -220,9 +228,16 @@ const outputs = [
 		.map-lines {
 			display: none;
 		}
+		.hub {
+			position: static;
+		}
+		.out {
+			position: relative;
+			left: auto;
+			top: auto;
+		}
 		.hub,
 		.out {
-			position: static;
 			width: auto;
 			transform: none;
 		}

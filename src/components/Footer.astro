@@ -1,0 +1,119 @@
+---
+import Mark from "./Mark.astro";
+import { CHANNEL, DOCS, ISSUES, RELEASES, REPO } from "../lib/site";
+---
+
+<footer class="footer">
+	<div class="wrap foot-top">
+		<div class="foot-brand">
+			<a href="/" class="brand"><Mark size={24} /><span>Crater</span></a>
+			<p>Free, open source worship projection. Built for the church and given back to it.</p>
+		</div>
+		<div class="foot-cols">
+			<div>
+				<span class="foot-h">Product</span>
+				<a href="/features">Features</a>
+				<a href="/download">Download</a>
+				<a href={RELEASES} target="_blank" rel="noopener">Release notes</a>
+			</div>
+			<div>
+				<span class="foot-h">Help</span>
+				<a href="/tutorials">Tutorials</a>
+				<a href={DOCS} target="_blank" rel="noopener">Documentation</a>
+				<a href="/request">Request a feature</a>
+				<a href={ISSUES} target="_blank" rel="noopener">Report a bug</a>
+			</div>
+			<div>
+				<span class="foot-h">Project</span>
+				<a href={REPO} target="_blank" rel="noopener">Source on GitHub</a>
+				<a href={CHANNEL} target="_blank" rel="noopener">YouTube</a>
+			</div>
+		</div>
+	</div>
+	<div class="wordmark" aria-hidden="true" data-wordmark>Crater</div>
+	<div class="wrap foot-bottom">
+		<span>Love and peace to you all by the mercies of our God.</span>
+		<span>© 2026 Crater</span>
+	</div>
+</footer>
+
+<style>
+	.footer {
+		margin-top: 180px;
+		border-top: 1px solid var(--line);
+		padding-top: 56px;
+		overflow: hidden;
+	}
+	.foot-top {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 48px;
+		justify-content: space-between;
+	}
+	.brand {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 19px;
+		letter-spacing: -0.01em;
+	}
+	.foot-brand {
+		max-width: 340px;
+	}
+	.foot-brand p {
+		margin: 14px 0 0;
+		font-size: 15px;
+		color: var(--ink-3);
+	}
+	.foot-cols {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 40px 64px;
+		font-size: 15px;
+	}
+	.foot-cols div {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	.foot-cols a {
+		color: var(--ink-2);
+		transition: color 0.25s ease;
+	}
+	.foot-cols a:hover {
+		color: var(--ink);
+	}
+	.foot-h {
+		font-family: var(--font-body);
+		font-variant-numeric: tabular-nums;
+		font-size: 12px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+	}
+	.wordmark {
+		margin-top: 56px;
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(120px, 27vw, 400px);
+		line-height: 0.8;
+		letter-spacing: -0.06em;
+		text-align: center;
+		color: transparent;
+		background: linear-gradient(180deg, var(--line-strong), transparent 85%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		user-select: none;
+	}
+	.foot-bottom {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		justify-content: space-between;
+		padding-block: 24px 40px;
+		font-size: 14px;
+		color: var(--ink-3);
+	}
+</style>

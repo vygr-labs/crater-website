@@ -1,0 +1,351 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHead from "../components/PageHead.astro";
+import { DOCS, ISSUES, RELEASES, osIcon } from "../lib/site";
+import { getRelease, href } from "../lib/release";
+
+const release = await getRelease();
+const { assets } = release;
+
+// Install notes come from the installation guide in the docs.
+const systems = [
+	{
+		id: "windows",
+		name: "Windows",
+		icon: osIcon.windows,
+		needs: "Windows 10 or 11, 64-bit",
+		main: { label: "Download the installer", asset: assets.winSetup },
+		alt: { label: "Portable zip", asset: assets.winZip },
+		steps: [
+			"Run the installer from your Downloads folder.",
+			"Crater isn't code-signed yet, so Windows may say it protected your PC. Click More info, then Run anyway.",
+			"Click Yes when Windows asks for permission, then follow the wizard.",
+		],
+		guide: "getting-started/installation/#windows",
+	},
+	{
+		id: "mac",
+		name: "macOS",
+		icon: osIcon.mac,
+		needs: "macOS 14 Sonoma or later, Apple silicon or Intel",
+		main: { label: "Download the disk image", asset: assets.macDmg },
+		alt: { label: "Zip of the app", asset: assets.macZip },
+		steps: [
+			"Open the disk image and drag Crater onto Applications.",
+			"Crater isn't signed with an Apple Developer ID yet, so macOS blocks the first launch.",
+			"Open System Settings, then Privacy & Security, and click Open Anyway. You only do this once.",
+		],
+		guide: "getting-started/installation/#macos",
+	},
+	{
+		id: "linux",
+		name: "Linux",
+		icon: osIcon.linux,
+		needs: "64-bit, glibc 2.35 or newer: Ubuntu 22.04, Debian 12, Fedora 36 and later",
+		main: { label: "Download the AppImage", asset: assets.linux },
+		alt: null,
+		steps: [
+			"The AppImage is the whole app in one file, with nothing to install.",
+			"Right-click it, choose Properties and turn on Executable as Program. Or run chmod +x on it.",
+			"Double-click the file to open Crater.",
+		],
+		guide: null,
+	},
+];
+
+const reqs = [
+	["Memory", "4 GB of RAM"],
+	["Graphics", "On Windows, a graphics chip with Direct3D 11. Intel HD 4000 class laptops and newer."],
+	["Disk", "About 1 GB free. The Bible library adds about 300 MB after the first launch, and imported media is copied in."],
+	["Screens", "One works. A second screen, projector or TV is recommended for the room."],
+];
+---
+
+<Base title="Download · Crater" description="Download Crater for Windows, macOS and Linux. Free, with no account, no trial and no licence.">
+	<main>
+		<PageHead lede="Free on as many computers as you like. No account, no trial, no licence.">
+			Download <span class="hl" data-hl>Crater</span>.
+			<p slot="after" class="dl-ver" data-reveal="up">
+				{release.version ? `${release.version}, released ${release.date}` : "The latest release"}{" · "}
+				<a href={release.notes} target="_blank" rel="noopener" class="u-link">What's new</a>
+			</p>
+		</PageHead>
+
+		<section class="wrap dl" data-dl>
+			{
+				systems.map((s) => (
+					<article class="card dl-os" data-os={s.id} data-reveal="card">
+						<div class="dl-head">
+							<Fragment set:html={s.icon} />
+							<h2>{s.name}</h2>
+							<span class="dl-yours" data-yours hidden>Your computer</span>
+						</div>
+						<p class="dl-needs">{s.needs}</p>
+						<a href={href(s.main.asset)} class="btn btn-brand dl-main" data-magnetic>
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14" /></svg>
+							{s.main.label}
+						</a>
+						<p class="dl-size">
+							{s.main.asset ? s.main.asset.size : "From the releases page"}
+							{s.alt && (
+								<>
+									{" · "}
+									<a href={href(s.alt.asset)} class="u-link">{s.alt.label}</a>
+									{s.alt.asset && ` (${s.alt.asset.size})`}
+								</>
+							)}
+						</p>
+						<ol class="dl-steps">
+							{s.steps.map((t) => <li>{t}</li>)}
+						</ol>
+						{s.guide && (
+							<a href={DOCS + s.guide} target="_blank" rel="noopener" class="dl-guide">
+								Step by step, with pictures
+							</a>
+						)}
+					</article>
+				))
+			}
+		</section>
+
+		<section class="wrap dl-more">
+			<div class="dl-req">
+				<h2 class="display h2" data-reveal="up">What it <span class="hl" data-hl>needs</span>.</h2>
+				<p class="lede" data-reveal="up">Crater is made for the laptop already in the booth.</p>
+			</div>
+			<dl class="dl-table">
+				{
+					reqs.map(([k, v]) => (
+						<div data-reveal="row">
+							<dt>{k}</dt>
+							<dd>{v}</dd>
+						</div>
+					))
+				}
+			</dl>
+		</section>
+
+		<section class="wrap dl-notes">
+			<div class="dl-note-card" data-reveal="up">
+				<h3>Updating</h3>
+				<p>
+					Crater checks for a new version once a day and puts a dot on the Settings gear when there is one. Nothing downloads until you click, and your songs, themes and
+					schedules stay as they are.
+				</p>
+			</div>
+			<div class="dl-note-card" data-reveal="up">
+				<h3>Checking a download</h3>
+				<p>
+					Every release lists the SHA-256 checksum of each file in{" "}
+					<a href={href(assets.sums)} class="u-link">SHA256SUMS.txt</a>. The built-in updater checks it for you.
+				</p>
+			</div>
+			<div class="dl-note-card" data-reveal="up">
+				<h3>Older versions</h3>
+				<p>
+					Every release and its notes are on <a href={RELEASES} target="_blank" rel="noopener" class="u-link">GitHub</a>. Stuck? <a href={ISSUES} target="_blank" rel="noopener" class="u-link">Open an issue</a> and we'll help.
+				</p>
+			</div>
+		</section>
+	</main>
+</Base>
+
+<script>
+	// Point out the visitor's own system. The page reads fine without it.
+	const ua = navigator.userAgent;
+	const os = /Windows/.test(ua) ? "windows" : /Mac OS X|Macintosh/.test(ua) && !/iPhone|iPad/.test(ua) ? "mac" : /Linux/.test(ua) && !/Android/.test(ua) ? "linux" : null;
+	const card = os && document.querySelector<HTMLElement>(`[data-os="${os}"]`);
+	if (card) {
+		card.classList.add("is-yours");
+		card.querySelector<HTMLElement>("[data-yours]")!.hidden = false;
+	}
+</script>
+
+<style>
+	.dl-ver {
+		margin: 22px 0 0;
+		font-size: 15px;
+		color: var(--ink-3);
+	}
+	.dl-ver a {
+		color: var(--ink-2);
+	}
+	.dl {
+		margin-top: 72px;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 16px;
+	}
+	.dl-os {
+		display: flex;
+		flex-direction: column;
+		padding: 32px;
+		transition: border-color 0.3s ease;
+	}
+	.dl-os.is-yours {
+		border-color: var(--brand);
+		background-image: radial-gradient(420px circle at 50% 0%, var(--brand-wash), transparent 70%);
+	}
+	.dl-head {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+	.dl-head h2 {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: 26px;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+	}
+	.dl-yours {
+		margin-left: auto;
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--brand);
+	}
+	.dl-yours[hidden] {
+		display: none;
+	}
+	.dl-needs {
+		margin: 12px 0 0;
+		min-height: 3em;
+		font-size: 14.5px;
+		line-height: 1.5;
+		color: var(--ink-3);
+	}
+	.dl-main {
+		margin-top: 24px;
+		justify-content: center;
+	}
+	.dl-os:not(.is-yours) .dl-main {
+		background: transparent;
+		color: var(--ink);
+		box-shadow: inset 0 0 0 1px var(--line-strong);
+	}
+	.dl-os:not(.is-yours) .dl-main:hover {
+		box-shadow: inset 0 0 0 1px var(--brand);
+	}
+	.dl-size {
+		margin: 12px 0 0;
+		text-align: center;
+		font-size: 13.5px;
+		color: var(--ink-3);
+	}
+	.dl-size a {
+		color: var(--ink-2);
+	}
+	.dl-steps {
+		margin: 28px 0 0;
+		padding: 24px 0 0;
+		border-top: 1px solid var(--line);
+		list-style: none;
+		counter-reset: step;
+		display: grid;
+		gap: 14px;
+		font-size: 14.5px;
+		line-height: 1.5;
+		color: var(--ink-2);
+	}
+	.dl-steps li {
+		position: relative;
+		padding-left: 30px;
+		counter-increment: step;
+	}
+	.dl-steps li::before {
+		content: counter(step);
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		display: grid;
+		place-items: center;
+		border: 1px solid var(--line-strong);
+		font-size: 11px;
+		font-variant-numeric: tabular-nums;
+		color: var(--ink-3);
+	}
+	.dl-guide {
+		margin-top: auto;
+		padding-top: 22px;
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--brand);
+	}
+	.dl-more {
+		padding-top: 160px;
+		display: grid;
+		grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+		gap: clamp(32px, 5vw, 80px);
+		align-items: start;
+	}
+	.dl-req .lede {
+		margin-top: 18px;
+	}
+	.dl-table {
+		margin: 0;
+	}
+	.dl-table div {
+		display: grid;
+		grid-template-columns: 140px minmax(0, 1fr);
+		gap: 24px;
+		padding: 20px 0;
+		border-top: 1px solid var(--line);
+	}
+	.dl-table div:last-child {
+		border-bottom: 1px solid var(--line);
+	}
+	.dl-table dt {
+		font-weight: 600;
+	}
+	.dl-table dd {
+		margin: 0;
+		color: var(--ink-2);
+		line-height: 1.5;
+	}
+	.dl-notes {
+		padding-top: 120px;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: clamp(24px, 4vw, 56px);
+	}
+	.dl-note-card h3 {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: 20px;
+		font-weight: 600;
+	}
+	.dl-note-card p {
+		margin: 12px 0 0;
+		font-size: 15px;
+		line-height: 1.6;
+		color: var(--ink-2);
+	}
+	@media (max-width: 1060px) {
+		.dl {
+			grid-template-columns: minmax(0, 1fr);
+			max-width: 620px;
+			margin-inline: auto;
+		}
+		.dl-needs {
+			min-height: 0;
+		}
+	}
+	@media (max-width: 900px) {
+		.dl-more,
+		.dl-notes {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+	@media (max-width: 520px) {
+		.dl-os {
+			padding: 24px;
+		}
+		.dl-table div {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 6px;
+		}
+	}
+</style>

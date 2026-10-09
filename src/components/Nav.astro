@@ -1,0 +1,258 @@
+---
+import Mark from "./Mark.astro";
+import { nav } from "../lib/site";
+
+const here = Astro.url.pathname.replace(/\/$/, "") || "/";
+const current = (href: string) => (here === href ? "page" : undefined);
+---
+
+<div class="progress" aria-hidden="true"></div>
+<header class="nav-wrap" data-nav>
+	<nav class="nav" aria-label="Main">
+		<a href="/" class="brand" aria-label="Crater home">
+			<Mark size={26} />
+			<span>Crater</span>
+		</a>
+		<div class="nav-links">
+			{
+				nav.map((l) =>
+					l.external ? (
+						<a href={l.href} target="_blank" rel="noopener">{l.label}</a>
+					) : (
+						<a href={l.href} aria-current={current(l.href)}>{l.label}</a>
+					),
+				)
+			}
+		</div>
+		<div class="nav-end">
+			<button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to light mode">
+				<svg class="i-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+				<svg class="i-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11Z"></path></svg>
+			</button>
+			<a href="/download" class="nav-cta" data-magnetic aria-current={current("/download")}>Download</a>
+			<button type="button" class="menu-btn" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu" data-menu-btn>
+				<span></span><span></span>
+			</button>
+		</div>
+	</nav>
+	<div class="nav-menu" id="nav-menu" data-menu hidden>
+		{
+			nav.map((l) =>
+				l.external ? (
+					<a href={l.href} target="_blank" rel="noopener">{l.label}</a>
+				) : (
+					<a href={l.href} aria-current={current(l.href)}>{l.label}</a>
+				),
+			)
+		}
+	</div>
+</header>
+
+<script>
+	// The small-screen menu. Plain DOM so it works with reduced motion too.
+	const btn = document.querySelector<HTMLButtonElement>("[data-menu-btn]");
+	const menu = document.querySelector<HTMLElement>("[data-menu]");
+	if (btn && menu) {
+		const set = (open: boolean) => {
+			btn.setAttribute("aria-expanded", String(open));
+			menu.hidden = !open;
+			document.body.classList.toggle("menu-open", open);
+		};
+		btn.addEventListener("click", () => set(menu.hidden));
+		addEventListener("keydown", (e) => e.key === "Escape" && !menu.hidden && set(false));
+		matchMedia("(min-width: 901px)").addEventListener("change", (e) => e.matches && set(false));
+	}
+</script>
+
+<style>
+	.nav-wrap {
+		position: fixed;
+		inset: 0 0 auto;
+		z-index: 50;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+		padding: 18px var(--gutter) 0;
+		pointer-events: none;
+	}
+	.nav {
+		pointer-events: auto;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		width: 100%;
+		max-width: calc(var(--wrap) - 2 * var(--gutter));
+		padding: 8px 8px 8px 18px;
+		border-radius: 999px;
+		background: var(--nav);
+		border: 1px solid var(--line);
+		backdrop-filter: blur(16px) saturate(1.4);
+		-webkit-backdrop-filter: blur(16px) saturate(1.4);
+		transition:
+			transform 0.6s var(--ease-out),
+			background-color 0.5s ease,
+			border-color 0.5s ease;
+	}
+	:global(.nav-hidden:not(.menu-open)) .nav {
+		transform: translateY(-140%);
+	}
+	.brand {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 19px;
+		letter-spacing: -0.01em;
+	}
+	.nav-links {
+		display: flex;
+		gap: 4px;
+		font-size: 15px;
+		color: var(--ink-2);
+	}
+	.nav-links a {
+		position: relative;
+		padding: 10px 14px;
+		transition: color 0.25s ease;
+	}
+	.nav-links a::after {
+		content: "";
+		position: absolute;
+		left: 14px;
+		right: 14px;
+		bottom: 6px;
+		height: 1px;
+		background: currentColor;
+		transform: scaleX(0);
+		transform-origin: right;
+		transition: transform 0.45s var(--ease-out);
+	}
+	.nav-links a:hover,
+	.nav-links a[aria-current="page"] {
+		color: var(--ink);
+	}
+	.nav-links a:hover::after,
+	.nav-links a[aria-current="page"]::after {
+		transform: scaleX(1);
+		transform-origin: left;
+	}
+	.nav-end {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+	.theme-toggle,
+	.menu-btn {
+		position: relative;
+		width: 44px;
+		height: 44px;
+		border-radius: 999px;
+		border: 1px solid var(--line);
+		background: transparent;
+		color: var(--ink-2);
+		display: grid;
+		place-items: center;
+		cursor: pointer;
+		overflow: hidden;
+		transition: color 0.25s ease, border-color 0.25s ease;
+	}
+	.theme-toggle:hover,
+	.menu-btn:hover {
+		color: var(--ink);
+		border-color: var(--line-strong);
+	}
+	.theme-toggle svg {
+		grid-area: 1 / 1;
+		transition:
+			transform 0.6s var(--ease-out),
+			opacity 0.4s ease;
+	}
+	:global([data-theme="dark"]) .i-moon,
+	:global([data-theme="light"]) .i-sun {
+		transform: translateY(140%) rotate(90deg);
+		opacity: 0;
+	}
+	.nav-cta {
+		display: inline-flex;
+		align-items: center;
+		height: 44px;
+		padding: 0 20px;
+		border-radius: 999px;
+		background: var(--ink);
+		color: var(--bg);
+		font-weight: 600;
+		font-size: 15px;
+		transition: transform 0.4s var(--ease-out), background-color 0.5s ease, color 0.5s ease;
+	}
+	/* Two bars that cross into an X when the menu is open. */
+	.menu-btn {
+		display: none;
+	}
+	.menu-btn span {
+		grid-area: 1 / 1;
+		width: 16px;
+		height: 1.6px;
+		border-radius: 1px;
+		background: currentColor;
+		transition: transform 0.4s var(--ease-out);
+	}
+	.menu-btn span:first-child {
+		transform: translateY(-3.5px);
+	}
+	.menu-btn span:last-child {
+		transform: translateY(3.5px);
+	}
+	.menu-btn[aria-expanded="true"] span:first-child {
+		transform: rotate(45deg);
+	}
+	.menu-btn[aria-expanded="true"] span:last-child {
+		transform: rotate(-45deg);
+	}
+	.nav-menu {
+		pointer-events: auto;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		padding: 8px;
+		border-radius: 22px;
+		/* Solid, so the page title under it never reads through the links. */
+		background: var(--card);
+		box-shadow: 0 30px 60px -20px var(--shadow);
+		border: 1px solid var(--line);
+		backdrop-filter: blur(16px) saturate(1.4);
+		-webkit-backdrop-filter: blur(16px) saturate(1.4);
+	}
+	.nav-menu[hidden] {
+		display: none;
+	}
+	.nav-menu a {
+		padding: 14px 16px;
+		border-radius: 14px;
+		font-size: 17px;
+		color: var(--ink-2);
+	}
+	.nav-menu a:hover,
+	.nav-menu a[aria-current="page"] {
+		color: var(--ink);
+		background: var(--brand-wash);
+	}
+	@media (max-width: 900px) {
+		.nav-links {
+			display: none;
+		}
+		.menu-btn {
+			display: grid;
+		}
+	}
+	@media (max-width: 380px) {
+		.nav {
+			padding-left: 14px;
+		}
+		.brand span {
+			display: none;
+		}
+	}
+</style>

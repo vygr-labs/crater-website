@@ -1,0 +1,71 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Page not found · Crater" description="This page isn't here. Head back to Crater's home page.">
+	<main class="nf">
+		<div class="nf-glow" aria-hidden="true"></div>
+		<div class="wrap nf-inner">
+			<p class="nf-ref">PAGE 404 · NOT FOUND</p>
+			<h1 class="display nf-title">Nothing on the screen.</h1>
+			<p class="lede nf-lede">The page you were after isn't here. It may have moved, or the link had a typo.</p>
+			<div class="nf-ctas">
+				<a href="/" class="btn btn-brand" data-magnetic>Back to home</a>
+				<a href="/download" class="btn btn-ghost" data-magnetic>Download Crater</a>
+			</div>
+		</div>
+	</main>
+</Base>
+
+<style>
+	.nf {
+		position: relative;
+		min-height: 78vh;
+		display: grid;
+		place-items: center;
+		padding-top: 140px;
+		text-align: center;
+		overflow: hidden;
+	}
+	.nf-glow {
+		position: absolute;
+		left: 50%;
+		bottom: -700px;
+		width: 1100px;
+		height: 1100px;
+		margin-left: -550px;
+		border-radius: 50%;
+		background: radial-gradient(closest-side, var(--glow), transparent 72%);
+		pointer-events: none;
+	}
+	.nf-inner {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	.nf-ref {
+		margin: 0;
+		font-family: "Funnel Sans", var(--font-body);
+		font-weight: 600;
+		font-size: 13px;
+		letter-spacing: 0.14em;
+		color: var(--brand);
+	}
+	.nf-title {
+		margin-top: 20px;
+		font-size: clamp(42px, 6vw, 88px);
+		line-height: 1;
+	}
+	.nf-lede {
+		margin: 22px auto 0;
+		max-width: 480px;
+	}
+	.nf-ctas {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 12px;
+		margin-top: 36px;
+	}
+</style>

@@ -1,0 +1,244 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHead from "../components/PageHead.astro";
+import { CHANNEL, DOCS, playlists } from "../lib/site";
+
+// The first steps, in the order a new volunteer meets them. Each one
+// links to the written guide on the docs site.
+const steps = [
+	["Install Crater", "Run the installer and get past the first-launch warning.", "getting-started/installation/"],
+	["Pick your screen", "Connect the projector and choose it as the projection screen.", "getting-started/first-launch/"],
+	["Learn the console", "The three panels, the library tabs and what the colours tell you.", "getting-started/interface-overview/"],
+	["Run a service", "Load the schedule, go live and move through the slides.", "guides/displaying-content/"],
+];
+---
+
+<Base title="Tutorials · Crater" description="Short video playlists for every Crater volunteer, from installing it to running a whole service from the keyboard.">
+	<main>
+		<PageHead lede="Each playlist covers one part of Crater in a few minutes. Hand the link to whoever runs the booth this week.">
+			Learn Crater in an <span class="hl" data-hl>afternoon</span>.
+		</PageHead>
+
+		<section class="wrap tl">
+			<ol class="tl-grid">
+				{
+					playlists.map((p) => (
+						<li data-reveal="card">
+							<a href={p.url} target="_blank" rel="noopener" class="card tl-card" data-spot>
+								<span class="tl-play" aria-hidden="true">
+									<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5-11-6.5Z" /></svg>
+								</span>
+								<span class="tl-n">{p.n}</span>
+								<span class="tl-l">{p.label}</span>
+								<span class="tl-d">{p.note}</span>
+								<span class="tl-go">Watch on YouTube</span>
+							</a>
+						</li>
+					))
+				}
+			</ol>
+			<p class="tl-note" data-reveal="up">
+				New videos land on the <a href={CHANNEL} target="_blank" rel="noopener" class="u-link">Crater channel</a> first.
+			</p>
+		</section>
+
+		<section class="wrap tl-first">
+			<div class="tl-first-head">
+				<h2 class="display h2" data-reveal="up">Rather <span class="hl" data-hl>read</span>?</h2>
+				<p class="lede" data-reveal="up">The written guides walk through the same first steps, with every setting named.</p>
+			</div>
+			<ol class="tl-steps">
+				{
+					steps.map(([t, d, path], i) => (
+						<li data-reveal="row">
+							<a href={DOCS + path} target="_blank" rel="noopener">
+								<span class="tl-sn">{i + 1}</span>
+								<span class="tl-st">
+									<strong>{t}</strong>
+									<span>{d}</span>
+								</span>
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+							</a>
+						</li>
+					))
+				}
+			</ol>
+		</section>
+	</main>
+</Base>
+
+<style>
+	.tl {
+		margin-top: 88px;
+	}
+	.tl-grid {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 16px;
+	}
+	.tl-card {
+		position: relative;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 28px;
+		overflow: hidden;
+		isolation: isolate;
+		transition:
+			transform 0.5s var(--ease-out),
+			border-color 0.3s ease;
+	}
+	.tl-card::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background: radial-gradient(420px circle at var(--mx, 50%) var(--my, -40%), var(--brand-wash), transparent 60%);
+		opacity: 0;
+		transition: opacity 0.4s ease;
+	}
+	.tl-card:hover {
+		transform: translateY(-4px);
+		border-color: var(--brand);
+	}
+	.tl-card:hover::before {
+		opacity: 1;
+	}
+	.tl-play {
+		width: 44px;
+		height: 44px;
+		margin-bottom: 18px;
+		border-radius: 50%;
+		display: grid;
+		place-items: center;
+		background: var(--brand-wash);
+		color: var(--brand);
+		transition: transform 0.45s var(--ease-out);
+	}
+	.tl-card:hover .tl-play {
+		transform: scale(1.1);
+	}
+	.tl-n {
+		font-variant-numeric: tabular-nums;
+		font-size: 12px;
+		color: var(--ink-3);
+	}
+	.tl-l {
+		font-family: var(--font-display);
+		font-size: 22px;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+	}
+	.tl-d {
+		font-size: 15px;
+		line-height: 1.5;
+		color: var(--ink-2);
+	}
+	.tl-go {
+		margin-top: auto;
+		padding-top: 18px;
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--brand);
+	}
+	.tl-note {
+		margin: 28px 0 0;
+		text-align: center;
+		font-size: 15px;
+		color: var(--ink-3);
+	}
+	.tl-first {
+		padding-top: 160px;
+		display: grid;
+		grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+		gap: clamp(32px, 5vw, 80px);
+		align-items: start;
+	}
+	.tl-first-head .lede {
+		margin-top: 18px;
+	}
+	.tl-steps {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.tl-steps li {
+		border-top: 1px solid var(--line);
+	}
+	.tl-steps li:last-child {
+		border-bottom: 1px solid var(--line);
+	}
+	.tl-steps a {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		padding: 22px 0;
+	}
+	.tl-sn {
+		flex: none;
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		display: grid;
+		place-items: center;
+		border: 1px solid var(--line-strong);
+		font-variant-numeric: tabular-nums;
+		font-size: 14px;
+		color: var(--ink-2);
+		transition:
+			border-color 0.3s ease,
+			color 0.3s ease;
+	}
+	.tl-st {
+		flex: 1;
+		display: grid;
+		gap: 4px;
+		min-width: 0;
+		transition: transform 0.45s var(--ease-out);
+	}
+	.tl-st strong {
+		font-size: 17px;
+		font-weight: 600;
+	}
+	.tl-st span {
+		font-size: 15px;
+		color: var(--ink-3);
+	}
+	.tl-steps svg {
+		flex: none;
+		color: var(--ink-3);
+		transition:
+			color 0.3s ease,
+			transform 0.45s var(--ease-out);
+	}
+	.tl-steps a:hover .tl-st {
+		transform: translateX(6px);
+	}
+	.tl-steps a:hover .tl-sn {
+		border-color: var(--brand);
+		color: var(--brand);
+	}
+	.tl-steps a:hover svg {
+		color: var(--brand);
+		transform: translateX(4px);
+	}
+	@media (max-width: 1060px) {
+		.tl-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+	@media (max-width: 900px) {
+		.tl-first {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+	@media (max-width: 620px) {
+		.tl-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

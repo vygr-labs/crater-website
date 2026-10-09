@@ -219,7 +219,7 @@ export function setupKeys() {
 	const vidIcon = $("[data-k-vid-icon]", root)!;
 	gsap.set(states, { opacity: 0 });
 
-	let shown: string | null = null;
+	let shown: string | null = "v16";
 	const DOWN = "↓";
 	const UP = "↑";
 	// Keys that are not on the little board still show in the caption.
@@ -239,7 +239,7 @@ export function setupKeys() {
 		if (k) tl.fromTo(state(k), { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: 0.5, ease: "expo.out" }, at + 0.1);
 	};
 
-	const tl = gsap.timeline({ repeat: -1, paused: true, repeatDelay: 0.6 });
+	const tl = gsap.timeline({ repeat: -1, paused: true, repeatDelay: 0.2 });
 	tl.call(() => (typed.textContent = ""), [], 0);
 	press(tl, ["Ctrl", "K"], "Ctrl K  search everything", 0.3);
 	swap(tl, "search", 0.35);
@@ -253,7 +253,11 @@ export function setupKeys() {
 	swap(tl, "logo", 5.95);
 	press(tl, ["Ctrl", "C"], "Ctrl C  clear the screen", 7.6);
 	swap(tl, null, 7.65);
-	tl.to(cap, { opacity: 0, duration: 0.3 }, 9.0);
+	tl.to(cap, { opacity: 0, duration: 0.3 }, 8.4);
+	// The screen waits on John 3:16 rather than blank until the loop starts.
+	// This comes after the loop because its fromTo tweens render their start
+	// values as soon as they are built, which would hide the verse again.
+	gsap.set(state("v16"), { opacity: 1 });
 
 	/* ── Hands-on mode ─────────────────────────────────────────────── */
 	let manual = false;
