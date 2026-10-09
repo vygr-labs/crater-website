@@ -1,39 +1,43 @@
-// The latest release, read from GitHub once at build time so every download
-// button points straight at its file. If GitHub can't be reached the buttons
-// fall back to the releases page, which always has the files.
+// The latest release from GitHub. Pages read it once at build time for their
+// first paint, /api/release serves it fresh for the browser to update with,
+// and /get/<file> redirects to the newest file. If GitHub can't be reached
+// everything falls back to the releases page, which always has the files.
 import { LATEST } from "./site";
 
 export type Asset = { url: string; size: string };
+export type AssetKey = "windows" | "windows-zip" | "mac" | "mac-zip" | "linux" | "checksums";
 export type Release = {
 	version: string | null;
 	date: string | null;
 	notes: string;
-	assets: Record<"winSetup" | "winZip" | "macDmg" | "macZip" | "linux" | "sums", Asset | null>;
+	assets: Record<AssetKey, Asset | null>;
 };
 
-const patterns = {
-	winSetup: /^Crater-Setup-.*\.exe$/,
-	winZip: /-win64\.zip$/,
-	macDmg: /-macos\.dmg$/,
-	macZip: /-macos\.zip$/,
+export const patterns: Record<AssetKey, RegExp> = {
+	windows: /^Crater-Setup-.*\.exe$/,
+	"windows-zip": /-win64\.zip$/,
+	mac: /-macos\.dmg$/,
+	"mac-zip": /-macos\.zip$/,
 	linux: /\.AppImage$/,
-	sums: /^SHA256SUMS\.txt$/,
+	checksums: /^SHA256SUMS\.txt$/,
 };
 
 const mb = (bytes: number) => `${Math.round(bytes / 1_000_000)} MB`;
 
-let cached: Promise<Release> | null = null;
+const empty = (): Release => ({
+	version: null,
+	date: null,
+	notes: LATEST,
+	assets: { windows: null, "windows-zip": null, mac: null, "mac-zip": null, linux: null, checksums: null },
+});
 
-export function getRelease(): Promise<Release> {
-	cached ??= load();
-	return cached;
-}
-
-async function load(): Promise<Release> {
-	const empty: Release = { version: null, date: null, notes: LATEST, assets: { winSetup: null, winZip: null, macDmg: null, macZip: null, linux: null, sums: null } };
+/** Asks GitHub for the latest release. Never throws. */
+export async function fetchRelease(): Promise<Release> {
+	const out = empty();
 	try {
-		const headers: Record<string, string> = { Accept: "application/vnd.github+json" };
-		if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+		const headers: Record<string, string> = { Accept: "application/vnd.github+json", "User-Agent": "crater-website" };
+		const token = process.env.GITHUB_RELEASES_TOKEN;
+		if (token) headers.Authorization = `Bearer ${token}`;
 		const res = await fetch("https://api.github.com/repos/vygr-labs/crater-v2/releases/latest", { headers });
 		if (!res.ok) throw new Error(`GitHub said ${res.status}`);
 		const r = (await res.json()) as {
@@ -42,18 +46,26 @@ async function load(): Promise<Release> {
 			published_at: string;
 			assets: { name: string; size: number; browser_download_url: string }[];
 		};
-		const assets = { ...empty.assets };
-		for (const [key, re] of Object.entries(patterns) as [keyof typeof patterns, RegExp][]) {
+		for (const [key, re] of Object.entries(patterns) as [AssetKey, RegExp][]) {
 			const a = r.assets.find((x) => re.test(x.name));
-			if (a) assets[key] = { url: a.browser_download_url, size: mb(a.size) };
+			if (a) out.assets[key] = { url: a.browser_download_url, size: mb(a.size) };
 		}
-		const date = new Date(r.published_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-		return { version: r.tag_name, date, notes: r.html_url, assets };
+		out.version = r.tag_name;
+		out.date = new Date(r.published_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+		out.notes = r.html_url;
 	} catch (e) {
-		console.warn(`[release] using the releases page for downloads: ${(e as Error).message}`);
-		return empty;
+		console.warn(`[release] falling back to the releases page: ${(e as Error).message}`);
 	}
+	return out;
 }
 
-/** The file's link, or the latest release page when it isn't known. */
-export const href = (a: Asset | null) => a?.url ?? LATEST;
+let cached: Promise<Release> | null = null;
+
+/** The release as of this build, fetched once and shared by every page. */
+export function getRelease(): Promise<Release> {
+	cached ??= fetchRelease();
+	return cached;
+}
+
+/** A stable link that always redirects to the newest file of this kind. */
+export const getHref = (key: AssetKey) => `/get/${key}`;

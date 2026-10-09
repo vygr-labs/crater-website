@@ -1,0 +1,234 @@
+/* The request and bug report pages share one form look. */
+.fpage {
+	margin-top: 80px;
+	display: grid;
+	grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+	gap: clamp(32px, 5vw, 80px);
+	align-items: start;
+}
+.fcard {
+	position: relative;
+	padding: clamp(24px, 4vw, 48px);
+}
+.fform {
+	display: grid;
+	gap: 30px;
+}
+.fform[hidden] {
+	display: none;
+}
+.ffield {
+	display: grid;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	min-width: 0;
+}
+.frow {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 20px;
+}
+.flabel {
+	padding: 0;
+	font-size: 15px;
+	font-weight: 600;
+}
+.flabel em {
+	margin-left: 6px;
+	font-style: normal;
+	font-weight: 400;
+	color: var(--ink-3);
+}
+.fhint {
+	font-size: 14px;
+	line-height: 1.5;
+	color: var(--ink-3);
+}
+.fform textarea,
+.fform input[type="text"],
+.fform input[type="email"],
+.fform select {
+	width: 100%;
+	margin-top: 4px;
+	padding: 14px 16px;
+	border-radius: 12px;
+	border: 1px solid var(--line-strong);
+	background: var(--bg-2);
+	color: var(--ink);
+	font: inherit;
+	font-size: 16px;
+	line-height: 1.5;
+	resize: vertical;
+	transition:
+		border-color 0.25s ease,
+		box-shadow 0.25s ease;
+}
+.fform textarea.fmono {
+	font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+	font-size: 13px;
+}
+.fform textarea::placeholder,
+.fform input::placeholder {
+	color: var(--ink-3);
+}
+.fform textarea:focus,
+.fform input:focus,
+.fform select:focus {
+	outline: none;
+	border-color: var(--brand);
+	box-shadow: 0 0 0 4px var(--brand-wash);
+}
+.fform [aria-invalid="true"] {
+	border-color: var(--live);
+}
+.fchips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 12px;
+}
+.fchip input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+.fchip span {
+	display: inline-block;
+	padding: 8px 14px;
+	border-radius: 999px;
+	border: 1px solid var(--line);
+	font-size: 14px;
+	color: var(--ink-2);
+	cursor: pointer;
+	transition:
+		border-color 0.25s ease,
+		background-color 0.25s ease,
+		color 0.25s ease;
+}
+.fchip span:hover {
+	border-color: var(--line-strong);
+	color: var(--ink);
+}
+.fchip input:checked + span {
+	border-color: var(--brand);
+	background: var(--brand-wash);
+	color: var(--brand);
+}
+.fchip input:focus-visible + span {
+	outline: 2px solid var(--brand);
+	outline-offset: 2px;
+}
+/* Kept off screen for people, left in the form for scripts to fill. */
+.ftrap {
+	position: absolute;
+	left: -10000px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+.ffoot {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+	padding-top: 26px;
+	border-top: 1px solid var(--line);
+}
+.fnote {
+	flex: 1 1 260px;
+	margin: 0;
+	font-size: 14px;
+	line-height: 1.5;
+	color: var(--ink-3);
+}
+.fnote a {
+	color: var(--ink-2);
+}
+.ferror {
+	margin: 0;
+	padding: 14px 16px;
+	border-radius: 12px;
+	background: var(--live-wash);
+	color: var(--live);
+	font-size: 15px;
+}
+.ferror[hidden] {
+	display: none;
+}
+.fform button[aria-busy="true"] {
+	opacity: 0.7;
+	pointer-events: none;
+}
+.fdone {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 14px;
+	padding: 12px 0;
+}
+.fdone[hidden] {
+	display: none;
+}
+.fdone-mark {
+	width: 52px;
+	height: 52px;
+	border-radius: 50%;
+	display: grid;
+	place-items: center;
+	background: var(--brand-wash);
+	color: var(--brand);
+}
+.fdone h2 {
+	margin: 6px 0 0;
+	font-family: var(--font-display);
+	font-size: 30px;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+}
+.fdone p {
+	margin: 0;
+	max-width: 480px;
+	font-size: 16px;
+	line-height: 1.6;
+	color: var(--ink-2);
+}
+.fdone-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-top: 10px;
+}
+.fside {
+	display: grid;
+	gap: 36px;
+	padding-top: 12px;
+}
+.fside h2 {
+	margin: 0;
+	font-family: var(--font-display);
+	font-size: 20px;
+	font-weight: 600;
+}
+.fside p {
+	margin: 10px 0 0;
+	font-size: 15px;
+	line-height: 1.6;
+	color: var(--ink-2);
+}
+@media (max-width: 900px) {
+	.fpage {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+@media (max-width: 560px) {
+	.frow {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+/* .btn sets display, which would otherwise beat the hidden attribute. */
+.fdone-row [hidden] {
+	display: none;
+}

@@ -1,0 +1,162 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHead from "../components/PageHead.astro";
+import { DOCS, ISSUES } from "../lib/site";
+import { getRelease } from "../lib/release";
+import "../styles/forms.css";
+
+const release = await getRelease();
+const areas = ["Songs", "Scripture", "Media", "Sermon slides", "Schedule", "Screens and stage", "Streaming", "Themes", "Installing or updating", "Something else"];
+const systems = ["Windows 11", "Windows 10", "macOS", "Linux"];
+const bugs = `${ISSUES}?q=is%3Aissue+is%3Aopen+label%3Abug`;
+---
+
+<Base title="Report a bug · Crater" description="Tell us when something in Crater goes wrong, so it can be fixed.">
+	<main>
+		<PageHead lede="Sorry it went wrong. Tell us what happened and we'll look into it.">
+			Something <span class="hl" data-hl>broke</span>?
+		</PageHead>
+
+		<section class="wrap fpage">
+			<div class="card fcard" data-report-card data-reveal="card">
+				<form class="fform" action="/api/report" method="post" data-report-form>
+					<input type="hidden" name="kind" value="bug" />
+					<input type="hidden" name="t" value="" />
+					<label class="ftrap" aria-hidden="true">Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+
+					<label class="ffield">
+						<span class="flabel">What went wrong?</span>
+						<span class="fhint">One line is enough here. You can add the details below.</span>
+						<input type="text" name="what" required minlength="4" maxlength="200" placeholder="The projector goes black when I play a video from the schedule" />
+					</label>
+
+					<fieldset class="ffield">
+						<legend class="flabel">Which part of Crater?</legend>
+						<div class="fchips">
+							{
+								areas.map((a, i) => (
+									<label class="fchip">
+										<input type="radio" name="area" value={a} checked={i === areas.length - 1} />
+										<span>{a}</span>
+									</label>
+								))
+							}
+						</div>
+					</fieldset>
+
+					<label class="ffield">
+						<span class="flabel">How do we see it happen? <em>Optional</em></span>
+						<span class="fhint">What you clicked or pressed, in order. Does it happen every time?</span>
+						<textarea name="steps" rows="5" maxlength="4000" placeholder={"1. Add a video to the schedule\n2. Press Enter to send it live\n3. The projector goes black, every time"}></textarea>
+					</label>
+
+					<label class="ffield">
+						<span class="flabel">What did you expect instead? <em>Optional</em></span>
+						<textarea name="expected" rows="2" maxlength="4000" placeholder="The video plays on the projector."></textarea>
+					</label>
+
+					<div class="frow">
+						<label class="ffield">
+							<span class="flabel">Computer</span>
+							<select name="os" data-report-os>
+								{systems.map((s) => <option value={s}>{s}</option>)}
+							</select>
+						</label>
+						<label class="ffield">
+							<span class="flabel">Crater version <em>Optional</em></span>
+							<span class="fhint">In Settings, then Updates.</span>
+							<input type="text" name="version" maxlength="40" placeholder={release.version ?? "v0.7.5"} />
+						</label>
+					</div>
+
+					<label class="ffield">
+						<span class="flabel">Log <em>Optional, kept private</em></span>
+						<span class="fhint">
+							Open Crater's data folder and paste the end of <code>crater.log</code> here. It's never posted publicly. Or skip this and use Send logs to developer in Settings, then Diagnostics.
+						</span>
+						<textarea name="log" rows="4" maxlength="20000" class="fmono" spellcheck="false"></textarea>
+					</label>
+
+					<div class="frow">
+						<label class="ffield">
+							<span class="flabel">Church or name <em>Optional</em></span>
+							<span class="fhint">Shown on the report.</span>
+							<input type="text" name="name" maxlength="120" autocomplete="organization" />
+						</label>
+						<label class="ffield">
+							<span class="flabel">Email <em>Optional</em></span>
+							<span class="fhint">So we can tell you when it's fixed. Never shown.</span>
+							<input type="email" name="email" maxlength="200" autocomplete="email" />
+						</label>
+					</div>
+
+					<p class="ferror" role="alert" data-report-error hidden></p>
+
+					<div class="ffoot">
+						<p class="fnote">Reports are posted publicly on <a href={bugs} target="_blank" rel="noopener" class="u-link">GitHub</a> without your email or log. No account needed.</p>
+						<button type="submit" class="btn btn-brand" data-magnetic>
+							Send report
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+						</button>
+					</div>
+				</form>
+
+				<div class="fdone" data-report-done hidden>
+					<span class="fdone-mark" aria-hidden="true">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg>
+					</span>
+					<h2 tabindex="-1">Thank you. It's sent.</h2>
+					<p>Your report is with the people building Crater. If you left an email, we'll write when it's fixed or if we need more detail.</p>
+					<div class="fdone-row">
+						<a href="#" class="btn btn-ghost" target="_blank" rel="noopener" data-report-issue hidden>See it on GitHub</a>
+						<a href="/report" class="btn btn-ghost">Report something else</a>
+					</div>
+				</div>
+			</div>
+
+			<aside class="fside">
+				<div data-reveal="up">
+					<h2>In the middle of a service?</h2>
+					<p>Press Ctrl + C to clear the screen while you sort it out. The <a href={`${DOCS}reference/troubleshooting/`} target="_blank" rel="noopener" class="u-link">troubleshooting guide</a> covers the usual fixes.</p>
+				</div>
+				<div data-reveal="up">
+					<h2>Where's the data folder?</h2>
+					<p>
+						On Windows, paste <code>%APPDATA%\Voyager Labs\Crater</code> into File Explorer's address bar. On a Mac it's <code>~/Library/Application Support/Voyager Labs/Crater</code>, and on Linux <code>~/.local/share/Voyager Labs/Crater</code>.
+					</p>
+				</div>
+				<div data-reveal="up">
+					<h2>Already reported?</h2>
+					<p>Check the <a href={bugs} target="_blank" rel="noopener" class="u-link">open bug reports</a>. A comment on one that matches helps us more than a new one.</p>
+				</div>
+			</aside>
+		</section>
+	</main>
+</Base>
+
+<script>
+	import "../scripts/report-form.ts";
+	// Start the computer menu on the visitor's own system. Windows 11 still
+	// calls itself Windows NT 10 in the user agent, so Chromium browsers are
+	// asked for the real version (13 and up is Windows 11).
+	const os = document.querySelector<HTMLSelectElement>("[data-report-os]");
+	const ua = navigator.userAgent;
+	if (os) {
+		os.value = /Windows/.test(ua) ? "Windows 11" : /Macintosh/.test(ua) ? "macOS" : /Linux/.test(ua) && !/Android/.test(ua) ? "Linux" : os.value;
+		const uad = (navigator as Navigator & { userAgentData?: { getHighEntropyValues(h: string[]): Promise<{ platform?: string; platformVersion?: string }> } }).userAgentData;
+		uad?.getHighEntropyValues(["platformVersion"]).then((v) => {
+			if (v.platform === "Windows" && v.platformVersion) os.value = parseInt(v.platformVersion, 10) >= 13 ? "Windows 11" : "Windows 10";
+		});
+	}
+</script>
+
+<style>
+	code {
+		padding: 1px 6px;
+		border-radius: 6px;
+		background: var(--bg-2);
+		border: 1px solid var(--line);
+		font-size: 0.9em;
+		overflow-wrap: anywhere;
+	}
+</style>

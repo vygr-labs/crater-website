@@ -1,3 +1,7 @@
 node_modules/
 dist/
 .astro/
+
+# local stand-in for the Turso database
+reports.local.db*
+.vercel/

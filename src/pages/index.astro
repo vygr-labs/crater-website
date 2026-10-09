@@ -3,7 +3,7 @@ import { Image } from "astro:assets";
 import Base from "../layouts/Base.astro";
 import Mark from "../components/Mark.astro";
 import { CHANNEL, DOCS, osIcon, playlists } from "../lib/site";
-import { getRelease, href } from "../lib/release";
+import { getHref, getRelease, type AssetKey } from "../lib/release";
 import Sunday from "../components/sections/Sunday.astro";
 import Screens from "../components/sections/Screens.astro";
 import Themes from "../components/sections/Themes.astro";
@@ -29,15 +29,15 @@ import schedule from "../assets/shots/schedule.webp";
 
 const release = await getRelease();
 const platforms = [
-	{ name: "Windows", icon: osIcon.windows, note: "Installer for Windows 10 and 11", asset: release.assets.winSetup },
-	{ name: "macOS", icon: osIcon.mac, note: "Apple silicon and Intel", asset: release.assets.macDmg },
-	{ name: "Linux", icon: osIcon.linux, note: "AppImage for x86-64", asset: release.assets.linux },
+	{ name: "Windows", icon: osIcon.windows, note: "Installer for Windows 10 and 11", key: "windows" as AssetKey },
+	{ name: "macOS", icon: osIcon.mac, note: "Apple silicon and Intel", key: "mac" as AssetKey },
+	{ name: "Linux", icon: osIcon.linux, note: "AppImage for x86-64", key: "linux" as AssetKey },
 ];
 
 const reel = [
 	{ img: projSongReel, title: "Songs", note: "Lyrics, verse by verse", alt: "It Is Well with My Soul on the projector" },
 	{ img: projScripture, title: "Scripture", note: "Highlight as you preach", alt: "John 3:16 with highlighted words" },
-	{ img: projSermon, title: "Sermon slides", note: "Built right in Crater", alt: "A sermon title slide" },
+	{ img: projSermon, title: "Sermon slides", note: "Built right in Crater", alt: "A sermon title slide, The Lord Is My Shepherd" },
 	{ img: projStrongs, title: "Strong's", note: "The Greek and Hebrew behind a word", alt: "A Strong's definition for agape" },
 	{ img: projStage, title: "Stage display", note: "Now, next and your notes", alt: "The stage display with current and next slide" },
 	{ img: projCountdown, title: "Countdowns", note: "Start on time", alt: "A countdown before the service" },
@@ -396,15 +396,33 @@ const faqs = [
 				<div class="platforms">
 					{
 						platforms.map((p) => (
-							<a href={href(p.asset)} class="platform" data-reveal="card" data-spot>
+							<a href={getHref(p.key)} class="platform" data-reveal="card" data-spot>
 								<Fragment set:html={p.icon} />
 								<span class="p-name">{p.name}</span>
-								<span class="p-note">{p.note}{p.asset && ` · ${p.asset.size}`}</span>
+								<span class="p-note">
+									{p.note}
+									{release.assets[p.key] && (
+										<>
+											{" · "}
+											<span data-rel-size={p.key}>{release.assets[p.key]!.size}</span>
+										</>
+									)}
+								</span>
 							</a>
 						))
 					}
 				</div>
-				<p class="dl-note" data-reveal="up">{release.version && `${release.version} · `}<a href="/download" class="u-link">Other downloads and install help</a></p>
+				<p class="dl-note" data-reveal="up">
+					{
+						release.version && (
+							<>
+								<span data-rel="version">{release.version}</span>
+								{" · "}
+							</>
+						)
+					}
+					<a href="/download" class="u-link">Other downloads and install help</a>
+				</p>
 			</div>
 		</section>
 	</main>
