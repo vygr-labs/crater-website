@@ -21,7 +21,7 @@ const rolldownStandIn = {
 // `prerender = false` (requests, bug reports and the latest release) run
 // as Vercel functions.
 export default defineConfig({
-	site: "https://crater.voyagerlabs.tech",
+	site: "https://getcrater.org",
 	adapter: vercel(),
 	server: { port: 4321 },
 	vite: { plugins: [rolldownStandIn] },
