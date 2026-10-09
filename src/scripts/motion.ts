@@ -49,6 +49,20 @@ function setupTheme() {
 }
 
 setupTheme();
+pauseOffscreenLoops();
+// Tells the fallback in the page head that motion started, so it doesn't
+// reveal what motion is about to animate in.
+(window as Window & { __motion?: boolean }).__motion = true;
+
+/* ── Looping animations rest while off screen ────────────────────────────
+   The meters, scan lines, carets and pulses would otherwise restyle the page
+   on every frame even when nobody can see them. */
+function pauseOffscreenLoops() {
+	const io = new IntersectionObserver((entries) => entries.forEach((e) => e.target.classList.toggle("is-resting", !e.isIntersecting)), {
+		rootMargin: "100px 0px",
+	});
+	$$("main > *, footer").forEach((el) => io.observe(el));
+}
 
 if (reduce) {
 	// Leave everything in its finished state.
@@ -90,50 +104,70 @@ function run() {
 	/* ── Hero intro, on the home page ───────────────────────────────────── */
 	if ($(".hero")) setupHero(sweep);
 
-	/* ── Scroll reveals ────────────────────────────────────────────────── */
-	ScrollTrigger.batch('[data-reveal="up"]', {
-		start: "top 88%",
-		once: true,
-		onEnter: (els) => gsap.fromTo(els, { y: 48, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, stagger: 0.09, ease: "expo.out" }),
-	});
-	ScrollTrigger.batch('[data-reveal="card"]', {
-		start: "top 90%",
-		once: true,
-		onEnter: (els) =>
-			gsap.fromTo(
-				els,
-				// No blur here: blurring a large card re-rasterises it every frame,
-				// which stuttered wherever several cards came in at once.
-				{ y: 90, scale: 0.96, opacity: 0 },
-				{ y: 0, scale: 1, opacity: 1, duration: 1.4, stagger: 0.12, ease: "expo.out" },
-			),
-	});
-	ScrollTrigger.batch('[data-reveal="row"]', {
-		start: "top 92%",
-		once: true,
-		onEnter: (els) => gsap.fromTo(els, { x: -24, opacity: 0 }, { x: 0, opacity: 1, duration: 0.9, stagger: 0.06, ease: "expo.out" }),
-	});
-	gsap.set('[data-reveal="up"], [data-reveal="card"], [data-reveal="row"]', { opacity: 0 });
+	// Everything else waits for the first paint, so the page shows before
+	// the scroll scenes are measured and built.
+	requestAnimationFrame(() => setTimeout(() => afterPaint(sweep), 0));
+}
 
+/* Entrances that play once as things scroll into view. One observer handles
+   them all, which costs far less at start-up than a scroll trigger each. */
+function setupEntrances(sweep: (el: HTMLElement, delay?: number) => gsap.core.Tween) {
+	const kinds: Record<string, [gsap.TweenVars, gsap.TweenVars]> = {
+		up: [{ y: 48, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, stagger: 0.09, ease: "expo.out" }],
+		// No blur on cards: blurring a large card re-rasterises it every frame.
+		card: [{ y: 90, scale: 0.96, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 1.4, stagger: 0.12, ease: "expo.out" }],
+		row: [{ x: -24, opacity: 0 }, { x: 0, opacity: 1, duration: 0.9, stagger: 0.06, ease: "expo.out" }],
+	};
+	const play = (el: HTMLElement) => {
+		if (el.dataset.count) {
+			const to = parseFloat(el.dataset.count);
+			const dec = parseInt(el.dataset.decimals || "0", 10);
+			const o = { v: 0 };
+			gsap.to(o, { v: to, duration: 1.8, ease: "power3.out", onUpdate: () => (el.textContent = o.v.toFixed(dec)) });
+		} else if (el.matches("[data-hl]")) sweep(el, 0.25);
+		else if (el.classList.contains("eyebrow")) gsap.from(el, { letterSpacing: "0.42em", duration: 1.2, ease: "expo.out" });
+	};
+	const io = new IntersectionObserver(
+		(entries) => {
+			const groups: Record<string, HTMLElement[]> = { up: [], card: [], row: [] };
+			entries.forEach((e) => {
+				if (!e.isIntersecting) return;
+				io.unobserve(e.target);
+				const el = e.target as HTMLElement;
+				const kind = el.dataset.reveal;
+				if (kind && groups[kind]) groups[kind].push(el);
+				else play(el);
+			});
+			for (const [kind, els] of Object.entries(groups)) if (els.length) gsap.fromTo(els, ...kinds[kind]);
+		},
+		{ rootMargin: "0px 0px -10% 0px" },
+	);
+	$$("[data-count]").forEach((el) => (el.textContent = (0).toFixed(parseInt(el.dataset.decimals || "0", 10))));
+	$$("[data-reveal], [data-count], .eyebrow").forEach((el) => io.observe(el));
 	$$("[data-hl]")
 		.filter((el) => !el.closest(".hero-title"))
-		.forEach((el) => ScrollTrigger.create({ trigger: el, start: "top 80%", once: true, onEnter: () => sweep(el, 0.25) }));
+		.forEach((el) => io.observe(el));
+}
 
-	/* ── Counters ──────────────────────────────────────────────────────── */
-	$$("[data-count]").forEach((el) => {
-		const to = parseFloat(el.dataset.count!);
-		const dec = parseInt(el.dataset.decimals || "0", 10);
-		const o = { v: 0 };
-		el.textContent = (0).toFixed(dec);
-		ScrollTrigger.create({
-			trigger: el,
-			start: "top 90%",
-			once: true,
-			onEnter: () =>
-				gsap.to(o, { v: to, duration: 1.8, ease: "power3.out", onUpdate: () => (el.textContent = o.v.toFixed(dec)) }),
-		});
-	});
+/* Runs fn once, when el comes within a screen and a half of the window. */
+function near(el: Element | null, fn: () => void) {
+	if (!el) return;
+	const io = new IntersectionObserver(
+		(entries) => {
+			if (!entries.some((e) => e.isIntersecting)) return;
+			io.disconnect();
+			fn();
+		},
+		{ rootMargin: "150% 0px" },
+	);
+	io.observe(el);
+}
 
+function afterPaint(sweep: (el: HTMLElement, delay?: number) => gsap.core.Tween) {
+	setupEntrances(sweep);
+
+	// The three pinned scenes are built straight away, in page order: a pin
+	// adds scroll length, and everything below has to be measured after it.
 	/* ── The reel: pinned, scrolls sideways ───────────────────────────── */
 	const mm = gsap.matchMedia();
 	mm.add("(min-width: 801px)", () => {
@@ -187,49 +221,52 @@ function run() {
 		);
 	});
 
-	/* ── Longer sections, in page order below the reel ─────────────────── */
-	setupFeatures(mm);
 	setupSunday(mm);
-	setupScreens();
 	setupThemes(mm);
-	setupKeys();
-	setupSwitch();
-	setupOpen();
-	setupRequest();
 	setupMicro(finePointer);
 
+	/* ── Everything else builds as it comes near ──────────────────────── */
+	near($("[data-feat]"), () => setupFeatures(mm));
+	near($("[data-screens]"), setupScreens);
+	near($("[data-keys]"), setupKeys);
+	near($("[data-switch]"), setupSwitch);
+	near($("[data-open]"), setupOpen);
+	near($("[data-request]"), setupRequest);
+	near($("[data-golive]"), setupGoLive);
+
 	/* ── Feature pictures drift inside their cards ───────────────────── */
-	$$("[data-parallax-box]").forEach((box) => {
-		const img = $("img", box);
-		if (!img) return;
-		gsap.fromTo(img, { yPercent: -4 }, { yPercent: 4, ease: "none", scrollTrigger: { trigger: box, start: "top bottom", end: "bottom top", scrub: true } });
-	});
+	$$("[data-parallax-box]").forEach((box) =>
+		near(box, () => {
+			const img = $("img", box);
+			if (img) gsap.fromTo(img, { yPercent: -4 }, { yPercent: 4, ease: "none", scrollTrigger: { trigger: box, start: "top bottom", end: "bottom top", scrub: true } });
+		}),
+	);
 
 	/* ── Statement: words light up as you read down ───────────────────── */
-	const sw = $$("[data-scrub-words] span");
-	if (sw.length)
-		gsap.to(sw, {
+	near($("[data-scrub-words]"), () =>
+		gsap.to($$("[data-scrub-words] span"), {
 			opacity: 1,
 			stagger: 0.12,
 			ease: "none",
 			scrollTrigger: { trigger: "[data-scrub-words]", start: "top 78%", end: "bottom 42%", scrub: 0.5 },
-		});
+		}),
+	);
 
 	/* ── Download: a second sunrise, the wordmark climbs out ──────────── */
-	if ($("[data-sun-2]"))
+	near($("[data-sun-2]"), () =>
 		gsap.fromTo(
 			"[data-sun-2]",
 			{ yPercent: 35, scale: 0.6, opacity: 0 },
 			{ yPercent: 0, scale: 1, opacity: 1, ease: "none", scrollTrigger: { trigger: "#download", start: "top 85%", end: "center center", scrub: 0.8 } },
-		);
-	gsap.fromTo(
-		"[data-wordmark]",
-		{ yPercent: 45, opacity: 0 },
-		{ yPercent: 0, opacity: 1, ease: "none", scrollTrigger: { trigger: ".footer", start: "top bottom", end: "bottom bottom", scrub: 0.6 } },
+		),
 	);
-
-	/* ── Preview to live, on a loop ────────────────────────────────────── */
-	setupGoLive();
+	near($(".footer"), () =>
+		gsap.fromTo(
+			"[data-wordmark]",
+			{ yPercent: 45, opacity: 0 },
+			{ yPercent: 0, opacity: 1, ease: "none", scrollTrigger: { trigger: ".footer", start: "top bottom", end: "bottom bottom", scrub: 0.6 } },
+		),
+	);
 
 	/* ── FAQ opens and closes smoothly ─────────────────────────────────── */
 	$$<HTMLDetailsElement>("details").forEach((d) => {
@@ -286,7 +323,9 @@ function run() {
 
 	// Fonts and images change heights after first layout.
 	ScrollTrigger.sort();
-	addEventListener("load", () => ScrollTrigger.refresh());
+	// Setup now runs after first paint, so the page may already have loaded.
+	if (document.readyState === "complete") ScrollTrigger.refresh();
+	else addEventListener("load", () => ScrollTrigger.refresh());
 	document.fonts?.ready.then(() => ScrollTrigger.refresh());
 }
 

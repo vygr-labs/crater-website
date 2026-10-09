@@ -87,6 +87,8 @@ export function setupSwitch() {
 	const pct = $("[data-switch-pct]", root)!;
 	const o = { p: 0 };
 	gsap.set(to, { opacity: 0, x: -24 });
+	gsap.set("[data-switch-bar]", { scaleX: 0 });
+	pct.textContent = "0%";
 	const tl = gsap.timeline({
 		defaults: { ease: "none" },
 		scrollTrigger: { trigger: $(".switch-demo", root)!, start: "top 75%", end: "bottom 45%", scrub: 0.6 },
@@ -414,11 +416,6 @@ export function setupOpen() {
 export function setupMicro(finePointer: boolean) {
 	// Reading progress along the top edge.
 	gsap.to(".progress", { scaleX: 1, ease: "none", scrollTrigger: { start: 0, end: "max", scrub: 0.3 } });
-
-	// Eyebrows: the letters close up from a wide spacing as they arrive.
-	$$(".eyebrow").forEach((el) =>
-		gsap.from(el, { letterSpacing: "0.42em", duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 90%", once: true } }),
-	);
 
 	if (!finePointer) return;
 

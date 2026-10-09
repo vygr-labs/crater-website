@@ -1057,10 +1057,13 @@ const faqs = [
 		gap: 2px;
 		height: 12px;
 	}
+	/* Bars scale rather than change height, so the meter never relays the page. */
 	.mon-meter i {
 		width: 3px;
+		height: 100%;
 		background: #3ddc84;
 		border-radius: 1px;
+		transform-origin: 50% 100%;
 		animation: meter 0.9s ease-in-out infinite alternate;
 	}
 	.mon-meter i:nth-child(2) { animation-delay: -0.3s; }
@@ -1068,8 +1071,8 @@ const faqs = [
 	.mon-meter i:nth-child(4) { animation-delay: -0.15s; }
 	.mon-meter i:nth-child(5) { animation-delay: -0.45s; }
 	@keyframes meter {
-		from { height: 20%; }
-		to { height: 100%; }
+		from { transform: scaleY(0.2); }
+		to { transform: scaleY(1); }
 	}
 	.mon-screen {
 		position: relative;
