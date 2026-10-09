@@ -5,6 +5,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
+import { setupKeys, setupMicro, setupOpen, setupScreens, setupSunday, setupSwitch, setupThemes } from "./sections";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -52,6 +53,7 @@ setupTheme();
 if (reduce) {
 	// Leave everything in its finished state.
 	$$("[data-hl]").forEach((el) => el.style.setProperty("--p", "100%"));
+	$$("[data-static-when-still]").forEach((el) => el.classList.add("is-static"));
 } else {
 	run();
 }
@@ -193,6 +195,8 @@ function run() {
 				scrub: 0.7,
 				invalidateOnRefresh: true,
 				anticipatePin: 1,
+				// Pins measure first so every trigger below sees their spacers.
+				refreshPriority: 2,
 			},
 		});
 		gsap.to("[data-reel-bar]", { scaleX: 1, ease: "none", scrollTrigger: { trigger: section, start: "top top", end: () => "+=" + distance(), scrub: true } });
@@ -205,6 +209,15 @@ function run() {
 			),
 		);
 	});
+
+	/* ── Longer sections, in page order below the reel ─────────────────── */
+	setupSunday(mm);
+	setupScreens();
+	setupThemes(finePointer);
+	setupKeys();
+	setupSwitch();
+	setupOpen();
+	setupMicro(finePointer);
 
 	/* ── Feature pictures drift inside their cards ───────────────────── */
 	$$("[data-parallax-box]").forEach((box) => {
@@ -292,6 +305,7 @@ function run() {
 	}
 
 	// Fonts and images change heights after first layout.
+	ScrollTrigger.sort();
 	addEventListener("load", () => ScrollTrigger.refresh());
 	document.fonts?.ready.then(() => ScrollTrigger.refresh());
 }

@@ -1,0 +1,243 @@
+---
+// One laptop, every screen. The laptop sits in the middle and the lines to
+// each output draw themselves as the section scrolls in.
+import { Image } from "astro:assets";
+import projSong from "../../assets/shots/proj-song.webp";
+import projStage from "../../assets/shots/proj-stage.webp";
+import projSongCyan from "../../assets/shots/proj-song-cyan.webp";
+import projScripture from "../../assets/shots/proj-scripture.webp";
+import heroConsole from "../../assets/shots/hero-console.webp";
+
+const outputs = [
+	{ id: "proj", tag: "HDMI", title: "The projector", body: "Full screen on the second display, with its own theme and transition.", img: projSong, alt: "A lyric on the projector" },
+	{ id: "stage", tag: "STAGE", title: "The stage display", body: "Live text, speaker notes and what is next, with a clock for the band.", img: projStage, alt: "The stage display" },
+	{ id: "ndi", tag: "NDI", title: "The live stream", body: "One NDI source for OBS and other streaming tools, with tally lights.", img: projSongCyan, alt: "The live output in a stream" },
+	{ id: "tv", tag: "WI-FI", title: "A TV in the foyer", body: "Open a local address in any browser on the Wi-Fi and the service follows.", img: projScripture, alt: "Scripture on a TV" },
+];
+---
+
+<section id="screens" class="screens wrap" data-screens>
+	<div class="section-head center">
+		<p class="eyebrow" data-reveal="up">One laptop, every screen</p>
+		<h2 class="display h2" data-reveal="up">Every screen in the room, <span class="hl" data-hl>in step</span>.</h2>
+		<p class="lede" data-reveal="up">Add as many outputs as you have screens. Each one mirrors the wall or becomes a stage view, and all of them change on the same key.</p>
+	</div>
+
+	<div class="map">
+		<svg class="map-lines" viewBox="0 0 1200 640" preserveAspectRatio="none" aria-hidden="true">
+			<path class="ml" pathLength="1" d="M600 320 C 470 320, 420 140, 250 140" />
+			<path class="ml" pathLength="1" d="M600 320 C 470 320, 420 500, 250 500" />
+			<path class="ml" pathLength="1" d="M600 320 C 730 320, 780 140, 950 140" />
+			<path class="ml" pathLength="1" d="M600 320 C 730 320, 780 500, 950 500" />
+			<path class="mp" pathLength="1" d="M600 320 C 470 320, 420 140, 250 140" />
+			<path class="mp" pathLength="1" d="M600 320 C 470 320, 420 500, 250 500" />
+			<path class="mp" pathLength="1" d="M600 320 C 730 320, 780 140, 950 140" />
+			<path class="mp" pathLength="1" d="M600 320 C 730 320, 780 500, 950 500" />
+		</svg>
+
+		<div class="hub" data-hub>
+			<div class="hub-screen">
+				<Image src={heroConsole} alt="The Crater console" widths={[480, 800]} sizes="320px" />
+			</div>
+			<div class="hub-base" aria-hidden="true"></div>
+			<span class="hub-label">Your laptop</span>
+		</div>
+
+		{
+			outputs.map((o, i) => (
+				<article class={`out out-${i}`} data-out>
+					<div class="out-shot">
+						<Image src={o.img} alt={o.alt} widths={[400, 640]} sizes="260px" />
+						<span class="out-tag">{o.tag}</span>
+					</div>
+					<h3>{o.title}</h3>
+					<p>{o.body}</p>
+				</article>
+			))
+		}
+	</div>
+	<p class="screens-note" data-reveal="up">Only one screen? Crater can show the output behind the console, the way EasyWorship does.</p>
+</section>
+
+<style>
+	.screens {
+		padding-top: 180px;
+	}
+	.section-head.center {
+		text-align: center;
+		max-width: 760px;
+		margin: 0 auto;
+	}
+	.section-head h2 {
+		margin-top: 16px;
+	}
+	.section-head .lede {
+		margin: 20px auto 0;
+		max-width: 600px;
+	}
+	.map {
+		position: relative;
+		margin: 64px auto 0;
+		max-width: 1200px;
+		aspect-ratio: 1200 / 640;
+	}
+	.map-lines {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		overflow: visible;
+	}
+	.map-lines path {
+		fill: none;
+		vector-effect: non-scaling-stroke;
+	}
+	.ml {
+		stroke: var(--line-strong);
+		stroke-width: 1.5;
+	}
+	/* A pulse travels each line: the same path, dashed short and long. */
+	.mp {
+		stroke: var(--brand);
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-dasharray: 0.06 0.94;
+		stroke-dashoffset: 1;
+		opacity: 0;
+	}
+	.screens.is-live .mp {
+		opacity: 1;
+		animation: pulse-line 2.4s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+	}
+	.screens.is-live .mp:nth-of-type(6) { animation-delay: 0.3s; }
+	.screens.is-live .mp:nth-of-type(7) { animation-delay: 0.6s; }
+	.screens.is-live .mp:nth-of-type(8) { animation-delay: 0.9s; }
+	@keyframes pulse-line {
+		from { stroke-dashoffset: 1; }
+		to { stroke-dashoffset: 0; }
+	}
+	.hub {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		width: 27%;
+		transform: translate(-50%, -50%);
+		z-index: 1;
+	}
+	.hub-screen {
+		padding: 6px;
+		border-radius: 12px 12px 4px 4px;
+		background: var(--frame);
+		border: 1px solid var(--line-strong);
+		box-shadow: 0 0 0 8px var(--brand-wash), 0 30px 80px -20px var(--shadow);
+	}
+	.hub-screen :global(img) {
+		border-radius: 6px;
+	}
+	.hub-base {
+		height: 10px;
+		margin: 0 -8%;
+		border-radius: 0 0 14px 14px;
+		background: linear-gradient(180deg, var(--line-strong), var(--line));
+	}
+	.hub-label {
+		display: block;
+		margin-top: 14px;
+		text-align: center;
+		font-family: var(--font-mono);
+		font-size: 12px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--brand);
+	}
+	.out {
+		position: absolute;
+		width: 21%;
+		transform: translate(-50%, -50%);
+	}
+	.out-0 { left: 17%; top: 22%; }
+	.out-1 { left: 17%; top: 78%; }
+	.out-2 { left: 83%; top: 22%; }
+	.out-3 { left: 83%; top: 78%; }
+	.out-shot {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		border-radius: 10px;
+		overflow: hidden;
+		border: 1px solid var(--line-strong);
+		background: #000;
+		transition: transform 0.5s var(--ease-out), box-shadow 0.5s ease;
+	}
+	.out:hover .out-shot {
+		transform: translateY(-4px);
+		box-shadow: 0 20px 50px -20px var(--glow);
+	}
+	.out-shot :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.out-tag {
+		position: absolute;
+		left: 8px;
+		top: 8px;
+		padding: 2px 7px;
+		border-radius: 4px;
+		background: rgb(0 0 0 / 0.6);
+		color: #2fd3e6;
+		font-family: var(--font-mono);
+		font-size: 10px;
+		letter-spacing: 0.08em;
+	}
+	.out h3 {
+		margin: 14px 0 0;
+		font-family: var(--font-display);
+		font-size: 18px;
+		font-weight: 600;
+	}
+	.out p {
+		margin: 4px 0 0;
+		font-size: 14px;
+		line-height: 1.5;
+		color: var(--ink-2);
+	}
+	.screens-note {
+		margin: 40px 0 0;
+		text-align: center;
+		color: var(--ink-3);
+		font-size: 15px;
+	}
+
+	@media (max-width: 900px) {
+		.map {
+			aspect-ratio: auto;
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 28px;
+		}
+		.map-lines {
+			display: none;
+		}
+		.hub,
+		.out {
+			position: static;
+			width: auto;
+			transform: none;
+		}
+		.hub {
+			grid-column: 1 / -1;
+			max-width: 420px;
+			margin: 0 auto 12px;
+		}
+	}
+	@media (max-width: 560px) {
+		.map {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.screens .mp {
+			display: none;
+		}
+	}
+</style>

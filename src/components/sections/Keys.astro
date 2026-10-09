@@ -1,0 +1,285 @@
+---
+// Keyboard first: real Crater shortcuts pressed in turn, with a small
+// projector answering each one. Keys and actions match the app's F1 list.
+import Mark from "../Mark.astro";
+
+const list = [
+	[["Enter"], "Send the preview live"],
+	[["↑", "↓"], "Previous or next slide"],
+	[["PgUp", "PgDn"], "Jump between choruses"],
+	[["Ctrl", "K"], "Search everything"],
+	[["Ctrl", "L"], "Logo on and off"],
+	[["Ctrl", "C"], "Clear the text"],
+	[["Ctrl", "P"], "Play or pause the video"],
+	[["F1"], "Every shortcut, any time"],
+];
+const board = ["Ctrl", "K", "L", "C", "↑", "↓", "Enter"];
+---
+
+<section id="keys" class="keys wrap" data-keys>
+	<div class="keys-grid">
+		<div class="keys-copy">
+			<p class="eyebrow" data-reveal="up">Keyboard first</p>
+			<h2 class="display h2" data-reveal="up">Run the service <span class="hl" data-hl>without the mouse</span>.</h2>
+			<p class="lede" data-reveal="up">Eyes on the stage, hands on the keys. Everything that matters on a Sunday is one or two keys away.</p>
+			<ul class="klist">
+				{
+					list.map(([keys, label]) => (
+						<li data-reveal="row">
+							<span class="kc-group">
+								{(keys as string[]).map((k) => (
+									<kbd>{k}</kbd>
+								))}
+							</span>
+							<span>{label}</span>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+
+		<div class="kdemo" data-reveal="card" aria-label="Shortcuts being pressed and the projector responding" role="img">
+			<div class="kscreen">
+				<div class="kstate" data-k="search">
+					<div class="kpal">
+						<span class="kpal-in"><span data-k-typed></span><i class="caret"></i></span>
+						<span class="kpal-row is-hit">John 3:16 <small>KJV</small></span>
+						<span class="kpal-row">John 3:17 <small>KJV</small></span>
+					</div>
+				</div>
+				<div class="kstate" data-k="v16">
+					<span class="kref">JOHN 3:16 · KJV</span>
+					<p>For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.</p>
+				</div>
+				<div class="kstate" data-k="v17">
+					<span class="kref">JOHN 3:17 · KJV</span>
+					<p>For God sent not his Son into the world to condemn the world; but that the world through him might be saved.</p>
+				</div>
+				<div class="kstate kstate-logo" data-k="logo"><Mark size={64} /></div>
+				<span class="kcap" data-k-cap></span>
+			</div>
+			<div class="kboard" aria-hidden="true">
+				{board.map((k) => <kbd class="kkey" data-key={k}>{k}</kbd>)}
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.keys {
+		padding-top: 180px;
+	}
+	.keys-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		gap: clamp(32px, 5vw, 88px);
+		align-items: center;
+	}
+	.keys-copy h2 {
+		margin-top: 16px;
+	}
+	.keys-copy .lede {
+		margin: 20px 0 0;
+		max-width: 500px;
+	}
+	.klist {
+		list-style: none;
+		margin: 32px 0 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 4px 24px;
+	}
+	.klist li {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 10px 0;
+		border-bottom: 1px solid var(--line);
+		font-size: 14.5px;
+		color: var(--ink-2);
+	}
+	.kc-group {
+		display: inline-flex;
+		gap: 4px;
+		flex: none;
+	}
+	kbd {
+		display: inline-grid;
+		place-items: center;
+		min-width: 28px;
+		height: 26px;
+		padding: 0 7px;
+		border-radius: 6px;
+		border: 1px solid var(--line-strong);
+		border-bottom-width: 2px;
+		background: var(--card);
+		color: var(--ink);
+		font-family: var(--font-mono);
+		font-size: 12px;
+	}
+	.kdemo {
+		padding: clamp(18px, 2.4vw, 32px);
+		border-radius: 24px;
+		background: var(--card);
+		border: 1px solid var(--line);
+	}
+	.kscreen {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		border-radius: 12px;
+		overflow: hidden;
+		background:
+			radial-gradient(60% 80% at 15% 20%, #571f44, transparent 70%),
+			radial-gradient(70% 70% at 85% 85%, #391528, transparent 70%),
+			#110910;
+		container-type: inline-size;
+		color: #fcf3f5;
+	}
+	.kstate {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 3cqw;
+		padding: 0 9%;
+		text-align: center;
+		opacity: 0;
+	}
+	.kstate p {
+		margin: 0;
+		font-family: "Funnel Sans", var(--font-body);
+		font-weight: 600;
+		font-size: 3.6cqw;
+		line-height: 1.3;
+	}
+	.kref {
+		font-family: "Funnel Sans", var(--font-body);
+		font-weight: 600;
+		font-size: 2cqw;
+		letter-spacing: 0.14em;
+		color: #f29cac;
+	}
+	.kstate-logo :global(.mark) {
+		width: 12cqw;
+		height: 12cqw;
+		--mark-body: #f4f6f8;
+		--brand: #2fd3e6;
+	}
+	.kpal {
+		width: 62%;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		padding: 10px;
+		border-radius: 12px;
+		background: rgb(14 18 20 / 0.92);
+		border: 1px solid rgb(255 255 255 / 0.12);
+		box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.8);
+		text-align: left;
+		font-family: var(--font-body);
+		font-size: 2.2cqw;
+		color: #eef2f3;
+	}
+	.kpal-in {
+		display: flex;
+		align-items: center;
+		padding: 8px 10px;
+		border-radius: 8px;
+		background: rgb(255 255 255 / 0.06);
+		font-family: var(--font-mono);
+	}
+	.caret {
+		width: 1px;
+		height: 1.1em;
+		margin-left: 2px;
+		background: #2fd3e6;
+		animation: caret 1s steps(1) infinite;
+	}
+	@keyframes caret {
+		50% {
+			opacity: 0;
+		}
+	}
+	.kpal-row {
+		display: flex;
+		justify-content: space-between;
+		padding: 7px 10px;
+		border-radius: 8px;
+		color: #a6b0b4;
+	}
+	.kpal-row small {
+		font-family: var(--font-mono);
+		font-size: 0.8em;
+	}
+	.kpal-row.is-hit {
+		background: rgb(47 211 230 / 0.14);
+		color: #eef2f3;
+	}
+	.kcap {
+		position: absolute;
+		left: 50%;
+		bottom: 5%;
+		transform: translateX(-50%);
+		padding: 5px 12px;
+		border-radius: 999px;
+		background: rgb(0 0 0 / 0.55);
+		backdrop-filter: blur(8px);
+		font-family: var(--font-mono);
+		font-size: 12px;
+		color: #eef2f3;
+		white-space: nowrap;
+		opacity: 0;
+	}
+	.kboard {
+		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin-top: 24px;
+	}
+	.kkey {
+		min-width: 54px;
+		height: 50px;
+		padding: 0 14px;
+		border-radius: 10px;
+		border-bottom-width: 4px;
+		font-size: 14px;
+		transition:
+			transform 0.12s ease,
+			border-bottom-width 0.12s ease,
+			background-color 0.2s ease,
+			color 0.2s ease,
+			border-color 0.2s ease,
+			box-shadow 0.3s ease;
+	}
+	.kkey.is-down {
+		transform: translateY(3px);
+		border-bottom-width: 1px;
+		border-color: var(--brand);
+		background: var(--brand-wash);
+		color: var(--brand);
+		box-shadow: 0 0 24px -4px var(--glow);
+	}
+	/* Still state for reduced motion and no JS: show the verse. */
+	.kstate[data-k="v16"] {
+		opacity: 1;
+	}
+	@media (max-width: 900px) {
+		.keys-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+	@media (max-width: 520px) {
+		.klist {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.kkey {
+			min-width: 40px;
+			height: 42px;
+			padding: 0 10px;
+		}
+	}
+</style>

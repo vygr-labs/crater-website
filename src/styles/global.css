@@ -304,3 +304,72 @@ a {
 		--s: 1 !important;
 	}
 }
+
+/* Small motion details */
+
+/* Reading progress along the top edge. */
+.progress {
+	position: fixed;
+	inset: 0 0 auto;
+	z-index: 60;
+	height: 2px;
+	background: linear-gradient(90deg, var(--brand), var(--gold));
+	transform: scaleX(0);
+	transform-origin: left;
+	pointer-events: none;
+}
+
+/* Eyebrows open with a short rule that draws in ahead of the text. */
+.eyebrow::before {
+	content: "";
+	display: inline-block;
+	vertical-align: middle;
+	width: 18px;
+	height: 1px;
+	margin: -2px 10px 0 0;
+	background: currentColor;
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform 0.9s var(--ease-out) 0.2s;
+}
+.eyebrow.is-in::before,
+html:not(.js) .eyebrow::before {
+	transform: scaleX(1);
+}
+
+/* Text links underline from the left. */
+.u-link {
+	background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+	transition: background-size 0.5s var(--ease-out), color 0.25s ease;
+}
+.u-link:hover {
+	background-size: 100% 1px;
+}
+
+/* Button icons answer the hover. */
+.btn svg {
+	transition: transform 0.5s var(--ease-out);
+}
+.btn-brand:hover svg {
+	animation: nudge-down 0.9s var(--ease-out) infinite;
+}
+.btn-ghost:hover svg {
+	transform: scale(1.18) rotate(-8deg);
+}
+@keyframes nudge-down {
+	0%, 100% { transform: translateY(0); }
+	45% { transform: translateY(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.progress {
+		display: none;
+	}
+	.eyebrow::before {
+		transform: scaleX(1);
+		transition: none;
+	}
+	.btn-brand:hover svg {
+		animation: none;
+	}
+}

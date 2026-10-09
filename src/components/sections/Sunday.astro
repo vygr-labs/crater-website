@@ -1,0 +1,256 @@
+---
+// A Sunday, start to finish. The section pins while the service moves
+// through its parts, and the projector on the right follows along.
+import { Image } from "astro:assets";
+import projCountdown from "../../assets/shots/proj-countdown.webp";
+import projSongReel from "../../assets/shots/proj-song-reel.webp";
+import projScripture from "../../assets/shots/proj-scripture.webp";
+import projSermon from "../../assets/shots/proj-sermon.webp";
+import projSong from "../../assets/shots/proj-song.webp";
+
+const steps = [
+	{ time: "9:50", title: "Countdown", body: "A timer counts the room in while people find their seats, and the stage display keeps the time for the band.", img: projCountdown, alt: "A countdown on the projector" },
+	{ time: "10:00", title: "Worship", body: "Lyrics go up verse by verse. When the leader goes back to the chorus, Page Up gets you there.", img: projSongReel, alt: "It Is Well with My Soul on the projector" },
+	{ time: "10:25", title: "The reading", body: "Type the reference as it is announced. The verse is on the wall before the reader reaches the pulpit.", img: projScripture, alt: "John 3:16 on the projector" },
+	{ time: "10:35", title: "The sermon", body: "Sermon slides sit in the same schedule, with scripture dropped in wherever the preacher turns.", img: projSermon, alt: "A sermon title slide" },
+	{ time: "11:20", title: "Closing hymn", body: "One last song, then Ctrl+L puts the logo up while the room empties. The schedule saves as you go.", img: projSong, alt: "Amazing Grace on the projector" },
+];
+---
+
+<section id="sunday" class="sunday" data-sunday data-static-when-still>
+	<div class="sunday-pin">
+		<div class="wrap sunday-grid">
+			<div class="sunday-copy">
+				<p class="eyebrow" data-reveal="up">A Sunday with Crater</p>
+				<h2 class="display h2" data-reveal="up">From the first song to the <span class="hl" data-hl>last amen</span>.</h2>
+				<ol class="steps">
+					{
+						steps.map((s, i) => (
+							<li class="step" data-step={i}>
+								<span class="step-time">{s.time}</span>
+								<div class="step-text">
+									<h3>{s.title}</h3>
+									<p class="lede">{s.body}</p>
+								</div>
+							</li>
+						))
+					}
+				</ol>
+			</div>
+			<div class="sunday-stage">
+				<div class="sunday-screen">
+					{
+						steps.map((s, i) => (
+							<div class="sunday-frame" data-frame={i}>
+								<Image src={s.img} alt={s.alt} widths={[640, 1100]} sizes="(max-width: 900px) 92vw, 46vw" />
+							</div>
+						))
+					}
+					<span class="sunday-live"><span class="dot"></span>LIVE</span>
+				</div>
+				<div class="sunday-clock" aria-hidden="true">
+					<span class="sunday-clock-bar"><span data-sunday-bar></span></span>
+					<span class="sunday-clock-t" data-sunday-time>9:50</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.sunday {
+		position: relative;
+		margin-top: 120px;
+	}
+	.sunday-pin {
+		min-height: 100vh;
+		display: flex;
+		align-items: center;
+		padding-block: 80px;
+	}
+	.sunday-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		gap: clamp(32px, 5vw, 88px);
+		align-items: center;
+	}
+	.sunday-copy h2 {
+		margin-top: 16px;
+	}
+	.steps {
+		list-style: none;
+		margin: 40px 0 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+	.step {
+		position: relative;
+		display: grid;
+		grid-template-columns: 64px 1fr;
+		gap: 16px;
+		padding: 14px 0 14px 20px;
+		border-left: 2px solid var(--line);
+		transition: border-color 0.5s ease;
+	}
+	.step::before {
+		content: "";
+		position: absolute;
+		left: -2px;
+		top: 0;
+		bottom: 0;
+		width: 2px;
+		background: var(--brand);
+		transform: scaleY(0);
+		transform-origin: top;
+		transition: transform 0.6s var(--ease-out);
+	}
+	.step.is-on::before {
+		transform: scaleY(1);
+	}
+	.step-time {
+		font-family: var(--font-mono);
+		font-size: 13px;
+		padding-top: 4px;
+		color: var(--ink-3);
+		transition: color 0.4s ease;
+	}
+	.step h3 {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: 21px;
+		font-weight: 600;
+		letter-spacing: -0.015em;
+		color: var(--ink-3);
+		transition: color 0.4s ease;
+	}
+	.step .lede {
+		margin: 0;
+		font-size: 15.5px;
+		max-height: 0;
+		opacity: 0;
+		overflow: hidden;
+		transition:
+			max-height 0.6s var(--ease-out),
+			opacity 0.5s ease,
+			margin 0.6s var(--ease-out);
+	}
+	.step.is-on h3,
+	.step.is-on .step-time {
+		color: var(--ink);
+	}
+	.step.is-on .step-time {
+		color: var(--brand);
+	}
+	.step.is-on .lede {
+		max-height: 120px;
+		opacity: 1;
+		margin-top: 6px;
+	}
+	.sunday-screen {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		border-radius: 16px;
+		overflow: hidden;
+		background: #000;
+		border: 1px solid var(--line-strong);
+		box-shadow: 0 40px 100px -30px var(--shadow);
+	}
+	.sunday-frame {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		clip-path: inset(0 0 0 100%);
+	}
+	.sunday-frame:first-child {
+		opacity: 1;
+		clip-path: inset(0);
+	}
+	.sunday-frame :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.sunday-live {
+		position: absolute;
+		top: 14px;
+		left: 14px;
+		z-index: 2;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 4px 10px;
+		border-radius: 6px;
+		background: rgb(0 0 0 / 0.55);
+		backdrop-filter: blur(6px);
+		color: #f26b5b;
+		font-family: var(--font-mono);
+		font-size: 12px;
+		letter-spacing: 0.08em;
+	}
+	.sunday-live .dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: currentColor;
+		animation: sunday-pulse 1.6s ease-in-out infinite;
+	}
+	@keyframes sunday-pulse {
+		50% {
+			opacity: 0.3;
+		}
+	}
+	.sunday-clock {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		margin-top: 20px;
+	}
+	.sunday-clock-bar {
+		position: relative;
+		flex: 1;
+		height: 2px;
+		border-radius: 2px;
+		background: var(--line);
+		overflow: hidden;
+	}
+	.sunday-clock-bar span {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(90deg, var(--brand), var(--gold));
+		transform: scaleX(0);
+		transform-origin: left;
+	}
+	.sunday-clock-t {
+		font-family: var(--font-mono);
+		font-size: 14px;
+		color: var(--ink-2);
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* Without the pinned scroll every step simply reads open. */
+	:global(html:not(.js)) .step .lede,
+	.sunday.is-static .step .lede {
+		max-height: none;
+		opacity: 1;
+		margin-top: 6px;
+	}
+	.sunday.is-static .step h3 {
+		color: var(--ink);
+	}
+
+	@media (max-width: 900px) {
+		.sunday-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.sunday-stage {
+			order: -1;
+			position: sticky;
+			top: 0;
+			z-index: 2;
+			padding: 16px 0 12px;
+			background: var(--bg);
+		}
+	}
+</style>

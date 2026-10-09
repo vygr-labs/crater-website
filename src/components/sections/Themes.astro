@@ -1,0 +1,225 @@
+---
+// The built-in themes, on one live slide. Hover or tap a swatch and the
+// slide restyles; left alone it walks through them while on screen.
+// Colours are taken from Crater's own seeded themes.
+const themes = [
+	{ name: "Plum & Rose", kind: "Scripture and songs", bg: ["#110910", "#571f44", "#1a0c18", "#391528"], text: "#fcf3f5", accent: "#f29cac", muted: "#c9a3ad" },
+	{ name: "Graphite & Cyan", kind: "Scripture and songs", bg: ["#0b0c0e", "#17343c", "#0e1013", "#191c24"], text: "#f4f6f8", accent: "#3ac8d4", muted: "#9fb0b6" },
+	{ name: "Classic Dark", kind: "Every kind", bg: ["#0a0a0d", "#16161c", "#0a0a0d", "#111116"], text: "#f5f5f0", accent: "#f5f5f0", muted: "#a5a5a0" },
+	{ name: "Midnight Focus", kind: "Presentations", bg: ["#020617", "#0b1a3a", "#020617", "#0b1a3a"], text: "#e0f2fe", accent: "#38bdf8", muted: "#7dd3fc" },
+	{ name: "Stage Bold", kind: "Presentations", bg: ["#1a0b1f", "#3a1844", "#1a0b1f", "#2a1030"], text: "#fff8e7", accent: "#fff8e7", muted: "#d9cdb4" },
+	{ name: "Clean Light", kind: "Presentations", bg: ["#f8fafc", "#e2e8f0", "#f8fafc", "#eef2f7"], text: "#0f172a", accent: "#1d4ed8", muted: "#475569" },
+];
+const vars = (t: (typeof themes)[number]) =>
+	`--t-a:${t.bg[0]};--t-b:${t.bg[1]};--t-c:${t.bg[2]};--t-d:${t.bg[3]};--t-text:${t.text};--t-accent:${t.accent};--t-muted:${t.muted}`;
+const bgVars = (t: (typeof themes)[number]) => `--b1:${t.bg[0]};--b2:${t.bg[1]};--b3:${t.bg[2]};--b4:${t.bg[3]}`;
+---
+
+<section id="themes" class="themes wrap" data-themes>
+	<div class="themes-grid">
+		<div class="themes-copy">
+			<p class="eyebrow" data-reveal="up">Themes</p>
+			<h2 class="display h2" data-reveal="up">Change the whole look in <span class="hl" data-hl>one click</span>.</h2>
+			<p class="lede" data-reveal="up">
+				Crater ships with themes for songs, scripture and slides. Pick one and every slide follows. Make your own in the editor, or send one to the next church as a single file.
+			</p>
+			<ul class="swatches" role="list">
+				{
+					themes.map((t, i) => (
+						<li>
+							<button type="button" class="swatch" style={vars(t)} data-theme-i={i} aria-pressed={i === 0 ? "true" : "false"}>
+								<span class="sw-chip" aria-hidden="true" />
+								<span class="sw-name">{t.name}</span>
+								<span class="sw-kind">{t.kind}</span>
+							</button>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+
+		<div class="slide-wrap" data-reveal="card">
+			<div class="slide" data-slide style={vars(themes[0])} aria-label="A sample slide in the selected theme" role="img">
+				<div class="slide-bg slide-bg-a" aria-hidden="true" style={bgVars(themes[0])}></div>
+				<div class="slide-bg slide-bg-b" aria-hidden="true"></div>
+				<div class="slide-body">
+					<span class="slide-ref">PSALM 23:1 · KJV</span>
+					<p class="slide-text">The LORD is my shepherd; I shall not want.</p>
+					<span class="slide-credit">He maketh me to lie down in green pastures</span>
+				</div>
+			</div>
+			<p class="slide-caption"><span data-theme-name>{themes[0].name}</span></p>
+		</div>
+	</div>
+</section>
+
+<style>
+	.themes {
+		padding-top: 180px;
+	}
+	.themes-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		gap: clamp(32px, 5vw, 88px);
+		align-items: center;
+	}
+	.themes-copy h2 {
+		margin-top: 16px;
+	}
+	.themes-copy .lede {
+		margin: 20px 0 0;
+		max-width: 520px;
+	}
+	.swatches {
+		list-style: none;
+		margin: 36px 0 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 8px;
+	}
+	.swatch {
+		width: 100%;
+		display: grid;
+		grid-template-columns: 34px 1fr;
+		grid-template-rows: auto auto;
+		column-gap: 12px;
+		align-items: center;
+		padding: 10px;
+		border-radius: 12px;
+		border: 1px solid var(--line);
+		background: transparent;
+		color: var(--ink);
+		font: inherit;
+		text-align: left;
+		cursor: pointer;
+		transition:
+			border-color 0.3s ease,
+			background-color 0.3s ease,
+			transform 0.4s var(--ease-out);
+	}
+	.swatch:hover {
+		transform: translateY(-2px);
+		border-color: var(--line-strong);
+	}
+	.swatch[aria-pressed="true"] {
+		border-color: var(--brand);
+		background: var(--brand-wash);
+	}
+	.sw-chip {
+		grid-row: span 2;
+		width: 34px;
+		height: 34px;
+		border-radius: 9px;
+		background:
+			radial-gradient(circle at 30% 30%, var(--t-b), transparent 70%),
+			var(--t-a);
+		box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+		position: relative;
+		overflow: hidden;
+	}
+	.sw-chip::after {
+		content: "";
+		position: absolute;
+		right: 6px;
+		bottom: 6px;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--t-accent);
+	}
+	.sw-name {
+		font-size: 14.5px;
+		font-weight: 600;
+	}
+	.sw-kind {
+		font-size: 12.5px;
+		color: var(--ink-3);
+	}
+	.slide-wrap {
+		perspective: 1600px;
+	}
+	.slide {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		border-radius: 16px;
+		overflow: hidden;
+		box-shadow:
+			0 50px 120px -40px var(--shadow),
+			0 0 0 1px var(--line-strong);
+		color: var(--t-text);
+		transition: color 0.7s ease;
+		will-change: transform;
+	}
+	/* Two background layers crossfade so the mesh never snaps. */
+	.slide-bg {
+		position: absolute;
+		inset: 0;
+		background:
+			radial-gradient(60% 80% at 15% 20%, var(--b2), transparent 70%),
+			radial-gradient(70% 70% at 85% 85%, var(--b4), transparent 70%),
+			radial-gradient(50% 60% at 80% 10%, var(--b3), transparent 70%),
+			var(--b1);
+		transition: opacity 0.8s ease;
+	}
+	.slide-bg-b {
+		opacity: 0;
+	}
+	.slide-body {
+		position: relative;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 3%;
+		padding: 0 9%;
+		text-align: center;
+		container-type: inline-size;
+	}
+	.slide-ref {
+		font-family: "Funnel Sans", var(--font-body);
+		font-weight: 600;
+		font-size: 2.6cqw;
+		letter-spacing: 0.14em;
+		color: var(--t-accent);
+		transition: color 0.7s ease;
+	}
+	.slide-text {
+		margin: 0;
+		font-family: "Funnel Sans", var(--font-body);
+		font-weight: 600;
+		font-size: 5.8cqw;
+		line-height: 1.2;
+		letter-spacing: -0.01em;
+		text-shadow: 0 4px 18px rgb(0 0 0 / 0.25);
+	}
+	.slide-credit {
+		font-family: "Funnel Sans", var(--font-body);
+		font-size: 2.2cqw;
+		color: var(--t-muted);
+		transition: color 0.7s ease;
+	}
+	.slide-caption {
+		margin: 18px 0 0;
+		text-align: center;
+		font-family: var(--font-mono);
+		font-size: 13px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+	}
+	@media (max-width: 900px) {
+		.themes-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.slide-wrap {
+			order: -1;
+		}
+	}
+	@media (max-width: 460px) {
+		.swatches {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

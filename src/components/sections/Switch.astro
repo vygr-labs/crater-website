@@ -1,0 +1,255 @@
+---
+// Coming from EasyWorship: the song library moves across as you scroll.
+const songs = [
+	["Amazing Grace", "John Newton"],
+	["Blessed Assurance", "Fanny Crosby"],
+	["Come, Thou Fount", "Robert Robinson"],
+	["Great Is Thy Faithfulness", "Thomas Chisholm"],
+	["Holy, Holy, Holy", "Reginald Heber"],
+	["It Is Well with My Soul", "Horatio Spafford"],
+	["Rock of Ages", "Augustus Toplady"],
+	["What a Friend We Have in Jesus", "Joseph Scriven"],
+];
+const points = [
+	["EasyWorship 6 and 7", "Point Crater at your song database and it does the rest."],
+	["Nothing left behind", "Titles, authors, copyright and CCLI numbers come across with the words."],
+	["Ready to project", "Lyrics are split into labelled verses and choruses on the way in."],
+	["No doubles", "Songs you already have are spotted first, and you choose to skip them."],
+];
+---
+
+<section id="switch" class="switch wrap" data-switch>
+	<div class="switch-head">
+		<p class="eyebrow" data-reveal="up">Coming from EasyWorship</p>
+		<h2 class="display h2" data-reveal="up">Bring every song <span class="hl" data-hl>with you</span>.</h2>
+		<p class="lede" data-reveal="up">Years of lyrics should not be retyped. Crater reads your EasyWorship library directly and keeps everything you entered.</p>
+	</div>
+
+	<div class="switch-demo card" data-reveal="card" aria-label="Songs moving from an EasyWorship library into Crater" role="img">
+		<div class="lib lib-from">
+			<div class="lib-bar">
+				<span class="lib-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+				<span class="lib-name">EasyWorship</span>
+				<span class="lib-file">Songs.db</span>
+			</div>
+			<ul>
+				{songs.map(([t, a]) => <li data-from><span>{t}</span><small>{a}</small></li>)}
+			</ul>
+		</div>
+
+		<div class="switch-flow" aria-hidden="true">
+			<svg viewBox="0 0 120 40" preserveAspectRatio="none"><path d="M0 20 H120" /></svg>
+			<span class="switch-pct" data-switch-pct>0%</span>
+		</div>
+
+		<div class="lib lib-to">
+			<div class="lib-bar">
+				<span class="lib-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+				<span class="lib-name">Crater</span>
+				<span class="lib-file lib-file-brand">Songs</span>
+			</div>
+			<ul>
+				{songs.map(([t, a]) => <li data-to><span>{t}</span><small>{a}</small><em>V1 · C · V2</em></li>)}
+			</ul>
+			<div class="lib-progress"><span data-switch-bar></span></div>
+		</div>
+	</div>
+
+	<ul class="switch-points">
+		{
+			points.map(([h, p]) => (
+				<li data-reveal="up">
+					<h3>{h}</h3>
+					<p class="lede">{p}</p>
+				</li>
+			))
+		}
+	</ul>
+</section>
+
+<style>
+	.switch {
+		padding-top: 160px;
+	}
+	.switch-head {
+		max-width: 720px;
+	}
+	.switch-head h2 {
+		margin-top: 16px;
+	}
+	.switch-head .lede {
+		margin: 20px 0 0;
+	}
+	.switch-demo {
+		margin-top: 56px;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 140px minmax(0, 1fr);
+		align-items: center;
+		gap: 12px;
+		padding: clamp(20px, 3vw, 40px);
+	}
+	.lib {
+		border-radius: 14px;
+		background: var(--bg-2);
+		border: 1px solid var(--line);
+		overflow: hidden;
+	}
+	.lib-bar {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 12px 14px;
+		border-bottom: 1px solid var(--line);
+		font-size: 13px;
+	}
+	.lib-dots {
+		display: inline-flex;
+		gap: 5px;
+	}
+	.lib-dots i {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--line-strong);
+	}
+	.lib-name {
+		font-weight: 600;
+	}
+	.lib-file {
+		margin-left: auto;
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--ink-3);
+	}
+	.lib-file-brand {
+		color: var(--brand);
+	}
+	.lib ul {
+		list-style: none;
+		margin: 0;
+		padding: 6px;
+	}
+	.lib li {
+		display: flex;
+		align-items: baseline;
+		gap: 10px;
+		padding: 8px 10px;
+		border-radius: 8px;
+		font-size: 14px;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+	.lib li span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.lib li small {
+		color: var(--ink-3);
+		font-size: 12px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.lib li em {
+		margin-left: auto;
+		font-style: normal;
+		font-family: var(--font-mono);
+		font-size: 10.5px;
+		color: var(--brand);
+		flex: none;
+	}
+	.lib-progress {
+		height: 2px;
+		background: var(--line);
+	}
+	.lib-progress span {
+		display: block;
+		height: 100%;
+		background: var(--brand);
+		transform: scaleX(0);
+		transform-origin: left;
+	}
+	.switch-flow {
+		position: relative;
+		height: 40px;
+		display: grid;
+		place-items: center;
+	}
+	.switch-flow svg {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		overflow: visible;
+	}
+	.switch-flow path {
+		fill: none;
+		stroke: var(--brand);
+		stroke-width: 2;
+		stroke-dasharray: 4 8;
+		vector-effect: non-scaling-stroke;
+		animation: flow 0.8s linear infinite;
+	}
+	@keyframes flow {
+		to {
+			stroke-dashoffset: -12;
+		}
+	}
+	.switch-pct {
+		position: relative;
+		padding: 4px 10px;
+		border-radius: 999px;
+		background: var(--card);
+		border: 1px solid var(--line-strong);
+		font-family: var(--font-mono);
+		font-size: 12px;
+		font-variant-numeric: tabular-nums;
+	}
+	.switch-points {
+		list-style: none;
+		margin: 48px 0 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 32px;
+	}
+	.switch-points li {
+		padding-top: 20px;
+		border-top: 1px solid var(--line);
+	}
+	.switch-points h3 {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: 19px;
+		font-weight: 600;
+	}
+	.switch-points .lede {
+		margin: 8px 0 0;
+		font-size: 15.5px;
+	}
+	@media (max-width: 900px) {
+		.switch-demo {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.switch-flow {
+			transform: rotate(90deg);
+			width: 80px;
+			margin: 0 auto;
+		}
+		.switch-flow .switch-pct {
+			transform: rotate(-90deg);
+		}
+		.switch-points {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+	@media (max-width: 560px) {
+		.switch-points {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.switch-flow path {
+			animation: none;
+		}
+	}
+</style>
