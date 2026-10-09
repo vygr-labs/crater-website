@@ -349,6 +349,7 @@ function setupHero(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timelin
 	gsap.set(".hero .arc", { opacity: 0, scale: 0.9 });
 	gsap.set("[data-screen]", { y: 140, rotateX: 28, scale: 0.9, opacity: 0 });
 	gsap.set("[data-float]", { y: 120, opacity: 0 });
+	gsap.set(".hero", { visibility: "visible" });
 
 	const intro = gsap.timeline({ defaults: { ease: "expo.out" }, delay: 0.15 });
 	intro
