@@ -136,7 +136,7 @@ const faqs = [
 						<ul aria-hidden={copy === 1 ? "true" : undefined}>
 							{marquee.map((m) => (
 								<li>
-									<span class="sep" aria-hidden="true" />
+									<span class="sep" aria-hidden="true"><Mark size={24} /></span>
 									{m}
 								</li>
 							))}
@@ -627,11 +627,13 @@ const faqs = [
 		color: var(--ink-2);
 		white-space: nowrap;
 	}
+	/* The Crater mark between items: the screen dimmed, the sun still lit. */
 	.marquee .sep {
-		width: 5px;
-		height: 5px;
-		border-radius: 50%;
-		background: var(--ink-3);
+		display: flex;
+	}
+	.marquee .sep :global(.mark path:first-child) {
+		fill: var(--ink-3);
+		opacity: 0.7;
 	}
 	@keyframes marquee {
 		to {
