@@ -89,7 +89,6 @@ const faqs = [
 		<!-- HERO -->
 		<section id="top" class="hero">
 			<div class="sun" aria-hidden="true"></div>
-			<div class="arc" aria-hidden="true"></div>
 			<div class="hero-copy wrap">
 				<div class="pill" data-hero-in>
 					<span class="pill-tag">Free</span>
@@ -117,6 +116,7 @@ const faqs = [
 			</div>
 
 			<div class="stage wrap">
+				<div class="arc" aria-hidden="true"></div>
 				<div class="screen" data-screen>
 					<Image src={heroConsole} alt="The Crater console with Amazing Grace live, the next verse lined up, and the song library below" widths={[960, 1440, 1920]} sizes="96vw" loading="eager" fetchpriority="high" />
 					<div class="screen-sheen" aria-hidden="true"></div>
@@ -448,10 +448,12 @@ const faqs = [
 		pointer-events: none;
 		will-change: transform, opacity;
 	}
+	/* Hangs off the console rather than the page top, so the copy above
+	   can grow with the window without the line running through it. */
 	.arc {
 		position: absolute;
 		left: 50%;
-		top: 640px;
+		top: -56px;
 		width: 1240px;
 		height: 1240px;
 		margin-left: -620px;
