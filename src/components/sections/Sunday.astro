@@ -30,7 +30,11 @@ const steps = [
 								<span class="step-time">{s.time}</span>
 								<div class="step-text">
 									<h3>{s.title}</h3>
-									<p class="lede">{s.body}</p>
+									<div class="step-body">
+										<div>
+											<p class="lede">{s.body}</p>
+										</div>
+									</div>
 								</div>
 							</li>
 						))
@@ -130,16 +134,25 @@ const steps = [
 		color: var(--ink-3);
 		transition: color 0.4s ease;
 	}
+	/* The body opens on a grid row rather than max-height, so the step
+	   closing and the step opening move in lockstep and the list keeps
+	   its height (motion.ts reserves room for the longest one). */
+	.step-body {
+		display: grid;
+		grid-template-rows: 0fr;
+		opacity: 0;
+		transition:
+			grid-template-rows 0.6s var(--ease-out),
+			opacity 0.5s ease;
+	}
+	.step-body > div {
+		min-height: 0;
+		overflow: hidden;
+	}
 	.step .lede {
 		margin: 0;
+		padding-top: 6px;
 		font-size: 15.5px;
-		max-height: 0;
-		opacity: 0;
-		overflow: hidden;
-		transition:
-			max-height 0.6s var(--ease-out),
-			opacity 0.5s ease,
-			margin 0.6s var(--ease-out);
 	}
 	.step.is-on h3,
 	.step.is-on .step-time {
@@ -148,10 +161,9 @@ const steps = [
 	.step.is-on .step-time {
 		color: var(--brand);
 	}
-	.step.is-on .lede {
-		max-height: 120px;
+	.step.is-on .step-body {
+		grid-template-rows: 1fr;
 		opacity: 1;
-		margin-top: 6px;
 	}
 	.sunday-screen {
 		position: relative;
@@ -271,11 +283,10 @@ const steps = [
 	}
 
 	/* Without the pinned scroll every step simply reads open. */
-	:global(html:not(.js)) .step .lede,
-	.sunday.is-static .step .lede {
-		max-height: none;
+	:global(html:not(.js)) .step-body,
+	.sunday.is-static .step-body {
+		grid-template-rows: 1fr;
 		opacity: 1;
-		margin-top: 6px;
 	}
 	.sunday.is-static .step h3 {
 		color: var(--ink);

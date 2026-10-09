@@ -44,8 +44,22 @@ export function setupSunday(mm: gsap.MatchMedia) {
 		});
 	};
 
+	// The copy is centred in the pinned screen, so the list must not change
+	// height as steps open and close, or the heading above it bobs. Hold it
+	// at its tallest: every step closed plus the longest body open.
+	const list = $(".steps", section)!;
+	const bodies = $$(".step-body", section);
+	const reserve = () => {
+		list.style.minHeight = "";
+		const open = bodies.reduce((sum, b) => sum + b.getBoundingClientRect().height, 0);
+		const tallest = Math.max(...bodies.map((b) => b.firstElementChild!.scrollHeight));
+		list.style.minHeight = `${list.getBoundingClientRect().height - open + tallest}px`;
+	};
+
 	mm.add("(min-width: 901px)", () => {
 		show(0);
+		reserve();
+		ScrollTrigger.addEventListener("refreshInit", reserve);
 		const per = () => innerHeight * 0.55;
 		ScrollTrigger.create({
 			trigger: section,
@@ -64,6 +78,8 @@ export function setupSunday(mm: gsap.MatchMedia) {
 		});
 		return () => {
 			current = -1;
+			ScrollTrigger.removeEventListener("refreshInit", reserve);
+			list.style.minHeight = "";
 		};
 	});
 
