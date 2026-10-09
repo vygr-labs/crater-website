@@ -5,7 +5,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { setupKeys, setupMicro, setupOpen, setupRequest, setupScreens, setupSunday, setupSwitch, setupThemes } from "./sections";
+import { setupFeatures, setupKeys, setupMicro, setupOpen, setupRequest, setupScreens, setupSunday, setupSwitch, setupThemes } from "./sections";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -102,8 +102,10 @@ function run() {
 		onEnter: (els) =>
 			gsap.fromTo(
 				els,
-				{ y: 90, scale: 0.96, opacity: 0, filter: "blur(10px)" },
-				{ y: 0, scale: 1, opacity: 1, filter: "blur(0px)", duration: 1.4, stagger: 0.12, ease: "expo.out", clearProps: "filter" },
+				// No blur here: blurring a large card re-rasterises it every frame,
+				// which stuttered wherever several cards came in at once.
+				{ y: 90, scale: 0.96, opacity: 0 },
+				{ y: 0, scale: 1, opacity: 1, duration: 1.4, stagger: 0.12, ease: "expo.out" },
 			),
 	});
 	ScrollTrigger.batch('[data-reveal="row"]', {
@@ -186,6 +188,7 @@ function run() {
 	});
 
 	/* ── Longer sections, in page order below the reel ─────────────────── */
+	setupFeatures(mm);
 	setupSunday(mm);
 	setupScreens();
 	setupThemes(mm);

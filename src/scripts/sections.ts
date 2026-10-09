@@ -447,3 +447,38 @@ export function setupMicro(finePointer: boolean) {
 		});
 	});
 }
+
+/* ── Feature cards ────────────────────────────────────────────────────────
+   Tied to the scroll rather than played once: each card starts tipped back,
+   low and a little small, and settles flat as it rises into view. The pair
+   come in from either side, the three small ones one after another, and
+   what's inside each card trails the card by a beat. */
+export function setupFeatures(mm: gsap.MatchMedia) {
+	const cards = $$("[data-feat]");
+	if (!cards.length) return;
+	mm.add({ wide: "(min-width: 1061px)", narrow: "(max-width: 1060px)" }, (ctx) => {
+		const { wide } = ctx.conditions as { wide: boolean };
+		let small = 0;
+		cards.forEach((card, i) => {
+			const isSmall = card.classList.contains("feat-sm");
+			const isWide = card.classList.contains("feat-wide");
+			// Side by side only when the grid is wide: the pair at 1 and 2,
+			// the small cards in a row of three.
+			const side = wide && !isWide && !isSmall ? (i % 2 ? -1 : 1) : 0;
+			const lag = wide && isSmall ? small++ * 70 : 0;
+			const st = { trigger: card, start: `top+=${lag} bottom`, end: `top+=${lag} 58%`, scrub: 0.7 };
+			gsap.fromTo(
+				card,
+				{ y: wide ? 150 : 90, x: side * 70, rotateX: wide ? 16 : 10, rotateY: side * -6, scale: 0.92, opacity: 0, transformPerspective: 1400, transformOrigin: "50% 0%" },
+				{ y: 0, x: 0, rotateX: 0, rotateY: 0, scale: 1, opacity: 1, ease: "none", scrollTrigger: st },
+			);
+			// The inside follows a little later, so the card reads as having depth.
+			const inner = Array.from(card.children) as HTMLElement[];
+			gsap.fromTo(
+				inner,
+				{ y: 40, opacity: 0.2 },
+				{ y: 0, opacity: 1, ease: "none", stagger: 0.08, scrollTrigger: { ...st, start: `top+=${lag + 60} bottom`, end: `top+=${lag} 50%` } },
+			);
+		});
+	});
+}

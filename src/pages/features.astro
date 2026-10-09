@@ -166,19 +166,23 @@ const areas = [
 			Everything Crater <span class="hl" data-hl>does</span>.
 		</PageHead>
 
-		<div class="wrap fx">
+		<div class="wrap fx" data-fx>
 			<nav class="fx-index" aria-label="On this page">
 				<ul>
 					{areas.map((a) => <li><a href={`#${a.id}`}>{a.title}</a></li>)}
 				</ul>
 			</nav>
-			<div class="fx-list">
+			<div class="fx-list" data-fx-list>
 				{
 					areas.map((a, i) => (
-						<section id={a.id} class="fx-item">
-							<div class="fx-copy" data-reveal="up">
+						<>
+						{/* Links and scroll triggers aim here: a card that has stuck
+						    reports where it is stuck, not where it sits in the page. */}
+						<span id={a.id} class="fx-anchor" data-fx-anchor />
+						<section class="fx-item" data-fx-card style={`--i:${i}`} aria-labelledby={`${a.id}-title`}>
+							<div class="fx-copy">
 								<span class="fx-n">{String(i + 1).padStart(2, "0")}</span>
-								<h2 class="display fx-title">{a.title}</h2>
+								<h2 class="display fx-title" id={`${a.id}-title`}>{a.title}</h2>
 								<p class="lede">{a.lede}</p>
 								<ul class="fx-points">
 									{a.points.map((p) => <li>{p}</li>)}
@@ -188,10 +192,12 @@ const areas = [
 									<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 								</a>
 							</div>
-							<div class="fx-shot" data-reveal="card" data-parallax-box>
-								<Image src={a.img} alt={a.alt} widths={[640, 1200]} sizes="(max-width: 900px) 100vw, 46vw" data-parallax />
+							<div class="fx-shot">
+								<Image src={a.img} alt={a.alt} widths={[640, 1200]} sizes="(max-width: 900px) 100vw, 46vw" />
 							</div>
 						</section>
+						{i < areas.length - 1 && <span class="fx-gap" aria-hidden="true" />}
+						</>
 					))
 				}
 			</div>
@@ -222,7 +228,8 @@ const areas = [
 	}
 	.fx-index {
 		position: sticky;
-		top: 110px;
+		/* Level with the top of the stack when there is one. */
+		top: var(--stack-top, 110px);
 	}
 	.fx-index ul {
 		list-style: none;
@@ -249,15 +256,51 @@ const areas = [
 		border-color: var(--brand);
 	}
 	.fx-list {
-		display: grid;
-		gap: clamp(72px, 9vw, 140px);
+		display: flex;
+		flex-direction: column;
+	}
+	.fx-anchor {
+		display: block;
+		height: 0;
+		scroll-margin-top: 110px;
 	}
 	.fx-item {
+		position: relative;
 		display: grid;
 		grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
 		gap: clamp(28px, 4vw, 64px);
 		align-items: center;
-		scroll-margin-top: 110px;
+	}
+	/* Wide enough to sit side by side: each feature is a card. */
+	@media (min-width: 901px) {
+		.fx-item {
+			padding: clamp(28px, 3vw, 44px);
+			border-radius: 28px;
+			background: var(--card);
+			border: 1px solid var(--line);
+		}
+	}
+	/* The space between features. A spacer rather than a margin, because a
+	   stuck card lets go early to keep room for its own margin. */
+	.fx-gap {
+		display: block;
+		flex: none;
+		height: clamp(72px, 9vw, 140px);
+	}
+	/* The script adds is-stacked when the whole stack fits the window. Each
+	   card sticks a little lower than the last, so the edges above it show. */
+	.fx-list.is-stacked {
+		padding-bottom: 12vh;
+	}
+	.fx-list.is-stacked .fx-item {
+		position: sticky;
+		top: calc(var(--stack-top) + var(--i) * var(--stack-step));
+		transform-origin: 50% 0;
+		box-shadow: 0 -6px 18px -12px var(--shadow);
+	}
+
+	.fx-list.is-stacked .fx-gap {
+		height: max(0px, calc(32vh - var(--even, 0px)));
 	}
 	.fx-n {
 		font-variant-numeric: tabular-nums;
@@ -321,9 +364,8 @@ const areas = [
 	}
 	.fx-shot :global(img) {
 		width: 100%;
-		transform: scale(1.06);
 	}
-	.fx-item:nth-child(even) .fx-shot {
+	.fx-item:nth-of-type(even) .fx-shot {
 		order: -1;
 	}
 	.fx-end {
@@ -360,24 +402,104 @@ const areas = [
 			grid-template-columns: minmax(0, 1fr);
 		}
 		.fx-item .fx-shot,
-		.fx-item:nth-child(even) .fx-shot {
+		.fx-item:nth-of-type(even) .fx-shot {
 			order: -1;
 		}
 	}
 </style>
 
 <script>
-	// Light up the index entry for the section in view.
+	import gsap from "gsap";
+	import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+	gsap.registerPlugin(ScrollTrigger);
+
+	const fx = document.querySelector<HTMLElement>("[data-fx]")!;
+	const list = document.querySelector<HTMLElement>("[data-fx-list]")!;
+	const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-fx-card]"));
+	const anchors = Array.from(document.querySelectorAll<HTMLElement>("[data-fx-anchor]"));
 	const links = Array.from(document.querySelectorAll<HTMLAnchorElement>(".fx-index a"));
-	const byId = new Map(links.map((a) => [a.hash.slice(1), a]));
-	const io = new IntersectionObserver(
-		(entries) =>
-			entries.forEach((e) => {
-				if (!e.isIntersecting) return;
-				links.forEach((a) => a.classList.remove("is-now"));
-				byId.get(e.target.id)?.classList.add("is-now");
-			}),
-		{ rootMargin: "-45% 0px -50% 0px" },
-	);
-	document.querySelectorAll(".fx-item").forEach((s) => io.observe(s));
+	const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+	const MIN_TOP = 96;
+	let top = MIN_TOP;
+	const STEP = 12;
+	list.style.setProperty("--stack-step", `${STEP}px`);
+
+	const SCALE = 0.96;
+	// How much to trim off the bottom of a covered card so it tucks behind
+	// every card that will sit on top of it. Measuring against the shortest of
+	// those, not just the next one, keeps it hidden after they are trimmed too.
+	const trim = (i: number) => {
+		const shortest = Math.min(...cards.slice(i + 1).map((c) => c.offsetHeight));
+		return Math.max(0, Math.ceil(cards[i].offsetHeight - (STEP + shortest) / SCALE) + 2);
+	};
+
+	// Stack only when every card, at the depth it sticks at, still shows whole.
+	let tweens: gsap.core.Tween[] = [];
+	const layout = () => {
+		// The stack sits in the middle of the window: the room the deepest card
+		// needs is split above and below, but never higher than under the nav.
+		const depth = Math.max(...cards.map((c, i) => i * STEP + c.offsetHeight));
+		top = Math.max(MIN_TOP, Math.round((innerHeight - depth) / 2));
+		const fits = innerWidth > 900 && top + depth <= innerHeight - 16;
+		fx.style.setProperty("--stack-top", `${fits ? top : 110}px`);
+		// A stuck card lets go when the end of the list reaches its bottom edge,
+		// so a tall card would leave before a short one. Room under each short
+		// card evens that out, and the gap after it shrinks by the same amount.
+		cards.forEach((c, i) => {
+			const even = fits ? depth - i * STEP - c.offsetHeight : 0;
+			c.style.marginBottom = even ? `${even}px` : "";
+			(c.nextElementSibling as HTMLElement | null)?.style.setProperty("--even", `${even}px`);
+		});
+		if (fits === list.classList.contains("is-stacked")) return ScrollTrigger.refresh();
+		tweens.forEach((t) => {
+			t.scrollTrigger?.kill();
+			t.kill();
+		});
+		tweens = [];
+		gsap.set(cards, { scale: 1, clearProps: "clipPath" });
+		gsap.set(cards.flatMap((c) => Array.from(c.children)), { autoAlpha: 1 });
+		list.classList.toggle("is-stacked", fits);
+		// As each card slides over, the one beneath steps back and its content
+		// fades, so only its edge shows above the new card.
+		if (fits && !reduce)
+			tweens = cards.slice(0, -1).flatMap((card, i) => {
+				const scrollTrigger = { trigger: anchors[i + 1], start: "top bottom", end: () => `top ${top + (i + 1) * STEP}px`, scrub: true, invalidateOnRefresh: true };
+				// Fading the content itself, not a variable it inherits, keeps each
+				// scroll tick to one style change, and hidden content isn't painted.
+				return [
+					gsap.fromTo(
+						card,
+						{ scale: 1, clipPath: "inset(0px 0px 0px 0px round 28px)" },
+						{ scale: SCALE, clipPath: () => `inset(0px 0px ${trim(i)}px 0px round 28px)`, ease: "none", scrollTrigger: { ...scrollTrigger, invalidateOnRefresh: true } },
+					),
+					gsap.to(card.children, { autoAlpha: 0, ease: "none", scrollTrigger }),
+				];
+			});
+		ScrollTrigger.refresh();
+	};
+	layout();
+	// Fonts arriving late reflow the cards, so measure again whenever any card
+	// changes size, not only when the window does.
+	let raf = 0;
+	const again = () => {
+		cancelAnimationFrame(raf);
+		raf = requestAnimationFrame(layout);
+	};
+	addEventListener("resize", again);
+	const ro = new ResizeObserver(again);
+	cards.forEach((c) => ro.observe(c));
+
+	// Light up the index entry for the card on top: the last one whose top
+	// has reached the middle of the window. Works the same both ways.
+	const mark = () => {
+		let now = 0;
+		cards.forEach((c, i) => {
+			if (c.getBoundingClientRect().top <= innerHeight * 0.45) now = i;
+		});
+		links.forEach((a, i) => a.classList.toggle("is-now", i === now));
+	};
+	let marking = 0;
+	addEventListener("scroll", () => (marking ||= requestAnimationFrame(() => ((marking = 0), mark()))), { passive: true });
+	mark();
 </script>
