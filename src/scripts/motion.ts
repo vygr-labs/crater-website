@@ -65,8 +65,8 @@ function pauseOffscreenLoops() {
 }
 
 if (reduce) {
-	// Leave everything in its finished state.
-	$$("[data-hl]").forEach((el) => el.style.setProperty("--p", "100%"));
+	// Leave everything in its finished state. Highlights only flash, so
+	// they simply stay as plain text.
 	$$("[data-static-when-still]").forEach((el) => el.classList.add("is-static"));
 } else {
 	run();
@@ -97,9 +97,19 @@ function run() {
 		lastY = scroll;
 	});
 
-	/* ── Highlight sweep: the gold wash crosses the word ──────────────── */
+	/* ── Highlight flash: the wash crosses the word, holds, then the word
+	   settles back to the ink colour and the underline leaves to the right. */
 	const sweep = (el: HTMLElement, delay = 0) =>
-		gsap.fromTo(el, { "--p": "0%", "--s": 0 }, { "--p": "100%", "--s": 1, duration: 1.1, delay, ease: "power3.inOut" });
+		gsap
+			.timeline({ delay })
+			.fromTo(el, { "--p": "0%", "--s": 0 }, { "--p": "100%", "--s": 1, duration: 1.1, ease: "power3.inOut" })
+			.add(() => el.classList.add("hl-out"), "+=1.2")
+			.to(el, { "--s": 0, duration: 0.7, ease: "power3.inOut" })
+			.fromTo(el, { "--fade": 0 }, { "--fade": 1, duration: 0.9, ease: "power2.out" }, "<0.1")
+			.add(() => {
+				el.classList.remove("hl-out");
+				el.style.setProperty("--p", "0%");
+			});
 
 	/* ── Hero intro, on the home page ───────────────────────────────────── */
 	if ($(".hero")) setupHero(sweep);
@@ -111,7 +121,7 @@ function run() {
 
 /* Entrances that play once as things scroll into view. One observer handles
    them all, which costs far less at start-up than a scroll trigger each. */
-function setupEntrances(sweep: (el: HTMLElement, delay?: number) => gsap.core.Tween) {
+function setupEntrances(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timeline) {
 	const kinds: Record<string, [gsap.TweenVars, gsap.TweenVars]> = {
 		up: [{ y: 48, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, stagger: 0.09, ease: "expo.out" }],
 		// No blur on cards: blurring a large card re-rasterises it every frame.
@@ -163,7 +173,7 @@ function near(el: Element | null, fn: () => void) {
 	io.observe(el);
 }
 
-function afterPaint(sweep: (el: HTMLElement, delay?: number) => gsap.core.Tween) {
+function afterPaint(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timeline) {
 	setupEntrances(sweep);
 
 	// The three pinned scenes are built straight away, in page order: a pin
@@ -331,7 +341,7 @@ function afterPaint(sweep: (el: HTMLElement, delay?: number) => gsap.core.Tween)
 
 /* The hero: the words rise, the console lies back and settles as you
    scroll, the projector floats up past it and the sun keeps rising. */
-function setupHero(sweep: (el: HTMLElement, delay?: number) => gsap.core.Tween) {
+function setupHero(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timeline) {
 	const words = $$(".hero-title .w");
 	gsap.set(words, { yPercent: 110 });
 	gsap.set("[data-hero-in]", { y: 24, opacity: 0 });
@@ -344,7 +354,6 @@ function setupHero(sweep: (el: HTMLElement, delay?: number) => gsap.core.Tween) 
 	intro
 		.to(".hero .sun", { yPercent: 0, scale: 1, opacity: 1, duration: 2.4, ease: "power2.out" }, 0)
 		.to(".hero .arc", { opacity: 1, scale: 1, duration: 2, ease: "power2.out" }, 0.2)
-		.to(".pill", { y: 0, opacity: 1, duration: 1 }, 0.1)
 		.to(words, { yPercent: 0, duration: 1.3, stagger: 0.07 }, 0.2)
 		.add(() => {
 			const hl = $(".hero-title [data-hl]");

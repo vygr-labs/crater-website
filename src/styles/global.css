@@ -158,21 +158,31 @@ a {
 	color: var(--ink-2);
 }
 
-/* The accent. Not a font swap: the word is highlighted the way Crater
-   highlights scripture on the projector, a gold wash that sweeps across
-   it when it comes into view. */
+/* The accent. The word lights up the way Crater highlights scripture on
+   the projector: a pale cyan wash sweeps across it as it comes into view,
+   holds a moment, then the word settles back to the ink colour. */
 .hl {
+	--hl-c: color-mix(in srgb, var(--brand) 55%, var(--ink));
 	--p: 0%;
 	--s: 0;
 	position: relative;
 	white-space: nowrap;
 	color: var(--ink);
-	background-image: linear-gradient(90deg, var(--gold) 0 50%, var(--ink) 50% 100%);
+	background-image: linear-gradient(90deg, var(--hl-c) 0 50%, var(--ink) 50% 100%);
 	background-size: 200% 100%;
 	background-position: calc(100% - var(--p)) 0;
 	-webkit-background-clip: text;
 	background-clip: text;
 	-webkit-text-fill-color: transparent;
+}
+
+/* Ink washes back over the colour as the word settles. */
+.hl.hl-out {
+	--fade: 0;
+	-webkit-text-fill-color: color-mix(in srgb, var(--ink) calc(var(--fade) * 100%), transparent);
+}
+.hl.hl-out::after {
+	transform-origin: right center;
 }
 
 .hl::after {
@@ -183,7 +193,7 @@ a {
 	bottom: 0.04em;
 	height: 0.1em;
 	border-radius: 0.05em;
-	background: var(--gold);
+	background: var(--hl-c);
 	transform-origin: left center;
 	transform: scaleX(var(--s));
 	opacity: 0.9;
@@ -296,10 +306,6 @@ a {
 	.js [data-reveal] {
 		opacity: 1 !important;
 		transform: none !important;
-	}
-	.hl {
-		--p: 100% !important;
-		--s: 1 !important;
 	}
 }
 

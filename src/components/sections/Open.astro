@@ -63,7 +63,7 @@ const releases = [
 						<li class="cl-item" data-cl-item>
 							<span class="cl-dot" aria-hidden="true" />
 							<div class="cl-head">
-								<span class={r.v === "Next" ? "cl-v cl-v-next" : "cl-v"}>{r.v === "Next" ? "Next" : `v${r.v}`}</span>
+								{r.v === "Next" ? <span class="cl-v"><span class="hl" data-hl>Next</span></span> : <span class="cl-v">v{r.v}</span>}
 								<span class="cl-note">{r.note}</span>
 							</div>
 							<ul>
@@ -214,9 +214,6 @@ const releases = [
 		font-family: var(--font-display);
 		font-size: 22px;
 		font-weight: 600;
-	}
-	.cl-v-next {
-		color: var(--gold);
 	}
 	.cl-note {
 		font-size: 14px;
