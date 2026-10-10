@@ -17,6 +17,7 @@ import {
 import { DRILLS, type Cue, type Drill, type Slide, type Wall } from "./drills";
 import { SONGS, sectionName } from "./songs";
 import { clearSessions, loadSessions, overview, previous, saveSession, secs, span, summarise, type CueResult } from "./stats";
+import { cleared, requestLink, saved, signOut, startSync, syncState } from "./sync";
 
 type Item = { title: string; slides: Slide[] };
 type Zone = "library" | "preview" | "live";
@@ -533,6 +534,7 @@ function start(root: HTMLElement) {
 		const results = run.results;
 		const prev = run.prev;
 		const all = saveSession({ at: Date.now(), drill: d.id, cues: results });
+		saved();
 		const now = summarise(results);
 		const then = prev.last ? summarise(prev.last) : null;
 		stopDrill();
@@ -667,7 +669,7 @@ function start(root: HTMLElement) {
 		if (!el.stats) return;
 		const body = el.stats.querySelector<HTMLElement>("[data-stats-body]")!;
 		if (!all.length) {
-			body.innerHTML = `<p class="st-empty">Finish a drill and your times, accuracy and keyboard use show up here, with charts comparing each run. They stay in this browser.</p>`;
+			body.innerHTML = `<p class="st-empty">Finish a drill and your times, accuracy and keyboard use show up here, with charts comparing each run.</p>${saveBox()}`;
 			return;
 		}
 		const weeks = innerWidth < 600 ? 15 : 26;
@@ -752,7 +754,46 @@ function start(root: HTMLElement) {
 				</table>
 			</div>`
 			}
+			${saveBox()}
 			<button type="button" class="st-reset" data-reset>Clear my progress</button>`;
+	}
+
+	// Saving to an email address, so the runs follow the learner to another
+	// computer. linkSent holds what happened to the last "send me a link".
+	let linkSent: "" | "sending" | "sent" | "email" | "busy" | "failed" = "";
+	function saveBox() {
+		const sync = syncState();
+		if (sync.email)
+			return `<div class="st-save is-on">
+				<p>${sync.note === "signed-in" ? "You're signed in. " : ""}Your progress is saved to <b>${esc(sync.email)}</b> and follows you to any browser you sign in on.</p>
+				<div class="st-save-acts">
+					<button type="button" data-sign-out>Sign out of this browser</button>
+					<button type="button" data-forget>Delete my saved progress</button>
+				</div>
+			</div>`;
+		const note =
+			sync.note === "expired" && !linkSent
+				? `<p class="st-save-note is-bad">That link has expired or was used already. Send yourself a new one.</p>`
+				: sync.note === "forgotten" && !linkSent
+					? `<p class="st-save-note">Your saved progress and email address are deleted. Your runs in this browser are still here.</p>`
+					: {
+							"": "",
+							sending: "",
+							sent: `<p class="st-save-note is-good">Check your inbox for a link from Crater. It works once, for the next 30 minutes.</p>`,
+							email: `<p class="st-save-note is-bad">That email address doesn't look right.</p>`,
+							busy: `<p class="st-save-note is-bad">Too many links asked for just now. Try again in an hour.</p>`,
+							failed: `<p class="st-save-note is-bad">The email couldn't be sent. Try again in a minute.</p>`,
+						}[linkSent];
+		return `<form class="st-save" data-save novalidate>
+			<p class="st-h">Keep your progress</p>
+			<p>Your runs are saved in this browser only. Enter your email and we'll send you a link that saves them, so you can pick up on another computer.</p>
+			<div class="st-save-row">
+				<input id="save-email" name="email" aria-label="Email address" type="email" autocomplete="email" placeholder="you@example.com" required />
+				<button type="submit" class="btn btn-brand" ${linkSent === "sending" ? "disabled" : ""}>${linkSent === "sending" ? "Sending…" : "Send me a link"}</button>
+			</div>
+			${note}
+			<p class="st-save-fine">We only use your address to sign you in. No newsletters.</p>
+		</form>`;
 	}
 
 	const when = (t: number) => {
@@ -956,10 +997,34 @@ function start(root: HTMLElement) {
 			statsDrill = f.dataset.stDrill!;
 			return drawStats();
 		}
+		if ((e.target as HTMLElement).closest("[data-sign-out]")) return void signOut();
+		if ((e.target as HTMLElement).closest("[data-forget]")) {
+			if (confirm("Delete the progress saved to your email? Your runs stay in this browser.")) signOut(true);
+			return;
+		}
 		if (!(e.target as HTMLElement).closest("[data-reset]")) return;
-		if (!confirm("Clear every drill result saved in this browser?")) return;
+		const where = syncState().email ? "in this browser and saved to your email" : "in this browser";
+		if (!confirm(`Clear every drill result ${where}?`)) return;
 		clearSessions();
+		cleared();
 		drawStats([]);
+	});
+
+	el.stats?.addEventListener("submit", async (e) => {
+		const form = (e.target as HTMLElement).closest<HTMLFormElement>("[data-save]");
+		if (!form) return;
+		e.preventDefault();
+		const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim();
+		linkSent = "sending";
+		drawStats();
+		linkSent = await requestLink(email);
+		drawStats();
+		// Keep what they typed when it needs fixing.
+		const input = el.stats!.querySelector<HTMLInputElement>("#save-email");
+		if (input && linkSent !== "sent") {
+			input.value = email;
+			input.focus();
+		}
 	});
 
 	// The arrow keys and Enter act on the panel clicked last.
@@ -1034,6 +1099,7 @@ function start(root: HTMLElement) {
 	drawButtons();
 	drawCoach();
 	drawStats();
+	startSync((all) => drawStats(all));
 	loadTranslation("KJV").then(() => el.q.value.trim() && runScripture(true), () => {});
 	if (new URLSearchParams(location.search).has("drill")) startDrill(new URLSearchParams(location.search).get("drill")!);
 	else openDrills(false);

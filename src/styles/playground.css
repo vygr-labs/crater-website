@@ -888,6 +888,7 @@
 /* ── Progress ────────────────────────────────────────────────────────── */
 .pg-stats {
 	margin-top: 120px;
+	scroll-margin-top: 100px;
 }
 .st-empty {
 	margin: 20px 0 0;
@@ -1055,6 +1056,95 @@
 	border-top: 1px solid var(--line);
 	white-space: nowrap;
 }
+/* Saving progress to an email address. */
+.st-save {
+	margin-top: 28px;
+	padding: 22px;
+	border-radius: 16px;
+	background: var(--card);
+	border: 1px solid var(--line);
+}
+.st-save p {
+	margin: 0;
+	max-width: 62ch;
+	color: var(--ink-2);
+	font-size: 15px;
+}
+.st-save .st-h {
+	color: var(--ink);
+}
+.st-save b {
+	color: var(--ink);
+	font-weight: 600;
+}
+.st-save-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-top: 16px;
+}
+.st-save input {
+	flex: 1 1 260px;
+	max-width: 380px;
+	height: 48px;
+	padding: 0 16px;
+	border-radius: 12px;
+	border: 1px solid var(--line-strong);
+	background: var(--bg);
+	color: var(--ink);
+	font: 16px var(--font-body);
+}
+.st-save input:focus {
+	outline: none;
+	border-color: var(--brand);
+}
+.st-save .btn {
+	height: 48px;
+	padding: 0 22px;
+	font-size: 15px;
+}
+.st-save .btn:disabled {
+	opacity: 0.6;
+	cursor: default;
+}
+.st-save .st-save-note {
+	margin-top: 12px;
+	font-size: 14px;
+}
+.st-save .st-save-note.is-good {
+	color: var(--brand);
+}
+.st-save .st-save-note.is-bad {
+	color: var(--live);
+}
+.st-save .st-save-fine {
+	margin-top: 12px;
+	font-size: 13px;
+	color: var(--ink-3);
+}
+.st-save-acts {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 20px;
+	margin-top: 14px;
+}
+.st-save-acts button {
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--ink-2);
+	font: 14px var(--font-body);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	cursor: pointer;
+}
+.st-save-acts button:hover {
+	color: var(--ink);
+}
+.st-empty + .st-save {
+	margin-top: 12px;
+}
+
 .st-reset {
 	margin-top: 16px;
 	padding: 0;

@@ -5,7 +5,7 @@ import { createClient, type Client } from "@libsql/client";
 let client: Client | null = null;
 let ready: Promise<void> | null = null;
 
-function db(): Client {
+export function db(): Client {
 	if (!client) {
 		const url = process.env.TURSO_DATABASE_URL;
 		// Local development writes to a file beside the project.

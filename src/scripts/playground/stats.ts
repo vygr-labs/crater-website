@@ -1,5 +1,5 @@
-// The learner's own record. It lives in this browser only: there are no
-// accounts, and nothing is sent anywhere.
+// The learner's own record. It lives in this browser, and only leaves it
+// when the learner saves their progress to an email address (sync.ts).
 import { KIND_NAMES, type Kind, type Skill } from "./drills";
 
 export type CueResult = { skill: Skill; kind?: Kind; ms: number; wrong: number; keys: number; clicks: number; hinted: boolean };
@@ -23,6 +23,13 @@ export function saveSession(s: Session) {
 		localStorage.setItem(KEY, JSON.stringify(all));
 	} catch {}
 	return all;
+}
+
+/** Swaps in the list merged with the saved copy. */
+export function replaceSessions(all: Session[]) {
+	try {
+		localStorage.setItem(KEY, JSON.stringify(all.slice(-MAX)));
+	} catch {}
 }
 
 export function clearSessions() {
