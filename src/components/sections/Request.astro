@@ -8,7 +8,7 @@ const example = "Import songs from ProPresenter, the way EasyWorship songs come 
 ---
 
 <section id="request" class="request wrap" data-request>
-	<div class="request-card card" data-reveal="card" data-spot>
+	<div class="request-card card" data-reveal="card">
 		<div class="request-copy">
 			<p class="eyebrow" data-reveal="up">Feature requests</p>
 			<h2 class="display h2" data-reveal="up">Missing something? <span class="hl" data-hl>Ask for it</span>.</h2>
@@ -56,13 +56,6 @@ const example = "Import songs from ProPresenter, the way EasyWorship songs come 
 		padding: clamp(28px, 4vw, 64px);
 		overflow: hidden;
 		isolation: isolate;
-	}
-	.request-card::before {
-		content: "";
-		position: absolute;
-		inset: 0;
-		z-index: -1;
-		background: radial-gradient(520px circle at var(--mx, 85%) var(--my, 0%), var(--brand-wash), transparent 60%);
 	}
 	.request-copy h2 {
 		margin-top: 16px;

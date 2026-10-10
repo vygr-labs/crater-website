@@ -266,14 +266,7 @@ function afterPaint(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timeli
 		}),
 	);
 
-	/* ── Download: a second sunrise, the wordmark climbs out ──────────── */
-	near($("[data-sun-2]"), () =>
-		gsap.fromTo(
-			"[data-sun-2]",
-			{ yPercent: 35, scale: 0.6, opacity: 0 },
-			{ yPercent: 0, scale: 1, opacity: 1, ease: "none", scrollTrigger: { trigger: "#download", start: "top 85%", end: "center center", scrub: 0.8 } },
-		),
-	);
+	/* ── Footer: the wordmark climbs out ────────────────────────────── */
 	near($(".footer"), () =>
 		gsap.fromTo(
 			"[data-wordmark]",
@@ -297,15 +290,8 @@ function afterPaint(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timeli
 		});
 	});
 
-	/* ── Pointer details: spotlight, tilt, magnetic buttons ───────────── */
+	/* ── Pointer details: tilt, magnetic buttons ───────────── */
 	if (finePointer) {
-		$$("[data-spot]").forEach((el) => {
-			el.addEventListener("pointermove", (e) => {
-				const r = el.getBoundingClientRect();
-				el.style.setProperty("--mx", `${e.clientX - r.left}px`);
-				el.style.setProperty("--my", `${e.clientY - r.top}px`);
-			});
-		});
 		$$(".platform").forEach((el) => {
 			const rx = gsap.quickTo(el, "rotateX", { duration: 0.6, ease: "power3.out" });
 			const ry = gsap.quickTo(el, "rotateY", { duration: 0.6, ease: "power3.out" });
@@ -344,12 +330,11 @@ function afterPaint(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timeli
 }
 
 /* The hero: the words rise, the console lies back and settles as you
-   scroll, the projector floats up past it and the sun keeps rising. */
+   scroll and the projector floats up past it. */
 function setupHero(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timeline) {
 	const words = $$(".hero-title .wi");
 	gsap.set(words, { yPercent: 110 });
 	gsap.set("[data-hero-in]", { y: 24, opacity: 0 });
-	gsap.set(".hero .sun", { yPercent: 30, scale: 0.6, opacity: 0 });
 	gsap.set(".hero .arc", { opacity: 0, scale: 0.9 });
 	gsap.set("[data-screen]", { y: 140, rotateX: 28, scale: 0.9, opacity: 0 });
 	gsap.set("[data-float]", { y: 120, opacity: 0 });
@@ -357,7 +342,6 @@ function setupHero(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timelin
 
 	const intro = gsap.timeline({ defaults: { ease: "expo.out" }, delay: 0.15 });
 	intro
-		.to(".hero .sun", { yPercent: 0, scale: 1, opacity: 1, duration: 2.4, ease: "power2.out" }, 0)
 		.to(".hero .arc", { opacity: 1, scale: 1, duration: 2, ease: "power2.out" }, 0.2)
 		.to(words, { yPercent: 0, duration: 1.3, stagger: 0.07 }, 0.2)
 		.add(() => {
@@ -366,11 +350,10 @@ function setupHero(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timelin
 		}, 0.95)
 		.to(".hero-lede, .hero-ctas, .hero-note", { y: 0, opacity: 1, duration: 1.1, stagger: 0.08 }, 0.6)
 		.to("[data-screen]", { y: 0, opacity: 1, duration: 1.8 }, 0.75)
-		.to("[data-float]", { y: 0, opacity: 1, duration: 1.6 }, 1.15)
-		.fromTo(".screen-sheen", { backgroundPosition: "120% 0" }, { backgroundPosition: "-20% 0", duration: 1.8, ease: "power2.inOut" }, 1.3);
+		.to("[data-float]", { y: 0, opacity: 1, duration: 1.6 }, 1.15);
 
-	// Scroll: the console lies back and settles flat, the projector floats
-	// up past it, and the sun keeps rising behind.
+	// Scroll: the console lies back and settles flat and the projector
+	// floats up past it.
 	gsap.fromTo(
 		"[data-screen]",
 		{ rotateX: 28, scale: 0.9 },
@@ -386,12 +369,6 @@ function setupHero(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timelin
 		yPercent: -40,
 		ease: "none",
 		scrollTrigger: { trigger: ".stage", start: "top 60%", end: "bottom top", scrub: 0.8 },
-	});
-	gsap.to(".hero .sun", {
-		yPercent: -18,
-		scale: 1.12,
-		ease: "none",
-		scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
 	});
 }
 

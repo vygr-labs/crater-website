@@ -4,7 +4,7 @@ import vercel from "@astrojs/vercel";
 import sitemap from "@astrojs/sitemap";
 import { rehypeHeadingIds, unified } from "@astrojs/markdown-remark";
 import remarkDirective from "remark-directive";
-import { rehypeHeadingLinks, remarkDocs } from "./src/lib/markdown.ts";
+import { rehypeExternalLinks, rehypeHeadingLinks, remarkDocs } from "./src/lib/markdown.ts";
 
 // The Vercel adapter's server code imports a constant from its own main file,
 // which also imports rolldown for build-time bundling. Rolldown loads a native
@@ -36,7 +36,7 @@ export default defineConfig({
 		processor: unified({
 			remarkPlugins: [remarkDirective, remarkDocs],
 			// Ids first, so the section links can point at them.
-			rehypePlugins: [rehypeHeadingIds, rehypeHeadingLinks],
+			rehypePlugins: [rehypeHeadingIds, rehypeHeadingLinks, rehypeExternalLinks],
 		}),
 		shikiConfig: { themes: { light: "github-light", dark: "github-dark" }, defaultColor: false },
 	},

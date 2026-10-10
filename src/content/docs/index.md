@@ -55,6 +55,6 @@ The [download page](/download) has the portable Windows zip, the macOS zip and c
 
 ## About
 
-Crater is made by **Eyetu Kingsley**, a software developer in Lagos, Nigeria, and is free under the GPL-3.0 licence. There are no accounts and no tracking. Everything about your services stays on your own computer.
+Crater is made by [Voyager Studios](https://voyagerlabs.tech/) and is free under the GPL-3.0 licence. There are no accounts and no tracking. Everything about your services stays on your own computer.
 
 *If Crater helps your church, [star the project on GitHub](https://github.com/vygr-labs/crater-v2) so others can find it.*

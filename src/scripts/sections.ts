@@ -171,7 +171,7 @@ export function setupThemes(mm: gsap.MatchMedia) {
 	let step = 0;
 
 	// Both background layers stay mounted and crossfade by opacity, so the
-	// mesh gradient never snaps from one theme to the next.
+	// colour never snaps from one theme to the next.
 	const read = (el: HTMLElement, v: string) => el.style.getPropertyValue(v).trim();
 	const apply = (i: number) => {
 		if (i === current) return;
@@ -480,15 +480,6 @@ export function setupMicro(finePointer: boolean) {
 	gsap.to(".progress", { scaleX: 1, ease: "none", scrollTrigger: { start: 0, end: "max", scrub: 0.3 } });
 
 	if (!finePointer) return;
-
-	// The hero glow leans toward the pointer.
-	const sun = $(".hero .sun");
-	const hero = $(".hero");
-	if (sun && hero) {
-		const sx = gsap.quickTo(sun, "x", { duration: 1.6, ease: "power3.out" });
-		hero.addEventListener("pointermove", (e) => sx((e.clientX / innerWidth - 0.5) * 160));
-		hero.addEventListener("pointerleave", () => sx(0));
-	}
 
 	// Reel slides tilt toward the pointer.
 	$$(".reel-frame").forEach((el) => {

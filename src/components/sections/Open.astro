@@ -28,7 +28,7 @@ const releases = [
 
 <section id="open" class="open wrap" data-open>
 	<div class="open-grid">
-		<div class="open-card card" data-reveal="card" data-spot>
+		<div class="open-card card" data-reveal="card">
 			<svg class="open-graph" viewBox="0 0 400 220" aria-hidden="true">
 				<path class="og" pathLength="1" d="M20 180 H380" />
 				<path class="og" pathLength="1" d="M80 180 C 110 180, 110 120, 140 120 H260 C 290 120, 290 180, 320 180" />
@@ -96,13 +96,6 @@ const releases = [
 		padding: clamp(28px, 3.4vw, 48px);
 		overflow: hidden;
 		isolation: isolate;
-	}
-	.open-card::before {
-		content: "";
-		position: absolute;
-		inset: 0;
-		z-index: -1;
-		background: radial-gradient(480px circle at var(--mx, 50%) var(--my, -40%), var(--brand-wash), transparent 60%);
 	}
 	.open-graph {
 		display: block;

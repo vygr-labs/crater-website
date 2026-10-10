@@ -186,10 +186,7 @@ const board = ["Ctrl", "K", "L", "C", "P", "↑", "↓", "Enter"];
 		aspect-ratio: 16 / 9;
 		border-radius: 12px;
 		overflow: hidden;
-		background:
-			radial-gradient(60% 80% at 15% 20%, #571f44, transparent 70%),
-			radial-gradient(70% 70% at 85% 85%, #391528, transparent 70%),
-			#110910;
+		background: #2a1022;
 		container-type: inline-size;
 		color: #fcf3f5;
 	}
@@ -230,24 +227,10 @@ const board = ["Ctrl", "K", "L", "C", "P", "↑", "↓", "Enter"];
 		--mark-body: #f4f6f8;
 		--brand: #2fd3e6;
 	}
-	/* A stand-in for a looping background video: slow drifting light, with
-	   a play or pause badge and a running progress bar. */
+	/* A stand-in for a looping background video: a play or pause badge and
+	   a running progress bar. */
 	.kstate-video {
-		background:
-			radial-gradient(40% 60% at var(--vx, 30%) 40%, rgb(242 156 172 / 0.55), transparent 70%),
-			radial-gradient(50% 70% at calc(100% - var(--vx, 30%)) 70%, rgb(87 31 68 / 0.9), transparent 70%),
-			#1a0c18;
-		animation: kvid 6s ease-in-out infinite alternate;
-	}
-	@property --vx {
-		syntax: "<percentage>";
-		inherits: false;
-		initial-value: 30%;
-	}
-	@keyframes kvid {
-		to {
-			--vx: 70%;
-		}
+		background: #3a1530;
 	}
 	.kvid-icon {
 		width: 9cqw;

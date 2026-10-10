@@ -88,7 +88,6 @@ const faqs = [
 	<main>
 		<!-- HERO -->
 		<section id="top" class="hero">
-			<div class="sun" aria-hidden="true"></div>
 			<div class="hero-copy wrap">
 				<h1 class="display hero-title" aria-label="Put the Word on the wall.">
 					<span class="line"><span class="w"><span class="wi">Put</span></span> <span class="w"><span class="wi">the</span></span> <span class="w"><span class="wi"><span class="hl" data-hl>Word</span></span></span></span>
@@ -112,10 +111,9 @@ const faqs = [
 			</div>
 
 			<div class="stage wrap">
-				<div class="arc" aria-hidden="true"></div>
+				<svg class="arc" viewBox="0 0 1240 200" aria-hidden="true"><path d="M182 182A620 620 0 0 1 1058 182" /></svg>
 				<div class="screen" data-screen>
 					<Image src={heroConsole} alt="The Crater console with Amazing Grace live, the next verse lined up, and the song library below" widths={[960, 1440, 1920]} sizes="96vw" loading="eager" fetchpriority="high" />
-					<div class="screen-sheen" aria-hidden="true"></div>
 				</div>
 				<div class="float-proj" data-float>
 					<Image src={projSong} alt="The projector showing the first verse of Amazing Grace" widths={[480, 800]} sizes="34vw" loading="eager" />
@@ -213,7 +211,7 @@ const faqs = [
 			</div>
 
 			<div class="grid">
-				<article class="card feat feat-wide" data-feat data-spot>
+				<article class="card feat feat-wide" data-feat>
 					<div class="feat-copy">
 						<h3>Find any verse as you type.</h3>
 						<p class="lede">
@@ -231,7 +229,7 @@ const faqs = [
 					</div>
 				</article>
 
-				<article class="card feat" data-feat data-spot>
+				<article class="card feat" data-feat>
 					<div>
 						<h3>Themes you set once.</h3>
 						<p class="lede">Fonts, colours and backgrounds with a live preview. Save it, reuse it every week, share it in one file.</p>
@@ -241,7 +239,7 @@ const faqs = [
 					</div>
 				</article>
 
-				<article class="card feat" data-feat data-spot>
+				<article class="card feat" data-feat>
 					<div>
 						<h3>Media and countdowns.</h3>
 						<p class="lede">Videos, images and timers sit in the same schedule as your songs. Loop a background, count the room in.</p>
@@ -252,7 +250,7 @@ const faqs = [
 				</article>
 
 				<!-- Preview and live: the next slide waits in gold, then takes the wall. -->
-				<article class="card feat feat-sm" data-feat data-spot>
+				<article class="card feat feat-sm" data-feat>
 					<div class="golive" data-golive aria-label="A slide waiting in preview, then going live" role="img">
 						<div class="gl-pane gl-preview">
 							<span class="tag tag-gold">PREVIEW</span>
@@ -276,7 +274,7 @@ const faqs = [
 				</article>
 
 				<!-- Stream: the live output arriving in a broadcast monitor over NDI. -->
-				<article class="card feat feat-sm" data-feat data-spot>
+				<article class="card feat feat-sm" data-feat>
 					<div class="monitor" aria-label="Crater's live output arriving in a stream over NDI" role="img">
 						<div class="mon-bar">
 							<span class="mon-rec"><span class="dot"></span>REC</span>
@@ -285,7 +283,6 @@ const faqs = [
 						</div>
 						<div class="mon-screen">
 							<Image src={projSongCyan} alt="" widths={[640]} sizes="320px" />
-							<span class="mon-scan" aria-hidden="true"></span>
 						</div>
 					</div>
 					<h3>Straight into your stream.</h3>
@@ -293,7 +290,7 @@ const faqs = [
 				</article>
 
 				<!-- Order of service: the real schedule panel. -->
-				<article class="card feat feat-sm" data-feat data-spot>
+				<article class="card feat feat-sm" data-feat>
 					<div class="sched" data-parallax-box>
 						<Image src={schedule} alt="The schedule with songs, a reading, sermon slides and a video in order" widths={[480, 800]} sizes="(max-width: 900px) 100vw, 400px" data-parallax />
 					</div>
@@ -384,7 +381,6 @@ const faqs = [
 
 		<!-- DOWNLOAD -->
 		<section id="download" class="download">
-			<div class="sun sun-2" aria-hidden="true" data-sun-2></div>
 			<div class="wrap download-inner">
 				<div data-reveal="up"><Mark size={56} /></div>
 				<h2 class="display download-title" data-reveal="up">Ready for <span class="hl" data-hl>Sunday</span>.</h2>
@@ -392,7 +388,7 @@ const faqs = [
 				<div class="platforms">
 					{
 						platforms.map((p) => (
-							<a href={getHref(p.key)} class="platform" data-reveal="card" data-spot>
+							<a href={getHref(p.key)} class="platform" data-reveal="card">
 								<Fragment set:html={p.icon} />
 								<span class="p-name">{p.name}</span>
 								<span class="p-note">
@@ -432,18 +428,6 @@ const faqs = [
 		padding-top: 168px;
 		text-align: center;
 	}
-	.sun {
-		position: absolute;
-		left: 50%;
-		top: 560px;
-		width: 1500px;
-		height: 1500px;
-		margin-left: -750px;
-		border-radius: 50%;
-		background: radial-gradient(closest-side, var(--glow), transparent 72%);
-		pointer-events: none;
-		will-change: transform, opacity;
-	}
 	/* Hangs off the console rather than the page top, so the copy above
 	   can grow with the window without the line running through it. */
 	.arc {
@@ -451,12 +435,15 @@ const faqs = [
 		left: 50%;
 		top: -56px;
 		width: 1240px;
-		height: 1240px;
+		height: 200px;
 		margin-left: -620px;
-		border-radius: 50%;
-		border-top: 1px solid var(--arc);
+		overflow: visible;
 		pointer-events: none;
-		mask-image: linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent);
+	}
+	.arc path {
+		fill: none;
+		stroke: var(--arc);
+		stroke-width: 1;
 	}
 	.hero-copy {
 		position: relative;
@@ -521,15 +508,6 @@ const faqs = [
 		width: 100%;
 		border-radius: 10px;
 	}
-	.screen-sheen {
-		position: absolute;
-		inset: 10px;
-		border-radius: 10px;
-		background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 0.07) 50%, transparent 65%);
-		background-size: 250% 100%;
-		background-position: 120% 0;
-		pointer-events: none;
-	}
 	.float-proj {
 		position: absolute;
 		right: -4px;
@@ -578,7 +556,7 @@ const faqs = [
 
 	/* MARQUEE */
 	.marquee {
-		margin-top: 150px;
+		margin-top: clamp(64px, 8vw, 96px);
 		border-block: 1px solid var(--line);
 		overflow: hidden;
 		mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
@@ -898,21 +876,6 @@ const faqs = [
 	.feat-sm .lede {
 		font-size: 16px;
 	}
-	/* cursor spotlight */
-	.feat::before,
-	.platform::before {
-		content: "";
-		position: absolute;
-		inset: 0;
-		z-index: -1;
-		background: radial-gradient(480px circle at var(--mx, 50%) var(--my, -40%), var(--brand-wash), transparent 60%);
-		opacity: 0;
-		transition: opacity 0.4s ease;
-	}
-	.feat:hover::before,
-	.platform:hover::before {
-		opacity: 1;
-	}
 	.feat h3 {
 		margin: 0;
 		font-family: var(--font-display);
@@ -1071,19 +1034,6 @@ const faqs = [
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-	}
-	.mon-scan {
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(180deg, transparent, rgb(47 211 230 / 0.12) 50%, transparent);
-		background-size: 100% 40%;
-		background-repeat: no-repeat;
-		animation: scan 3.2s linear infinite;
-		mix-blend-mode: screen;
-	}
-	@keyframes scan {
-		from { background-position: 0 -60%; }
-		to { background-position: 0 160%; }
 	}
 
 	.sched {
@@ -1335,22 +1285,6 @@ const faqs = [
 		padding-block: 220px 160px;
 		text-align: center;
 		overflow: hidden;
-	}
-	/* The rising sun is bigger than the section. Fade it out before the
-	   section's edge so the clip never shows as a hard line. */
-	.download::after {
-		content: "";
-		position: absolute;
-		inset: auto 0 0;
-		height: 340px;
-		background: linear-gradient(180deg, transparent, var(--bg));
-		pointer-events: none;
-	}
-	.sun-2 {
-		top: 300px;
-		width: 1100px;
-		height: 1100px;
-		margin-left: -550px;
 	}
 	.download-inner {
 		position: relative;

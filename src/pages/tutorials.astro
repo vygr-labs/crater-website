@@ -24,7 +24,7 @@ const steps = [
 				{
 					playlists.map((p) => (
 						<li data-reveal="card">
-							<a href={p.url} target="_blank" rel="noopener" class="card tl-card" data-spot>
+							<a href={p.url} target="_blank" rel="noopener" class="card tl-card">
 								<span class="tl-play" aria-hidden="true">
 									<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5-11-6.5Z" /></svg>
 								</span>
@@ -92,21 +92,9 @@ const steps = [
 			transform 0.5s var(--ease-out),
 			border-color 0.3s ease;
 	}
-	.tl-card::before {
-		content: "";
-		position: absolute;
-		inset: 0;
-		z-index: -1;
-		background: radial-gradient(420px circle at var(--mx, 50%) var(--my, -40%), var(--brand-wash), transparent 60%);
-		opacity: 0;
-		transition: opacity 0.4s ease;
-	}
 	.tl-card:hover {
 		transform: translateY(-4px);
 		border-color: var(--brand);
-	}
-	.tl-card:hover::before {
-		opacity: 1;
 	}
 	.tl-play {
 		width: 44px;

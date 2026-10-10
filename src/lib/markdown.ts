@@ -111,3 +111,17 @@ export function rehypeHeadingLinks() {
 		});
 	};
 }
+
+// Links that leave the site open in a new tab, like the rest of the site's
+// outside links, so the page someone was reading stays put.
+export function rehypeExternalLinks() {
+	return (tree: Node) => {
+		visit(tree as never, "element", (node: Node) => {
+			const href = node.tagName === "a" ? String(node.properties?.href ?? "") : "";
+			if (/^https?:\/\//.test(href) && !/^https?:\/\/(www\.)?getcrater\.org/.test(href)) {
+				node.properties!.target = "_blank";
+				node.properties!.rel = ["noopener"];
+			}
+		});
+	};
+}

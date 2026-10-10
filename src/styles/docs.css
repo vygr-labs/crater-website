@@ -7,7 +7,7 @@
 	--toc: 220px;
 	display: grid;
 	grid-template-columns: var(--side) minmax(0, 1fr) var(--toc);
-	gap: clamp(32px, 4vw, 64px);
+	gap: clamp(48px, 5vw, 88px);
 	padding-top: 116px;
 	align-items: start;
 }
@@ -208,6 +208,10 @@ kbd {
 .doc {
 	min-width: 0;
 	max-width: 760px;
+	/* Spare width on big screens is shared between both sides of the page
+	   instead of piling up next to the outline. */
+	margin-inline: auto;
+	width: 100%;
 }
 .doc-group {
 	margin: 0 0 12px;
@@ -295,7 +299,14 @@ kbd {
 .prose .code-wrap,
 .prose .callout,
 .prose .tabs {
-	margin: 0 0 20px;
+	margin: 0 0 24px;
+}
+/* Boxes get more room than paragraphs so each one reads as its own stop. */
+.prose :is(p, ul, ol) + :is(.callout, .code-wrap, .tabs, table) {
+	margin-top: 32px;
+}
+.prose :is(.callout, .code-wrap, .tabs, table) {
+	margin-bottom: 32px;
 }
 .prose strong {
 	color: var(--ink);
@@ -311,7 +322,7 @@ kbd {
 	scroll-margin-top: 110px;
 }
 .prose h2 {
-	margin: 56px 0 16px;
+	margin: 72px 0 18px;
 	font-size: 30px;
 	line-height: 1.15;
 	letter-spacing: -0.02em;
@@ -356,8 +367,8 @@ kbd {
 	padding-left: 22px;
 }
 .prose li {
-	margin: 6px 0;
-	padding-left: 4px;
+	margin: 12px 0;
+	padding-left: 6px;
 }
 .prose li::marker {
 	color: var(--ink-3);
@@ -710,6 +721,19 @@ html.search-open {
 .docs-bar,
 .side-scrim {
 	display: none;
+}
+
+/* Wide screens: the docs spread past the width of the nav so the reading
+   column and both side lists get room instead of a squeezed middle. */
+@media (min-width: 1680px) {
+	.docs {
+		--side: 280px;
+		--toc: 260px;
+		max-width: 1840px;
+	}
+	.doc {
+		max-width: 840px;
+	}
 }
 
 @media (max-width: 1240px) {

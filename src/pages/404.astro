@@ -4,7 +4,6 @@ import Base from "../layouts/Base.astro";
 
 <Base title="Page not found · Crater" description="This page isn't here. Head back to Crater's home page.">
 	<main class="nf">
-		<div class="nf-glow" aria-hidden="true"></div>
 		<div class="wrap nf-inner">
 			<p class="nf-ref">PAGE 404 · NOT FOUND</p>
 			<h1 class="display nf-title">Nothing on the screen.</h1>
@@ -26,17 +25,6 @@ import Base from "../layouts/Base.astro";
 		padding-top: 140px;
 		text-align: center;
 		overflow: hidden;
-	}
-	.nf-glow {
-		position: absolute;
-		left: 50%;
-		bottom: -700px;
-		width: 1100px;
-		height: 1100px;
-		margin-left: -550px;
-		border-radius: 50%;
-		background: radial-gradient(closest-side, var(--glow), transparent 72%);
-		pointer-events: none;
 	}
 	.nf-inner {
 		position: relative;

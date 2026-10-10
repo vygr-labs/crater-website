@@ -5,9 +5,9 @@ description: How content moves from your library and schedule, through Preview, 
 
 Everything you show in Crater follows the same path:
 
-```text
-Library or Schedule  ──click──▶  Preview  ──double-click / Enter──▶  Live  ──▶  Projector
-```
+1. Click an item in the **Library** or the **Schedule** to put it in **Preview**.
+2. Double-click it, or press **Enter**, to send it **Live**.
+3. Whatever is Live shows on the projector.
 
 **Preview** is your private staging area. **Live** is what the room sees. Nothing reaches the screen until you send it live.
 
