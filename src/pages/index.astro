@@ -78,13 +78,36 @@ const faqs = [
 		"Yes. Crater sends its output over NDI, which OBS and most streaming tools already understand. No capture card needed.",
 	],
 	["Is our information private?", "Completely. No accounts, no tracking, no analytics. Your songs and services stay on your computer."],
+	[
+		"Is Crater the same as the Crater Bible Project?",
+		"Yes. Crater Bible Project is another name for the same app. It is the same free download, made by Voyager Studios.",
+	],
 ];
+
+// Tells search engines what Crater is, including the other name people
+// search for it by.
+const appLd = {
+	"@context": "https://schema.org",
+	"@type": "SoftwareApplication",
+	name: "Crater",
+	alternateName: "Crater Bible Project",
+	description: "Free, open source worship projection software for churches. Scripture, songs, media and sermon slides on the screen from one console.",
+	applicationCategory: "MultimediaApplication",
+	operatingSystem: "Windows 10, Windows 11, macOS 14 or later, Linux",
+	url: "https://getcrater.org",
+	downloadUrl: "https://getcrater.org/download",
+	isAccessibleForFree: true,
+	license: "https://www.gnu.org/licenses/gpl-3.0.html",
+	offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+	publisher: { "@type": "Organization", name: "Voyager Studios", url: "https://voyagerlabs.tech/" },
+};
 ---
 
 <Base
 	title="Crater · Free worship projection for churches"
-	description="Free, open source worship projection software. Scripture, songs, media and sermon slides on the screen from one calm console. Windows, macOS and Linux."
+	description="Crater, also known as the Crater Bible Project, is free, open source worship projection software. Scripture, songs, media and sermon slides from one calm console on Windows, macOS and Linux."
 >
+	<script slot="head" type="application/ld+json" set:html={JSON.stringify(appLd)} />
 	<main>
 		<!-- HERO -->
 		<section id="top" class="hero">

@@ -3,7 +3,7 @@ title: Crater documentation
 description: Free, open-source worship projection software for churches. Put scripture, songs, media and sermon slides on the screen from one simple console.
 ---
 
-**Crater** is free, open-source worship projection software for churches. It puts Bible verses, song lyrics, pictures, videos, PDFs and sermon slides on your projector, TV or live stream, all from one console that a volunteer can learn in an afternoon.
+**Crater**, also known as the **Crater Bible Project**, is free, open-source worship projection software for churches. It puts Bible verses, song lyrics, pictures, videos, PDFs and sermon slides on your projector, TV or live stream, all from one console that a volunteer can learn in an afternoon.
 
 Crater starts quickly, stays light on memory and is built to run well on the modest laptops most churches already have in the sound booth.
 
