@@ -95,7 +95,7 @@ export function setupSunday(mm: gsap.MatchMedia) {
 
 /* Coming from EasyWorship: songs leave the old library and land in Crater,
    tied to the scroll so the reader moves the import along. */
-export function setupSwitch() {
+export function setupSwitch(mm: gsap.MatchMedia) {
 	const root = $("[data-switch]");
 	if (!root) return;
 	const from = $$("[data-from]", root);
@@ -105,10 +105,8 @@ export function setupSwitch() {
 	gsap.set(to, { opacity: 0, x: -24 });
 	gsap.set("[data-switch-bar]", { scaleX: 0 });
 	pct.textContent = "0%";
-	const tl = gsap.timeline({
-		defaults: { ease: "none" },
-		scrollTrigger: { trigger: $(".switch-demo", root)!, start: "top 75%", end: "bottom 45%", scrub: 0.6 },
-	});
+	const demo = $(".switch-demo", root)!;
+	const tl = gsap.timeline({ defaults: { ease: "none" }, paused: true });
 	from.forEach((el, i) => {
 		const at = i * 0.5;
 		tl.to(el, { x: 24, opacity: 0.25, duration: 0.6 }, at).to(to[i], { x: 0, opacity: 1, duration: 0.6 }, at + 0.3);
@@ -119,6 +117,13 @@ export function setupSwitch() {
 		{ p: 100, duration: total, onUpdate: () => (pct.textContent = `${Math.round(o.p)}%`) },
 		0,
 	);
+	// Wide screens hold the library in the middle while the songs cross.
+	mm.add("(min-width: 901px)", () => {
+		ScrollTrigger.create({ trigger: demo, start: "center center", end: () => `+=${innerHeight}`, pin: true, scrub: 0.6, animation: tl });
+	});
+	mm.add("(max-width: 900px)", () => {
+		ScrollTrigger.create({ trigger: demo, start: "top 75%", end: "bottom 45%", scrub: 0.6, animation: tl });
+	});
 }
 
 /* One laptop, every screen: the cables draw out from the laptop and each
@@ -224,7 +229,7 @@ export function setupThemes(mm: gsap.MatchMedia) {
    the little projector answering each one. Loops while it is visible.
    Clicking a shortcut in the list takes over: the loop stops, that key is
    pressed on the demo, and the loop comes back after a quiet spell. */
-export function setupKeys() {
+export function setupKeys(mm: gsap.MatchMedia) {
 	const root = $("[data-keys]");
 	if (!root) return;
 	const state = (k: string) => $(`[data-k="${k}"]`, root)!;
@@ -287,10 +292,15 @@ export function setupKeys() {
 	let idle: gsap.core.Tween | null = null;
 	const rows = $$<HTMLButtonElement>("[data-k-act]", root);
 
+	// On a wide screen the section holds while the scroll presses each
+	// shortcut in turn, and a clicked row hands back to the scroll after.
+	let scene: ((i: number) => void) | null = null;
+	let at = -1;
 	const resume = () => {
 		manual = false;
 		rows.forEach((r) => r.classList.remove("is-now"));
 		step?.kill();
+		if (scene) return scene(Math.max(at, 0));
 		gsap.to([...states, cap], { opacity: 0, duration: 0.4, overwrite: true });
 		gsap.delayedCall(0.5, () => {
 			if (!manual && inView) tl.restart();
@@ -358,16 +368,52 @@ export function setupKeys() {
 	);
 	root.classList.add("is-live");
 
-	ScrollTrigger.create({
-		trigger: $(".kdemo", root)!,
-		start: "top 85%",
-		end: "bottom top",
-		onToggle: (self) => {
-			inView = self.isActive;
-			if (manual) return;
-			if (self.isActive) tl.play();
-			else tl.pause();
-		},
+	const beats: [string, () => void][] = [
+		["search", actions.search],
+		["live", actions.live],
+		["step", actions.step],
+		["logo", actions.logo],
+		["clear", actions.clear],
+	];
+	mm.add("(min-width: 901px)", () => {
+		scene = (i) => {
+			at = i;
+			shown = i === 2 ? "v16" : shown;
+			beats[i][1]();
+			// A beat is the scroll's doing, so it doesn't count as a click.
+			manual = false;
+			idle?.kill();
+			rows.forEach((r) => r.classList.toggle("is-now", r.dataset.kAct === beats[i][0]));
+		};
+		ScrollTrigger.create({
+			trigger: $(".keys-grid", root)!,
+			start: "center center",
+			end: () => `+=${innerHeight * 0.45 * beats.length}`,
+			pin: true,
+			onUpdate: (self) => {
+				const i = Math.min(beats.length - 1, Math.floor(self.progress * beats.length));
+				if (i !== at) scene!(i);
+			},
+		});
+		return () => {
+			scene = null;
+			at = -1;
+			step?.kill();
+		};
+	});
+	mm.add("(max-width: 900px)", () => {
+		ScrollTrigger.create({
+			trigger: $(".kdemo", root)!,
+			start: "top 85%",
+			end: "bottom top",
+			onToggle: (self) => {
+				inView = self.isActive;
+				if (manual) return;
+				if (self.isActive) tl.play();
+				else tl.pause();
+			},
+		});
+		return () => tl.pause();
 	});
 	gsap.set(keycaps, { opacity: 0, transformPerspective: 400 });
 	ScrollTrigger.batch(keycaps, {

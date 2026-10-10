@@ -233,13 +233,13 @@ function afterPaint(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timeli
 
 	setupSunday(mm);
 	setupThemes(mm);
+	setupKeys(mm);
+	setupSwitch(mm);
 	setupMicro(finePointer);
 
 	/* ── Everything else builds as it comes near ──────────────────────── */
 	near($("[data-feat]"), () => setupFeatures(mm));
 	near($("[data-screens]"), setupScreens);
-	near($("[data-keys]"), setupKeys);
-	near($("[data-switch]"), setupSwitch);
 	near($("[data-open]"), setupOpen);
 	near($("[data-request]"), setupRequest);
 	near($("[data-golive]"), setupGoLive);
