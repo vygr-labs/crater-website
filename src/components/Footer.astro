@@ -19,9 +19,19 @@ import { CHANNEL, DOCS, RELEASES, REPO } from "../lib/site";
 			<div>
 				<span class="foot-h">Help</span>
 				<a href="/tutorials">Tutorials</a>
-				<a href={DOCS} target="_blank" rel="noopener">Documentation</a>
+				<a href="/playground">Practice projection</a>
+				<a href="/docs">Documentation</a>
 				<a href="/request">Request a feature</a>
 				<a href="/report">Report a bug</a>
+			</div>
+			<div>
+				<span class="foot-h">Guides</span>
+				<a href="/how-to-project-bible-verses">Projecting scripture</a>
+				<a href="/church-projector-setup">Projector setup</a>
+				<a href="/stream-church-service-ndi">Lyrics on your stream</a>
+				<a href="/easyworship-alternative">Coming from EasyWorship</a>
+				<a href="/propresenter-alternative">Coming from ProPresenter</a>
+				<a href="/free-church-presentation-software">Free church presentation software</a>
 			</div>
 			<div>
 				<span class="foot-h">Project</span>
@@ -101,11 +111,9 @@ import { CHANNEL, DOCS, RELEASES, REPO } from "../lib/site";
 		line-height: 0.8;
 		letter-spacing: -0.06em;
 		text-align: center;
-		color: transparent;
-		background: linear-gradient(180deg, var(--line-strong), transparent 85%);
-		-webkit-background-clip: text;
-		background-clip: text;
+		color: var(--line);
 		user-select: none;
+		pointer-events: none;
 	}
 	.foot-bottom {
 		display: flex;

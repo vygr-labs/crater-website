@@ -3,7 +3,8 @@ import Mark from "./Mark.astro";
 import { nav } from "../lib/site";
 
 const here = Astro.url.pathname.replace(/\/$/, "") || "/";
-const current = (href: string) => (here === href ? "page" : undefined);
+// The docs link stays lit on every docs page.
+const current = (href: string) => (here === href || (href === "/docs" && here.startsWith("/docs/")) ? "page" : undefined);
 ---
 
 <div class="progress" aria-hidden="true"></div>

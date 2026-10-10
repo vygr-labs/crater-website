@@ -1,5 +1,5 @@
 // Links and facts shared by every page.
-export const DOCS = "https://crater.voyagerlabs.tech/";
+export const DOCS = "/docs/";
 export const CHANNEL = "https://www.youtube.com/@craterbibleproject";
 export const REPO = "https://github.com/vygr-labs/crater-v2";
 export const RELEASES = `${REPO}/releases`;
@@ -24,8 +24,9 @@ export const playlists = [
 export const nav = [
 	{ href: "/features", label: "Features" },
 	{ href: "/tutorials", label: "Tutorials" },
+	{ href: "/playground", label: "Practice" },
 	{ href: "/request", label: "Request a feature" },
-	{ href: DOCS, label: "Docs", external: true },
+	{ href: "/docs", label: "Docs" },
 ];
 
 // Platform marks, drawn to match the line icons used across the site.

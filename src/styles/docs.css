@@ -1,0 +1,870 @@
+/* The docs: a sidebar, the page and an "on this page" list on wide
+   screens. The sidebar becomes a drawer under 1000px and the outline folds
+   into the top of the page. */
+
+.docs {
+	--side: 248px;
+	--toc: 220px;
+	display: grid;
+	grid-template-columns: var(--side) minmax(0, 1fr) var(--toc);
+	gap: clamp(32px, 4vw, 64px);
+	padding-top: 116px;
+	align-items: start;
+}
+
+/* ── Moving between pages ────────────────────────────────────────────────
+   The browser keeps the old page on screen until the new one is ready, then
+   the nav and sidebar stay still while the page itself fades across. The
+   names are only set during a page change so the theme switch keeps its
+   circle reveal. */
+@media (prefers-reduced-motion: no-preference) {
+	@view-transition {
+		navigation: auto;
+		types: page;
+	}
+	html:active-view-transition-type(page) {
+		.doc,
+		.art {
+			view-transition-name: page;
+		}
+		.docs-toc {
+			view-transition-name: toc;
+		}
+	}
+	html:active-view-transition-type(page)::view-transition-old(root),
+	html:active-view-transition-type(page)::view-transition-new(root) {
+		animation: none;
+	}
+	::view-transition-group(page),
+	::view-transition-group(toc) {
+		animation: none;
+	}
+	::view-transition-old(page),
+	::view-transition-old(toc) {
+		animation: page-out 0.16s ease both;
+	}
+	::view-transition-new(page),
+	::view-transition-new(toc) {
+		animation: page-in 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both;
+	}
+}
+@keyframes page-out {
+	to {
+		opacity: 0;
+	}
+}
+@keyframes page-in {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────── */
+.docs-side,
+.docs-toc {
+	position: sticky;
+	top: 100px;
+}
+.side-inner,
+.toc-inner {
+	max-height: calc(100dvh - 120px);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	padding: 4px 6px 32px 0;
+	scrollbar-width: thin;
+	scrollbar-color: var(--line-strong) transparent;
+}
+.side-top {
+	display: none;
+}
+.side-search {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	height: 42px;
+	padding: 0 10px 0 14px;
+	margin-bottom: 26px;
+	border-radius: 12px;
+	border: 1px solid var(--line);
+	background: var(--bg-2);
+	color: var(--ink-3);
+	font: inherit;
+	font-size: 14.5px;
+	cursor: pointer;
+	transition: border-color 0.25s ease, color 0.25s ease;
+}
+.side-search:hover {
+	border-color: var(--line-strong);
+	color: var(--ink-2);
+}
+.side-search kbd {
+	margin-left: auto;
+}
+kbd {
+	display: inline-grid;
+	place-items: center;
+	min-width: 22px;
+	height: 22px;
+	padding: 0 6px;
+	border-radius: 6px;
+	border: 1px solid var(--line-strong);
+	border-bottom-width: 2px;
+	background: var(--card);
+	font: 500 12px/1 var(--font-body);
+	color: var(--ink-2);
+}
+.side-group + .side-group {
+	margin-top: 26px;
+}
+.side-h {
+	margin: 0 0 8px;
+	padding-left: 12px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--ink);
+}
+.docs-side ul,
+.docs-toc ul,
+.toc-inline ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.docs-side ul {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+.docs-side li a {
+	display: block;
+	padding: 6px 12px;
+	border-radius: 8px;
+	font-size: 14.5px;
+	line-height: 1.4;
+	color: var(--ink-2);
+	transition: color 0.2s ease, background-color 0.2s ease;
+}
+.docs-side li a:hover {
+	color: var(--ink);
+	background: var(--bg-2);
+}
+.docs-side li a[aria-current="page"] {
+	color: var(--brand);
+	background: var(--brand-wash);
+	font-weight: 500;
+}
+.side-practice {
+	display: block;
+	margin-top: 30px;
+	padding: 14px 14px 15px;
+	border-radius: 14px;
+	border: 1px solid var(--line);
+	background: var(--bg-2);
+	transition: border-color 0.25s ease;
+}
+.side-practice:hover {
+	border-color: var(--brand);
+}
+.side-practice strong {
+	display: block;
+	font-size: 14px;
+	font-weight: 600;
+}
+.side-practice span {
+	display: block;
+	margin-top: 4px;
+	font-size: 13px;
+	line-height: 1.45;
+	color: var(--ink-3);
+}
+
+/* ── On this page ────────────────────────────────────────────────────── */
+.docs-toc .side-h {
+	padding-left: 14px;
+}
+.docs-toc li a {
+	display: block;
+	padding: 5px 0 5px 14px;
+	border-left: 1px solid var(--line);
+	font-size: 13.5px;
+	line-height: 1.4;
+	color: var(--ink-3);
+	transition: color 0.2s ease, border-color 0.2s ease;
+}
+.docs-toc li.d3 a {
+	padding-left: 26px;
+}
+.docs-toc li a:hover {
+	color: var(--ink);
+}
+.docs-toc li a.is-here {
+	color: var(--brand);
+	border-left-color: var(--brand);
+}
+
+/* ── The page ────────────────────────────────────────────────────────── */
+.doc {
+	min-width: 0;
+	max-width: 760px;
+}
+.doc-group {
+	margin: 0 0 12px;
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--brand);
+}
+.doc-title {
+	font-size: clamp(36px, 4.4vw, 54px);
+	line-height: 1.04;
+	letter-spacing: -0.03em;
+}
+.doc-lede {
+	margin: 18px 0 0;
+	font-size: 19px;
+	line-height: 1.5;
+	color: var(--ink-2);
+}
+.doc-head {
+	padding-bottom: 32px;
+	margin-bottom: 8px;
+	border-bottom: 1px solid var(--line);
+}
+
+.toc-inline {
+	display: none;
+	margin: 20px 0 4px;
+	border-radius: 14px;
+	border: 1px solid var(--line);
+	background: var(--bg-2);
+}
+.toc-inline summary {
+	padding: 13px 16px;
+	font-size: 15px;
+	font-weight: 500;
+	cursor: pointer;
+	list-style: none;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.toc-inline summary::-webkit-details-marker {
+	display: none;
+}
+.toc-inline summary::after {
+	content: "";
+	width: 8px;
+	height: 8px;
+	border-right: 1.6px solid var(--ink-3);
+	border-bottom: 1.6px solid var(--ink-3);
+	transform: rotate(45deg) translateY(-2px);
+	transition: transform 0.3s var(--ease-out);
+}
+.toc-inline[open] summary::after {
+	transform: rotate(-135deg) translateY(-2px);
+}
+.toc-inline ul {
+	padding: 0 8px 10px;
+}
+.toc-inline a {
+	display: block;
+	padding: 8px 10px;
+	border-radius: 8px;
+	font-size: 15px;
+	color: var(--ink-2);
+}
+.toc-inline li.d3 a {
+	padding-left: 24px;
+	font-size: 14px;
+}
+
+/* ── Prose ───────────────────────────────────────────────────────────── */
+.prose {
+	font-size: 17px;
+	line-height: 1.7;
+	color: var(--ink-2);
+}
+.prose > :first-child {
+	margin-top: 28px;
+}
+.prose p,
+.prose ul,
+.prose ol,
+.prose table,
+.prose .code-wrap,
+.prose .callout,
+.prose .tabs {
+	margin: 0 0 20px;
+}
+.prose strong {
+	color: var(--ink);
+	font-weight: 600;
+}
+.prose h2,
+.prose h3,
+.prose h4 {
+	position: relative;
+	color: var(--ink);
+	font-family: var(--font-display);
+	font-weight: 600;
+	scroll-margin-top: 110px;
+}
+.prose h2 {
+	margin: 56px 0 16px;
+	font-size: 30px;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+}
+.prose h3 {
+	margin: 36px 0 12px;
+	font-size: 21px;
+	line-height: 1.25;
+	letter-spacing: -0.01em;
+}
+.prose h4 {
+	margin: 28px 0 10px;
+	font-size: 17px;
+}
+.h-anchor {
+	margin-left: 10px;
+	color: var(--ink-3);
+	font-weight: 400;
+	opacity: 0;
+	transition: opacity 0.2s ease, color 0.2s ease;
+}
+.prose :is(h2, h3):hover .h-anchor,
+.h-anchor:focus-visible {
+	opacity: 1;
+}
+.h-anchor:hover {
+	color: var(--brand);
+}
+.prose a:not(.h-anchor) {
+	color: var(--brand);
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 3px;
+	text-decoration-color: color-mix(in srgb, var(--brand) 40%, transparent);
+	transition: text-decoration-color 0.2s ease;
+}
+.prose a:not(.h-anchor):hover {
+	text-decoration-color: var(--brand);
+}
+.prose ul,
+.prose ol {
+	padding-left: 22px;
+}
+.prose li {
+	margin: 6px 0;
+	padding-left: 4px;
+}
+.prose li::marker {
+	color: var(--ink-3);
+}
+.prose ol > li::marker {
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+.prose li > ul,
+.prose li > ol {
+	margin: 6px 0 0;
+}
+.prose hr {
+	margin: 40px 0;
+	border: 0;
+	border-top: 1px solid var(--line);
+}
+.prose :not(pre) > code {
+	padding: 2px 6px;
+	border-radius: 6px;
+	background: var(--bg-2);
+	border: 1px solid var(--line);
+	font-size: 0.88em;
+	color: var(--ink);
+	overflow-wrap: anywhere;
+}
+.prose em {
+	color: var(--ink);
+}
+
+/* Tables scroll sideways on phones rather than squeezing the words. */
+.prose table {
+	display: block;
+	max-width: 100%;
+	overflow-x: auto;
+	border-collapse: collapse;
+	font-size: 15.5px;
+	line-height: 1.5;
+	border: 1px solid var(--line);
+	border-radius: 14px;
+}
+.prose th,
+.prose td {
+	padding: 11px 16px;
+	text-align: left;
+	vertical-align: top;
+	border-bottom: 1px solid var(--line);
+}
+.prose th {
+	color: var(--ink);
+	font-weight: 600;
+	background: var(--bg-2);
+	white-space: nowrap;
+}
+.prose tr:last-child td {
+	border-bottom: 0;
+}
+.prose td:first-child {
+	color: var(--ink);
+}
+
+/* Code */
+.code-wrap {
+	position: relative;
+}
+.prose pre {
+	margin: 0;
+	padding: 18px 20px;
+	border-radius: 14px;
+	border: 1px solid var(--line);
+	background: var(--bg-2) !important;
+	font-size: 14px;
+	line-height: 1.6;
+	overflow-x: auto;
+}
+.prose pre code {
+	font-family: ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+}
+:root[data-theme="dark"] .prose pre span {
+	color: var(--shiki-dark);
+}
+:root[data-theme="light"] .prose pre span {
+	color: var(--shiki-light);
+}
+.copy {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	height: 30px;
+	padding: 0 12px;
+	border-radius: 8px;
+	border: 1px solid var(--line-strong);
+	background: var(--card);
+	color: var(--ink-2);
+	font: 500 13px var(--font-body);
+	cursor: pointer;
+	opacity: 0;
+	transition: opacity 0.2s ease, color 0.2s ease;
+}
+.code-wrap:hover .copy,
+.copy:focus-visible {
+	opacity: 1;
+}
+.copy:hover {
+	color: var(--ink);
+}
+
+/* Callouts */
+.callout {
+	--c: var(--brand);
+	--w: var(--brand-wash);
+	padding: 16px 20px 2px;
+	border-radius: 14px;
+	background: var(--w);
+	border: 1px solid color-mix(in srgb, var(--c) 30%, transparent);
+	font-size: 16px;
+	line-height: 1.6;
+}
+.callout[data-kind="warning"] {
+	--c: var(--gold);
+	--w: var(--gold-wash);
+}
+.callout p,
+.callout ul {
+	margin: 0 0 14px;
+}
+.callout .callout-title {
+	margin-bottom: 6px;
+	color: var(--c);
+	font-weight: 600;
+}
+
+/* Tabs. Without the script every panel shows under its own label. */
+.tabs {
+	border: 1px solid var(--line);
+	border-radius: 14px;
+	overflow: hidden;
+}
+.tab-list {
+	display: none;
+}
+.tab-panel {
+	padding: 16px 20px 0;
+}
+.tab-label {
+	margin-bottom: 8px !important;
+	color: var(--ink);
+	font-weight: 600;
+}
+.tabs.is-live .tab-list {
+	display: flex;
+	gap: 2px;
+	padding: 6px;
+	border-bottom: 1px solid var(--line);
+	background: var(--bg-2);
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+.tabs.is-live .tab-label {
+	display: none;
+}
+.tabs.is-live .tab-panel:not([data-on]) {
+	display: none;
+}
+.tab-list button {
+	flex: none;
+	height: 36px;
+	padding: 0 14px;
+	border-radius: 9px;
+	border: 0;
+	background: transparent;
+	color: var(--ink-3);
+	font: 500 14.5px var(--font-body);
+	cursor: pointer;
+	transition: color 0.2s ease, background-color 0.2s ease;
+}
+.tab-list button:hover {
+	color: var(--ink);
+}
+.tab-list button[aria-selected="true"] {
+	background: var(--card);
+	color: var(--ink);
+	box-shadow: 0 0 0 1px var(--line);
+}
+.tab-panel .code-wrap,
+.tab-panel pre {
+	margin-bottom: 16px;
+}
+
+/* ── Foot of the page ───────────────────────────────────────────────── */
+.doc-foot {
+	margin-top: 56px;
+	padding-top: 24px;
+	border-top: 1px solid var(--line);
+}
+.doc-edit {
+	font-size: 14.5px;
+	color: var(--ink-3);
+}
+.doc-edit:hover {
+	color: var(--ink);
+}
+.pager {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	margin-top: 28px;
+}
+.pager-link {
+	display: block;
+	padding: 16px 20px;
+	border-radius: 16px;
+	border: 1px solid var(--line);
+	transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+.pager-link:hover {
+	border-color: var(--brand);
+	background: var(--brand-wash);
+}
+.pager-link span {
+	display: block;
+	font-size: 13.5px;
+	color: var(--ink-3);
+}
+.pager-link strong {
+	display: block;
+	margin-top: 2px;
+	font-family: var(--font-display);
+	font-size: 18px;
+	font-weight: 600;
+}
+.pager-next {
+	grid-column: 2;
+	text-align: right;
+}
+
+/* ── Search ──────────────────────────────────────────────────────────── */
+.search {
+	width: min(640px, calc(100vw - 32px));
+	max-height: min(620px, calc(100dvh - 120px));
+	margin: 96px auto auto;
+	padding: 0;
+	border: 1px solid var(--line-strong);
+	border-radius: 20px;
+	background: var(--card);
+	color: var(--ink);
+	box-shadow: 0 40px 100px -30px var(--shadow);
+	overflow: hidden;
+}
+.search[open] {
+	display: flex;
+}
+.search::backdrop {
+	background: rgb(0 0 0 / 0.5);
+	backdrop-filter: blur(4px);
+}
+.search-box {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	min-height: 0;
+}
+.search-field {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 0 14px 0 18px;
+	border-bottom: 1px solid var(--line);
+	color: var(--ink-3);
+}
+.search-field input {
+	flex: 1;
+	min-width: 0;
+	height: 60px;
+	border: 0;
+	background: transparent;
+	color: var(--ink);
+	font: 400 18px var(--font-body);
+	outline: none;
+}
+.search-field input::-webkit-search-cancel-button {
+	display: none;
+}
+.search-close {
+	height: 28px;
+	padding: 0 9px;
+	border-radius: 7px;
+	border: 1px solid var(--line-strong);
+	background: transparent;
+	color: var(--ink-3);
+	font: 500 12px var(--font-body);
+	cursor: pointer;
+}
+.search-results {
+	list-style: none;
+	margin: 0;
+	padding: 8px;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+.search-results:empty {
+	display: none;
+}
+.search-results a {
+	display: block;
+	padding: 12px 14px;
+	border-radius: 12px;
+}
+.search-results li[aria-selected="true"] a,
+.search-results a:hover {
+	background: var(--brand-wash);
+}
+.r-page {
+	display: block;
+	font-size: 12.5px;
+	color: var(--ink-3);
+}
+.search-results strong {
+	display: block;
+	font-weight: 600;
+	font-size: 16px;
+}
+.r-text {
+	display: block;
+	margin-top: 3px;
+	font-size: 14px;
+	line-height: 1.5;
+	color: var(--ink-2);
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+.search-results mark {
+	background: none;
+	color: var(--brand);
+	font-weight: 600;
+}
+.search-empty {
+	margin: 0;
+	padding: 22px 20px;
+	color: var(--ink-3);
+	font-size: 15px;
+}
+html.search-open {
+	overflow: hidden;
+}
+
+/* ── Smaller screens ─────────────────────────────────────────────────── */
+.docs-bar,
+.side-scrim {
+	display: none;
+}
+
+@media (max-width: 1240px) {
+	.docs {
+		grid-template-columns: var(--side) minmax(0, 1fr);
+	}
+	.docs-toc {
+		display: none;
+	}
+	.toc-inline {
+		display: block;
+	}
+}
+
+@media (max-width: 1000px) {
+	.docs {
+		grid-template-columns: minmax(0, 1fr);
+		padding-top: 96px;
+		gap: 0;
+	}
+	.doc {
+		max-width: none;
+	}
+	.docs-bar {
+		display: flex;
+		gap: 8px;
+		margin-bottom: 28px;
+	}
+	.docs-bar-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		height: 46px;
+		padding: 0 16px;
+		border-radius: 14px;
+		border: 1px solid var(--line);
+		background: var(--bg-2);
+		color: var(--ink);
+		font: 500 15px var(--font-body);
+		cursor: pointer;
+	}
+	.docs-bar-btn:first-child {
+		flex: 1;
+		min-width: 0;
+	}
+	.docs-bar-btn span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.docs-bar-btn svg {
+		flex: none;
+		color: var(--ink-3);
+	}
+	/* The sidebar slides in from the left as a sheet. */
+	.docs-side {
+		position: fixed;
+		inset: 0 auto 0 0;
+		z-index: 70;
+		width: min(330px, 86vw);
+		padding: 20px 14px 0 18px;
+		background: var(--card);
+		border-right: 1px solid var(--line);
+		box-shadow: 30px 0 80px -30px var(--shadow);
+		transform: translateX(-104%);
+		visibility: hidden;
+		transition: transform 0.45s var(--ease-out), visibility 0s linear 0.45s;
+	}
+	.docs-side.is-open {
+		transform: none;
+		visibility: visible;
+		transition: transform 0.45s var(--ease-out);
+	}
+	.side-top {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin: 0 0 16px 12px;
+		font-family: var(--font-display);
+		font-size: 19px;
+		font-weight: 600;
+	}
+	.side-close {
+		width: 42px;
+		height: 42px;
+		display: grid;
+		place-items: center;
+		border-radius: 12px;
+		border: 1px solid var(--line);
+		background: transparent;
+		color: var(--ink-2);
+		cursor: pointer;
+	}
+	.side-inner {
+		max-height: 100dvh;
+		height: 100%;
+		padding-bottom: 40px;
+	}
+	.docs-side li a {
+		padding: 10px 12px;
+		font-size: 16px;
+	}
+	.side-scrim:not([hidden]) {
+		display: block;
+		position: fixed;
+		inset: 0;
+		z-index: 65;
+		background: rgb(0 0 0 / 0.5);
+	}
+	body.side-open {
+		overflow: hidden;
+	}
+	.search {
+		margin-top: 24px;
+		max-height: calc(100dvh - 48px);
+	}
+}
+
+@media (max-width: 560px) {
+	.docs-search-btn span {
+		display: none;
+	}
+	.prose {
+		font-size: 16.5px;
+	}
+	.prose h2 {
+		font-size: 25px;
+		margin-top: 44px;
+	}
+	.doc-lede {
+		font-size: 17.5px;
+	}
+	.prose th,
+	.prose td {
+		padding: 10px 12px;
+	}
+	.callout {
+		padding: 14px 16px 1px;
+	}
+	.pager {
+		grid-template-columns: 1fr;
+	}
+	.pager-next {
+		grid-column: 1;
+	}
+	.copy {
+		opacity: 1;
+	}
+	.h-anchor {
+		display: none;
+	}
+}
+
+@media (hover: none) {
+	.copy {
+		opacity: 1;
+	}
+}

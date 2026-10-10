@@ -70,7 +70,11 @@ const image = new URL("/og.png", Astro.site);
 						y = +sessionStorage.getItem(key) || 0;
 						sessionStorage.removeItem(key);
 					} catch (e) {}
-					if (y && !location.hash) requestAnimationFrame(function () { scrollTo(0, y); });
+					// Only a reload or Back/Forward returns to where you were. Following
+					// a link to a page you read earlier starts it from the top.
+					var nav = performance.getEntriesByType("navigation")[0];
+					var back = nav && (nav.type === "reload" || nav.type === "back_forward");
+					if (y && back && !location.hash) requestAnimationFrame(function () { scrollTo(0, y); });
 				});
 			})();
 		</script>
@@ -78,6 +82,7 @@ const image = new URL("/og.png", Astro.site);
 		<!-- The headline and body fonts are needed for the first screen. -->
 		<link rel="preload" href="/fonts/funnel-display-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
 		<link rel="preload" href="/fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+		<slot name="head" />
 	</head>
 	<body>
 		<div class="grain" aria-hidden="true"></div>

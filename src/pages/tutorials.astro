@@ -6,10 +6,10 @@ import { CHANNEL, DOCS, playlists } from "../lib/site";
 // The first steps, in the order a new volunteer meets them. Each one
 // links to the written guide on the docs site.
 const steps = [
-	["Install Crater", "Run the installer and get past the first-launch warning.", "getting-started/installation/"],
-	["Pick your screen", "Connect the projector and choose it as the projection screen.", "getting-started/first-launch/"],
-	["Learn the console", "The three panels, the library tabs and what the colours tell you.", "getting-started/interface-overview/"],
-	["Run a service", "Load the schedule, go live and move through the slides.", "guides/displaying-content/"],
+	["Install Crater", "Run the installer and get past the first-launch warning.", "getting-started/installation"],
+	["Pick your screen", "Connect the projector and choose it as the projection screen.", "getting-started/first-launch"],
+	["Learn the console", "The three panels, the library tabs and what the colours tell you.", "getting-started/interface-overview"],
+	["Run a service", "Load the schedule, go live and move through the slides.", "guides/displaying-content"],
 ];
 ---
 
@@ -51,7 +51,7 @@ const steps = [
 				{
 					steps.map(([t, d, path], i) => (
 						<li data-reveal="row">
-							<a href={DOCS + path} target="_blank" rel="noopener">
+							<a href={DOCS + path}>
 								<span class="tl-sn">{i + 1}</span>
 								<span class="tl-st">
 									<strong>{t}</strong>

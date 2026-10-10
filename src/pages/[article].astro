@@ -1,0 +1,142 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "../layouts/Base.astro";
+import PageHead from "../components/PageHead.astro";
+import "../styles/docs.css";
+
+export async function getStaticPaths() {
+	const all = await getCollection("articles");
+	return all.map((entry) => ({ params: { article: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const all = await getCollection("articles");
+const related = entry.data.related.map((id) => all.find((a) => a.id === id)).filter((a) => !!a);
+const url = new URL(`/${entry.id}`, Astro.site).href;
+const ld = {
+	"@context": "https://schema.org",
+	"@type": "Article",
+	headline: entry.data.heading,
+	description: entry.data.description,
+	url,
+	author: { "@type": "Person", name: "Eyetu Kingsley" },
+	publisher: { "@type": "Organization", name: "Crater", url: "https://getcrater.org" },
+	image: new URL("/og.png", Astro.site).href,
+};
+---
+
+<Base title={entry.data.title} description={entry.data.description}>
+	<script slot="head" type="application/ld+json" set:html={JSON.stringify(ld)} />
+	<main>
+		<PageHead lede={entry.data.lede}>{entry.data.heading}</PageHead>
+
+		<article class="wrap art">
+			<div class="prose">
+				<Content />
+			</div>
+
+			<aside class="art-cta">
+				<p class="art-cta-h">Try Crater this week</p>
+				<p class="art-cta-p">It's free on Windows, macOS and Linux. Practise in your browser first if you like.</p>
+				<div class="art-cta-btns">
+					<a href="/download" class="btn btn-brand">Download Crater</a>
+					<a href="/playground" class="btn btn-ghost">Practise in the browser</a>
+				</div>
+			</aside>
+
+			{
+				related.length > 0 && (
+					<nav class="art-related" aria-label="Related">
+						<p class="art-related-h">Read next</p>
+						<ul>
+							{related.map((a) => (
+								<li>
+									<a href={`/${a.id}`}>
+										<strong>{a.data.heading}</strong>
+										<span>{a.data.description}</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					</nav>
+				)
+			}
+		</article>
+	</main>
+</Base>
+
+<style>
+	.art {
+		max-width: calc(760px + 2 * (var(--gutter) + var(--inset)));
+		margin-top: 40px;
+	}
+	.art-cta {
+		margin-top: 64px;
+		padding: 28px;
+		border-radius: 22px;
+		background: var(--card);
+		border: 1px solid var(--line);
+	}
+	.art-cta-h {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: 24px;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+	}
+	.art-cta-p {
+		margin: 8px 0 0;
+		color: var(--ink-2);
+	}
+	.art-cta-btns {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin-top: 20px;
+	}
+	.art-related {
+		margin-top: 56px;
+	}
+	.art-related-h {
+		margin: 0 0 14px;
+		font-weight: 600;
+	}
+	.art-related ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 10px;
+	}
+	.art-related a {
+		display: block;
+		padding: 16px 20px;
+		border-radius: 16px;
+		border: 1px solid var(--line);
+		transition: border-color 0.25s ease;
+	}
+	.art-related a:hover {
+		border-color: var(--brand);
+	}
+	.art-related strong {
+		display: block;
+		font-family: var(--font-display);
+		font-size: 18px;
+		font-weight: 600;
+	}
+	.art-related span {
+		display: block;
+		margin-top: 4px;
+		font-size: 15px;
+		color: var(--ink-2);
+	}
+	@media (max-width: 560px) {
+		.art-cta {
+			padding: 22px;
+		}
+		.art-cta-btns .btn {
+			width: 100%;
+		}
+	}
+</style>

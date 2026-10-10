@@ -1,0 +1,176 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { docHref, docsNav, docsOrder, sideLabel } from "../../lib/docs";
+import "../../styles/docs.css";
+
+export async function getStaticPaths() {
+	const docs = await getCollection("docs");
+	return docs.map((entry) => ({ params: { slug: entry.id === "index" ? undefined : entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const all = await getCollection("docs");
+const byId = Object.fromEntries(all.map((d) => [d.id, d]));
+const label = (id: string) => sideLabel[id] ?? byId[id]?.data.title ?? id;
+
+const at = docsOrder.indexOf(entry.id);
+const prev = at > 0 ? docsOrder[at - 1] : null;
+const next = at >= 0 && at < docsOrder.length - 1 ? docsOrder[at + 1] : null;
+const group = docsNav.find((g) => g.items.includes(entry.id));
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const isHome = entry.id === "index";
+
+const title = isHome ? "Crater documentation: free worship projection software" : `${entry.data.title} · Crater docs`;
+const url = new URL(docHref(entry.id), Astro.site).href;
+const crumbs = [
+	{ name: "Docs", item: new URL("/docs", Astro.site).href },
+	...(isHome ? [] : [{ name: entry.data.title, item: url }]),
+];
+const ld = {
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	itemListElement: crumbs.map((c, i) => ({ "@type": "ListItem", position: i + 1, ...c })),
+};
+const edit = `https://github.com/vygr-labs/crater-website/edit/main/src/content/docs/${entry.id}.md`;
+---
+
+<Base title={title} description={entry.data.description}>
+	<script slot="head" type="application/ld+json" set:html={JSON.stringify(ld)} />
+	<main class="docs wrap" data-docs>
+		<div class="docs-bar">
+			<button type="button" class="docs-bar-btn" data-side-open aria-controls="docs-side" aria-expanded="false">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+				<span>{group?.label ?? "Docs"}</span>
+			</button>
+			<button type="button" class="docs-bar-btn docs-search-btn" data-search-open>
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+				<span>Search</span>
+			</button>
+		</div>
+
+		<aside class="docs-side" id="docs-side" data-side aria-label="Documentation">
+			<div class="side-inner" data-lenis-prevent>
+				<div class="side-top">
+					<span>Documentation</span>
+					<button type="button" class="side-close" data-side-close aria-label="Close the docs menu">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+					</button>
+				</div>
+				<button type="button" class="side-search" data-search-open>
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+					<span>Search the docs</span>
+					<kbd>/</kbd>
+				</button>
+				<nav>
+					{
+						docsNav.map((g) => (
+							<div class="side-group">
+								<p class="side-h">{g.label}</p>
+								<ul>
+									{g.items.map((id) => (
+										<li>
+											<a href={docHref(id)} aria-current={id === entry.id ? "page" : undefined}>
+												{label(id)}
+											</a>
+										</li>
+									))}
+								</ul>
+							</div>
+						))
+					}
+				</nav>
+				<a class="side-practice" href="/playground">
+					<strong>Practice on a pretend console</strong>
+					<span>Try sending verses and songs live in your browser.</span>
+				</a>
+			</div>
+		</aside>
+		<div class="side-scrim" data-side-scrim hidden></div>
+
+		<article class="doc">
+			<header class="doc-head">
+				{!isHome && group && <p class="doc-group">{group.label}</p>}
+				<h1 class="display doc-title">{isHome ? "Crater documentation" : entry.data.title}</h1>
+				<p class="doc-lede">{entry.data.description}</p>
+			</header>
+
+			{
+				toc.length > 2 && (
+					<details class="toc-inline">
+						<summary>On this page</summary>
+						<ul>
+							{toc.map((h) => (
+								<li class={`d${h.depth}`}>
+									<a href={`#${h.slug}`}>{h.text}</a>
+								</li>
+							))}
+						</ul>
+					</details>
+				)
+			}
+
+			<div class="prose">
+				<Content />
+			</div>
+
+			<footer class="doc-foot">
+				<a href={edit} target="_blank" rel="noopener" class="u-link doc-edit">Suggest an edit to this page</a>
+				<nav class="pager" aria-label="Previous and next">
+					{
+						prev ? (
+							<a href={docHref(prev)} class="pager-link">
+								<span>Previous</span>
+								<strong>{label(prev)}</strong>
+							</a>
+						) : (
+							<span />
+						)
+					}
+					{
+						next && (
+							<a href={docHref(next)} class="pager-link pager-next">
+								<span>Next</span>
+								<strong>{label(next)}</strong>
+							</a>
+						)
+					}
+				</nav>
+			</footer>
+		</article>
+
+		{
+			toc.length > 0 && (
+				<aside class="docs-toc" aria-label="On this page">
+					<div class="toc-inner" data-lenis-prevent>
+						<p class="side-h">On this page</p>
+						<ul data-toc>
+							{toc.map((h) => (
+								<li class={`d${h.depth}`}>
+									<a href={`#${h.slug}`}>{h.text}</a>
+								</li>
+							))}
+						</ul>
+					</div>
+				</aside>
+			)
+		}
+	</main>
+
+	<dialog class="search" data-search aria-label="Search the docs">
+		<div class="search-box">
+			<div class="search-field">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+				<input type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false" data-search-input />
+				<button type="button" class="search-close" data-search-close>Esc</button>
+			</div>
+			<ul class="search-results" role="listbox" data-search-results data-lenis-prevent></ul>
+			<p class="search-empty" data-search-empty hidden>Nothing matches that yet. Try fewer words.</p>
+		</div>
+	</dialog>
+</Base>
+
+<script>
+	import "../../scripts/docs.ts";
+</script>

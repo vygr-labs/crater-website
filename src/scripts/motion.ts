@@ -85,7 +85,11 @@ function run() {
 			const target = id === "#top" ? 0 : $(id);
 			if (target === null) return;
 			e.preventDefault();
-			lenis.scrollTo(target as HTMLElement | number, { offset: -24, duration: 1.4 });
+			// Docs headings carry a scroll margin so the nav never covers them.
+			const margin = typeof target === "number" ? 0 : parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+			lenis.scrollTo(target as HTMLElement | number, { offset: -(margin || 24), duration: 1.4 });
+			// In the docs the address follows, so a section link can be copied.
+			if ($("[data-docs]") && typeof target !== "number") history.replaceState(null, "", id);
 		}),
 	);
 

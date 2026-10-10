@@ -31,7 +31,7 @@ const areas = [
 			"Search by the words you remember when the reference slips your mind.",
 			'Ranges like "John 3:16-18" select together, and "jn 3:16 niv" switches translation as you type.',
 		],
-		docs: "features/scriptures/",
+		docs: "features/scriptures",
 	},
 	{
 		id: "strongs",
@@ -44,7 +44,7 @@ const areas = [
 			"A King James reader with each tagged word linked to its number.",
 			"Put a definition on the screen when the sermon turns on a word.",
 		],
-		docs: "features/strongs/",
+		docs: "features/strongs",
 	},
 	{
 		id: "songs",
@@ -59,7 +59,7 @@ const areas = [
 			"Change a song for one service only and the library copy stays as it was.",
 			"Bring your songs across from EasyWorship 6 and 7, with authors, copyright and CCLI numbers.",
 		],
-		docs: "features/songs/",
+		docs: "features/songs",
 	},
 	{
 		id: "media",
@@ -73,7 +73,7 @@ const areas = [
 			"Fit, crop, loop and mute for each item.",
 			"Your church logo one shortcut away, for the moments between.",
 		],
-		docs: "features/media/",
+		docs: "features/media",
 	},
 	{
 		id: "presentations",
@@ -85,7 +85,7 @@ const areas = [
 			"Slide designs for a title, a section divider, title and content, two columns, a quote, a full picture or a blank slide.",
 			"Speaker notes that show on the stage monitor and never on the congregation's screen.",
 		],
-		docs: "features/presentations/",
+		docs: "features/presentations",
 	},
 	{
 		id: "schedule",
@@ -98,7 +98,7 @@ const areas = [
 			"Drag to reorder. It saves itself a few seconds after every change.",
 			"Keep schedules for later and load them again.",
 		],
-		docs: "features/schedules/",
+		docs: "features/schedules",
 	},
 	{
 		id: "screens",
@@ -113,7 +113,7 @@ const areas = [
 			"Cast the live screen to a TV or phone browser on the same network, with no cable.",
 			"With one display, the projection can sit full size behind the console while you prepare at home.",
 		],
-		docs: "features/outputs/",
+		docs: "features/outputs",
 	},
 	{
 		id: "streaming",
@@ -127,7 +127,7 @@ const areas = [
 			"Hide pictures and video on the stream while lyrics and scripture still go out.",
 			"An on-demand mode for slow laptops that only sends a frame when something changes.",
 		],
-		docs: "features/ndi-streaming/",
+		docs: "features/ndi-streaming",
 	},
 	{
 		id: "themes",
@@ -140,7 +140,7 @@ const areas = [
 			"A default theme for each screen, so the stage and the lobby can look different.",
 			"Export a theme as a single file and import one from another church.",
 		],
-		docs: "features/themes/",
+		docs: "features/themes",
 	},
 	{
 		id: "everyday",
@@ -155,7 +155,7 @@ const areas = [
 			"Updates keep your songs, themes, schedules, media and settings.",
 			"Keyboard shortcuts for everything that matters mid-service.",
 		],
-		docs: "reference/keyboard-shortcuts/",
+		docs: "reference/keyboard-shortcuts",
 	},
 ];
 ---
@@ -187,7 +187,7 @@ const areas = [
 								<ul class="fx-points">
 									{a.points.map((p) => <li>{p}</li>)}
 								</ul>
-								<a href={DOCS + a.docs} target="_blank" rel="noopener" class="fx-more">
+								<a href={DOCS + a.docs} class="fx-more">
 									Read the guide
 									<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 								</a>
