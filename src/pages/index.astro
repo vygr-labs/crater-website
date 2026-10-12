@@ -829,18 +829,13 @@ const appLd = {
 			0 0 18px var(--glow);
 	}
 	@media (max-width: 800px) {
-		.reel {
-			width: auto;
-			overflow-x: auto;
-			scroll-snap-type: x mandatory;
-			padding-bottom: 8px;
-		}
 		.reel-item {
 			width: 86vw;
 			flex: none;
-			scroll-snap-align: center;
 		}
-		.reel-progress {
+		/* Six names don't fit under a phone-wide line, and the caption under
+		   each slide already says which one it is. */
+		.rp-step span {
 			display: none;
 		}
 	}
@@ -1078,6 +1073,12 @@ const appLd = {
 		.feat,
 		.feat-sm {
 			grid-column: 1 / -1;
+		}
+		/* Stacked, there is nothing to line up with, and iOS Safari sizes the
+		   shared visual row too short so the title rides up over the picture. */
+		.feat-sm {
+			grid-row: auto;
+			display: flex;
 		}
 		.feat-wide {
 			grid-template-columns: minmax(0, 1fr);

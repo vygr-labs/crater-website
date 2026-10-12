@@ -282,11 +282,14 @@ const steps = [
 		color: var(--ink-2);
 	}
 
-	/* Without the pinned scroll every step simply reads open. */
+	/* Without the pinned scroll every step simply reads open. Opening them
+	   must not animate: the scroll triggers further down the page measure
+	   right away, and would land short by however much is still growing. */
 	:global(html:not(.js)) .step-body,
 	.sunday.is-static .step-body {
 		grid-template-rows: 1fr;
 		opacity: 1;
+		transition: none;
 	}
 	.sunday.is-static .step h3 {
 		color: var(--ink);

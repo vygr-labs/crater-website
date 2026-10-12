@@ -213,8 +213,18 @@ const bgVars = (t: (typeof themes)[number]) => `--b1:${t.bg[0]};--b2:${t.bg[1]};
 		.themes-grid {
 			grid-template-columns: minmax(0, 1fr);
 		}
+		/* The slide holds at the top while the swatches scroll under it, as
+		   the Sunday screen does. */
 		.slide-wrap {
 			order: -1;
+			position: sticky;
+			top: 0;
+			z-index: 2;
+			padding: 16px 0 12px;
+			background: var(--bg);
+		}
+		.slide-caption {
+			margin-top: 12px;
 		}
 	}
 	@media (max-width: 460px) {

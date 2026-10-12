@@ -41,54 +41,56 @@ const board = ["Ctrl", "K", "L", "C", "P", "↑", "↓", "Enter"];
 			</ul>
 		</div>
 
-		<div class="kdemo" data-reveal="card" aria-label="Shortcuts being pressed and the projector responding" role="img">
-			<div class="kscreen">
-				<div class="kstate" data-k="search">
-					<div class="kpal">
-						<span class="kpal-in"><span data-k-typed></span><i class="caret"></i></span>
-						<span class="kpal-row is-hit">John 3:16 <small>KJV</small></span>
-						<span class="kpal-row">John 3:17 <small>KJV</small></span>
+		<div class="kstage">
+			<div class="kdemo" data-reveal="card" aria-label="Shortcuts being pressed and the projector responding" role="img">
+				<div class="kscreen">
+					<div class="kstate" data-k="search">
+						<div class="kpal">
+							<span class="kpal-in"><span data-k-typed></span><i class="caret"></i></span>
+							<span class="kpal-row is-hit">John 3:16 <small>KJV</small></span>
+							<span class="kpal-row">John 3:17 <small>KJV</small></span>
+						</div>
 					</div>
-				</div>
-				<div class="kstate" data-k="v16">
-					<span class="kref">JOHN 3:16 · KJV</span>
-					<p>For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.</p>
-				</div>
-				<div class="kstate" data-k="v17">
-					<span class="kref">JOHN 3:17 · KJV</span>
-					<p>For God sent not his Son into the world to condemn the world; but that the world through him might be saved.</p>
-				</div>
-				<div class="kstate" data-k="verse">
-					<span class="kref">BLESSED ASSURANCE · VERSE 1</span>
-					<p>Blessed assurance, Jesus is mine! O what a foretaste of glory divine!</p>
-				</div>
-				<div class="kstate" data-k="chorus">
-					<span class="kref">BLESSED ASSURANCE · CHORUS</span>
-					<p>This is my story, this is my song, praising my Saviour all the day long.</p>
-				</div>
-				<div class="kstate kstate-video" data-k="video">
-					<span class="kvid-icon" data-k-vid-icon aria-hidden="true">
-						<svg viewBox="0 0 24 24" fill="currentColor"><path class="kvid-play" d="M8 5.5v13l11-6.5z"></path><path class="kvid-pause" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"></path></svg>
-					</span>
-					<span class="kvid-bar"><i></i></span>
-				</div>
-				<div class="kstate" data-k="help">
-					<div class="kpal khelp">
-						{
-							list.map(([keys, label]) => (
-								<span class="khelp-row">
-									<span>{label}</span>
-									<small>{keys.join(" ")}</small>
-								</span>
-							))
-						}
+					<div class="kstate" data-k="v16">
+						<span class="kref">JOHN 3:16 · KJV</span>
+						<p>For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.</p>
 					</div>
+					<div class="kstate" data-k="v17">
+						<span class="kref">JOHN 3:17 · KJV</span>
+						<p>For God sent not his Son into the world to condemn the world; but that the world through him might be saved.</p>
+					</div>
+					<div class="kstate" data-k="verse">
+						<span class="kref">BLESSED ASSURANCE · VERSE 1</span>
+						<p>Blessed assurance, Jesus is mine! O what a foretaste of glory divine!</p>
+					</div>
+					<div class="kstate" data-k="chorus">
+						<span class="kref">BLESSED ASSURANCE · CHORUS</span>
+						<p>This is my story, this is my song, praising my Saviour all the day long.</p>
+					</div>
+					<div class="kstate kstate-video" data-k="video">
+						<span class="kvid-icon" data-k-vid-icon aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="currentColor"><path class="kvid-play" d="M8 5.5v13l11-6.5z"></path><path class="kvid-pause" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"></path></svg>
+						</span>
+						<span class="kvid-bar"><i></i></span>
+					</div>
+					<div class="kstate" data-k="help">
+						<div class="kpal khelp">
+							{
+								list.map(([keys, label]) => (
+									<span class="khelp-row">
+										<span>{label}</span>
+										<small>{keys.join(" ")}</small>
+									</span>
+								))
+							}
+						</div>
+					</div>
+					<div class="kstate kstate-logo" data-k="logo"><Mark size={64} /></div>
+					<span class="kcap" data-k-cap></span>
 				</div>
-				<div class="kstate kstate-logo" data-k="logo"><Mark size={64} /></div>
-				<span class="kcap" data-k-cap></span>
-			</div>
-			<div class="kboard" aria-hidden="true">
-				{board.map((k) => <kbd class="kkey" data-key={k}>{k}</kbd>)}
+				<div class="kboard" aria-hidden="true">
+					{board.map((k) => <kbd class="kkey" data-key={k}>{k}</kbd>)}
+				</div>
 			</div>
 		</div>
 	</div>
@@ -414,6 +416,20 @@ const board = ["Ctrl", "K", "L", "C", "P", "↑", "↓", "Enter"];
 	@media (max-width: 900px) {
 		.keys-grid {
 			grid-template-columns: minmax(0, 1fr);
+		}
+		/* The demo holds at the top while the list scrolls under it, as the
+		   Sunday screen does, so a tapped shortcut is seen landing. */
+		.kstage {
+			order: -1;
+			position: sticky;
+			top: 0;
+			z-index: 2;
+			padding: 16px 0 12px;
+			background: var(--bg);
+		}
+		.kboard {
+			gap: 8px;
+			margin-top: 14px;
 		}
 	}
 	@media (max-width: 520px) {

@@ -138,6 +138,14 @@ export function setupScreens() {
 	gsap.set(lines, { strokeDasharray: 1, strokeDashoffset: 1 });
 	gsap.set(outs, { opacity: 0, scale: 0.85, y: 20 });
 	gsap.set(hub, { opacity: 0, scale: 0.9 });
+	// The map centres each piece on its point with translate(-50%, -50%).
+	// Once GSAP owns the transform it would freeze that as pixels for the
+	// width the page loaded at, so hand the centring to GSAP as percents.
+	// Stacked on small screens, nothing is centred on a point.
+	gsap.matchMedia().add({ map: "(min-width: 901px)", stack: "(max-width: 900px)" }, (ctx) => {
+		const c = ctx.conditions!.map ? -50 : 0;
+		gsap.set([hub, ...outs], { x: 0, xPercent: c, yPercent: c });
+	});
 	const tl = gsap.timeline({
 		scrollTrigger: {
 			trigger: $(".map", root)!,
@@ -208,8 +216,10 @@ export function setupThemes(mm: gsap.MatchMedia) {
 			onUpdate,
 		});
 	});
+	// The slide is stuck to the top on phones, so the swatches scrolling
+	// under it set the pace.
 	mm.add("(max-width: 900px)", () => {
-		ScrollTrigger.create({ trigger: slide, start: "top 80%", end: "bottom 20%", onUpdate });
+		ScrollTrigger.create({ trigger: $(".swatches", root)!, start: "top 85%", end: "bottom 45%", onUpdate });
 	});
 
 	gsap.fromTo(
@@ -225,10 +235,9 @@ export function setupThemes(mm: gsap.MatchMedia) {
 	});
 }
 
-/* Keyboard first: a short script of real shortcuts, pressed in turn, with
-   the little projector answering each one. Loops while it is visible.
-   Clicking a shortcut in the list takes over: the loop stops, that key is
-   pressed on the demo, and the loop comes back after a quiet spell. */
+/* Keyboard first: scrolling presses each shortcut in the list, top to
+   bottom, with the little projector answering each one. Clicking a
+   shortcut takes over, and the scroll picks up again after a quiet spell. */
 export function setupKeys(mm: gsap.MatchMedia) {
 	const root = $("[data-keys]");
 	if (!root) return;
@@ -262,29 +271,12 @@ export function setupKeys(mm: gsap.MatchMedia) {
 		if (k) tl.fromTo(state(k), { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: 0.5, ease: "expo.out" }, at + 0.1);
 	};
 
-	const tl = gsap.timeline({ repeat: -1, paused: true, repeatDelay: 0.2 });
-	tl.call(() => (typed.textContent = ""), [], 0);
-	press(tl, ["Ctrl", "K"], "Ctrl K  search everything", 0.3);
-	swap(tl, "search", 0.35);
 	const q = "jn 3 16";
-	for (let i = 0; i < q.length; i++) tl.call(() => (typed.textContent = q.slice(0, i + 1)), [], 0.9 + i * 0.09);
-	press(tl, ["Enter"], "Enter  send it live", 2.1);
-	swap(tl, "v16", 2.15);
-	press(tl, [DOWN], `${DOWN}  next verse`, 4.0);
-	swap(tl, "v17", 4.05);
-	press(tl, ["Ctrl", "L"], "Ctrl L  logo on", 5.9);
-	swap(tl, "logo", 5.95);
-	press(tl, ["Ctrl", "C"], "Ctrl C  clear the screen", 7.6);
-	swap(tl, null, 7.65);
-	tl.to(cap, { opacity: 0, duration: 0.3 }, 8.4);
-	// The screen waits on John 3:16 rather than blank until the loop starts.
-	// This comes after the loop because its fromTo tweens render their start
-	// values as soon as they are built, which would hide the verse again.
+	// The screen waits on John 3:16 until the scroll presses the first key.
 	gsap.set(state("v16"), { opacity: 1 });
 
 	/* ── Hands-on mode ─────────────────────────────────────────────── */
 	let manual = false;
-	let inView = false;
 	let underLogo: string | null = null;
 	let underHelp: string | null = null;
 	let paused = false;
@@ -292,22 +284,15 @@ export function setupKeys(mm: gsap.MatchMedia) {
 	let idle: gsap.core.Tween | null = null;
 	const rows = $$<HTMLButtonElement>("[data-k-act]", root);
 
-	// On a wide screen the section holds while the scroll presses each
-	// shortcut in turn, and a clicked row hands back to the scroll after.
-	let scene: ((i: number) => void) | null = null;
+	// A clicked row hands back to the scroll after a quiet spell.
 	let at = -1;
 	const resume = () => {
 		manual = false;
 		rows.forEach((r) => r.classList.remove("is-now"));
 		step?.kill();
-		if (scene) return scene(Math.max(at, 0));
-		gsap.to([...states, cap], { opacity: 0, duration: 0.4, overwrite: true });
-		gsap.delayedCall(0.5, () => {
-			if (!manual && inView) tl.restart();
-		});
+		if (at >= 0) scene(at);
 	};
 	const act = (keys: string[], label: string, k: string | null, extra?: (s: gsap.core.Timeline) => void) => {
-		tl.pause();
 		step?.kill();
 		manual = true;
 		step = gsap.timeline();
@@ -368,52 +353,43 @@ export function setupKeys(mm: gsap.MatchMedia) {
 	);
 	root.classList.add("is-live");
 
-	const beats: [string, () => void][] = [
-		["search", actions.search],
-		["live", actions.live],
-		["step", actions.step],
-		["logo", actions.logo],
-		["clear", actions.clear],
-	];
+	// Each row, in list order, and what the screen shows once it is pressed.
+	// A beat starts from what the one above it left, so scrolling back up
+	// replays the same press rather than toggling from wherever it was.
+	const after: Record<string, string | null> = { live: "v16", step: "v17", chorus: "chorus", search: "search", logo: "logo", clear: null, video: "video", help: "help" };
+	const beats = rows.map((r) => r.dataset.kAct!);
+	function scene(i: number) {
+		at = i;
+		shown = i > 0 ? after[beats[i - 1]] : "v16";
+		actions[beats[i]]();
+		// A beat is the scroll's doing, so it doesn't count as a click.
+		manual = false;
+		idle?.kill();
+		rows.forEach((r, k) => r.classList.toggle("is-now", k === i));
+	}
+	const onUpdate = (self: ScrollTrigger) => {
+		const i = Math.min(beats.length - 1, Math.floor(self.progress * beats.length));
+		if (i !== at) scene(i);
+	};
+	const reset = () => {
+		at = -1;
+		step?.kill();
+	};
+	// Wide screens hold the section while the scroll presses each key. On
+	// phones the demo is stuck to the top and the list scrolls under it.
 	mm.add("(min-width: 901px)", () => {
-		scene = (i) => {
-			at = i;
-			shown = i === 2 ? "v16" : shown;
-			beats[i][1]();
-			// A beat is the scroll's doing, so it doesn't count as a click.
-			manual = false;
-			idle?.kill();
-			rows.forEach((r) => r.classList.toggle("is-now", r.dataset.kAct === beats[i][0]));
-		};
 		ScrollTrigger.create({
 			trigger: $(".keys-grid", root)!,
 			start: "center center",
-			end: () => `+=${innerHeight * 0.45 * beats.length}`,
+			end: () => `+=${innerHeight * 0.3 * beats.length}`,
 			pin: true,
-			onUpdate: (self) => {
-				const i = Math.min(beats.length - 1, Math.floor(self.progress * beats.length));
-				if (i !== at) scene!(i);
-			},
+			onUpdate,
 		});
-		return () => {
-			scene = null;
-			at = -1;
-			step?.kill();
-		};
+		return reset;
 	});
 	mm.add("(max-width: 900px)", () => {
-		ScrollTrigger.create({
-			trigger: $(".kdemo", root)!,
-			start: "top 85%",
-			end: "bottom top",
-			onToggle: (self) => {
-				inView = self.isActive;
-				if (manual) return;
-				if (self.isActive) tl.play();
-				else tl.pause();
-			},
-		});
-		return () => tl.pause();
+		ScrollTrigger.create({ trigger: $(".klist", root)!, start: "top 80%", end: "bottom 55%", onUpdate });
+		return reset;
 	});
 	gsap.set(keycaps, { opacity: 0, transformPerspective: 400 });
 	ScrollTrigger.batch(keycaps, {

@@ -182,9 +182,9 @@ function afterPaint(sweep: (el: HTMLElement, delay?: number) => gsap.core.Timeli
 
 	// The three pinned scenes are built straight away, in page order: a pin
 	// adds scroll length, and everything below has to be measured after it.
-	/* ── The reel: pinned, scrolls sideways ───────────────────────────── */
+	/* ── The reel: pinned, scrolls sideways, phones included ─────────── */
 	const mm = gsap.matchMedia();
-	mm.add("(min-width: 801px)", () => {
+	mm.add("all", () => {
 		const section = $("[data-reel]");
 		if (!section) return;
 		const track = $("[data-reel-track]")!;
