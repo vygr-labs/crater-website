@@ -2,7 +2,7 @@
 title: How to add a Bible translation to Crater · Crater
 description: Import a licensed Bible into Crater from a Zefania, OpenSong, OSIS, USFM or USX file, or straight from a zip. What to check before you add one, and how to lay out a zip so it imports in one go.
 heading: How to add a Bible translation to Crater
-lede: Crater comes with 14 English translations. If your church reads from another one, you can add it from a file in a couple of minutes.
+lede: Crater comes with ten public domain English translations. If your church reads from another one, you can add it from a file in a couple of minutes.
 related: [how-to-project-bible-verses, free-church-presentation-software, church-projector-setup]
 ---
 

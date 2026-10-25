@@ -7,24 +7,22 @@ The **Scripture** tab (**Ctrl + 2**) finds any verse in seconds, whether you kno
 
 ## Included translations
 
-Crater comes with 14 English translations. They're listed by abbreviation in the sidebar.
+Crater comes with ten English translations, all in the public domain. They're listed by abbreviation in the sidebar.
 
 | Code | Translation |
 |------|-------------|
-| AMPC | Amplified Bible, Classic Edition |
 | ASV | American Standard Version |
-| CEV | Contemporary English Version |
-| ESV | English Standard Version |
-| GNT | Good News Translation |
+| BBE | Bible in Basic English |
+| BSB | Berean Standard Bible |
+| DARBY | Darby Translation |
+| DRA | Douay-Rheims 1899 |
+| GNV | Geneva Bible 1599 |
 | KJV | King James Version |
-| MSG | The Message |
-| NASB2020 | New American Standard Bible (2020) |
-| NIV | New International Version |
-| NKJV | New King James Version |
-| NLT | New Living Translation |
-| RSV | Revised Standard Version |
-| TLV | Tree of Life Version |
-| TPT | The Passion Translation |
+| WBT | Webster's Bible |
+| WEB | World English Bible |
+| YLT | Young's Literal Translation |
+
+To use another translation, such as one in your congregation's language or a modern one your church is licensed to use, add it from a file in **Settings > Scripture**. See [How to add a Bible translation](/import-bible-translations).
 
 The Passion Translation doesn't include every book yet. Exodus to Deuteronomy, 1 and 2 Samuel, 1 and 2 Kings, 1 and 2 Chronicles, Ezra, Nehemiah, Esther, Job and Ecclesiastes are missing from it.
 
@@ -52,7 +50,7 @@ A few tips:
 - **Check the line under the box.** It shows how Crater read what you typed, for example *Interpreted: John 3 16*.
 - **Use a colon or a space** between chapter and verse. Crater doesn't read dots (`John 3.16`).
 - **Ranges stay inside one chapter.** `John 3:16-18` works. For verses across chapters, select them with the mouse (see below).
-- **Type a translation code** after the reference, like `jn 3:16 niv`, to switch translation as you go.
+- **Type a translation code** after the reference, like `jn 3:16 web`, to switch translation as you go.
 
 If you prefer typing into separate book, chapter and verse boxes, choose the *controlled* input style from the gear menu. **Tab** or **Space** moves to the next box and **Backspace** in an empty box moves back.
 
@@ -92,7 +90,7 @@ Click the copy button above the verse list (or in the Preview panel for a script
 
 ## Switching translation
 
-Click a translation code in the sidebar. Crater keeps your place: if you were on John 3:16 in KJV, you'll be on John 3:16 in NIV. **Double-click** a translation code to switch and send the current verse live in that translation at the same time.
+Click a translation code in the sidebar. Crater keeps your place: if you were on John 3:16 in KJV, you'll be on John 3:16 in WEB. **Double-click** a translation code to switch and send the current verse live in that translation at the same time.
 
 To change which translation opens by default, go to **Settings > Scripture > Default version**.
 

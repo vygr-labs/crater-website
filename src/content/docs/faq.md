@@ -69,7 +69,7 @@ Not yet. Phone remote control is planned. For now, you can show the live project
 
 ### Which Bible translations are included?
 
-Fourteen English translations: AMPC, ASV, CEV, ESV, GNT, KJV, MSG, NASB2020, NIV, NKJV, NLT, RSV, TLV and TPT. See [Scripture](/docs/features/scriptures#included-translations).
+Ten English translations in the public domain: ASV, BBE, BSB, DARBY, DRA, GNV, KJV, WBT, WEB and YLT. You can add other translations your church is licensed to use from a Zefania, OpenSong, OSIS, USFM or USX file. See [Scripture](/docs/features/scriptures#included-translations) and [adding a translation](/import-bible-translations).
 
 ### Can I add other translations?
 

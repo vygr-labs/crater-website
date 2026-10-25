@@ -10,7 +10,7 @@ Crater is worship projection software made for the church and given back to it. 
 
 ## What it does
 
-- **Scripture.** Fourteen English translations, including the KJV, NIV, ESV, NKJV and NLT. Find a verse by reference or by the words you remember.
+- **Scripture.** Ten public domain English translations, including the KJV, WEB, BSB and ASV, and you can [add others](/import-bible-translations) your church is licensed to use. Find a verse by reference or by the words you remember.
 - **Songs.** A searchable song library with verse and chorus labels, formatting and collections. EasyWorship 6 and 7 libraries import directly.
 - **Media.** Pictures, videos and PDF pages, with fit, crop, loop and mute for each item.
 - **Presentations.** Sermon slides with speaker notes for the preacher.

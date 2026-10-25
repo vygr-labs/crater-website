@@ -66,7 +66,7 @@ What the room sees right now. A red **LIVE** badge shows when something is live.
 | Tab | What's in it |
 |-----|--------------|
 | **Songs** | Your song library, favourites and collections. See [Songs](/docs/features/songs). |
-| **Scripture** | 14 Bible translations with reference lookup and full-text search. See [Scripture](/docs/features/scriptures). |
+| **Scripture** | 10 public domain Bible translations, plus any you add, with reference lookup and full-text search. See [Scripture](/docs/features/scriptures). |
 | **Strong's** | Greek and Hebrew dictionary plus a King James reader with Strong's numbers. See [Strong's Concordance](/docs/features/strongs). You can hide this tab in Settings. |
 | **Media** | Pictures, videos and PDFs. See [Media](/docs/features/media). |
 | **Presentations** | Sermon slides with speaker notes. See [Presentations](/docs/features/presentations). |

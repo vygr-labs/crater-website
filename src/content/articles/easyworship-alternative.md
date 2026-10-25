@@ -37,7 +37,7 @@ The console works the way an EasyWorship operator expects. You pick a song or a 
 
 ## What Crater adds
 
-- **Fourteen Bible translations built in**, with lookup by reference (`jn 3:16`) or by the words you remember.
+- **Ten public domain Bible translations built in**, and others you can add from a file, with lookup by reference (`jn 3:16`) or by the words you remember.
 - **Strong's Greek and Hebrew definitions** you can put on the screen.
 - **A stage monitor** for the preacher and the band, showing the words, speaker notes, what's next and a clock.
 - **NDI output on Windows**, so lyrics and scripture go straight into OBS or vMix without a capture card.
@@ -46,7 +46,7 @@ The console works the way an EasyWorship operator expects. You pick a song or a 
 
 ## What to know before you switch
 
-Crater can't load Bible translations of your own yet, so check the fourteen included ones cover what your church reads. NDI streaming is Windows only for now. On a Mac, Crater isn't signed with an Apple Developer ID yet, so the first launch needs one extra click, which the [installation guide](/docs/getting-started/installation#opening-crater-the-first-time) walks through.
+Crater comes with public domain translations only. If your church reads from a modern translation, you'll need a file of it you're licensed to use, which you can then [add to Crater](/import-bible-translations). NDI streaming is Windows only for now. On a Mac, Crater isn't signed with an Apple Developer ID yet, so the first launch needs one extra click, which the [installation guide](/docs/getting-started/installation#opening-crater-the-first-time) walks through.
 
 ## Switching in an afternoon
 

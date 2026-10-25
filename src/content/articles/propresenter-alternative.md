@@ -22,7 +22,7 @@ If your church depends on ProPresenter's advanced production features, list the 
 
 ## What a Sunday needs, and where Crater has it
 
-**Scripture.** Fourteen English translations come built in. Type `rom 8:28` or a few words you remember and the verse is ready. Select a range of verses, switch translation with one click, and show Strong's definitions when the preacher digs into the Greek or Hebrew. See [Scripture](/docs/features/scriptures).
+**Scripture.** Ten public domain English translations come built in, and you can [add others](/import-bible-translations) from a file. Type `rom 8:28` or a few words you remember and the verse is ready. Select a range of verses, switch translation with one click, and show Strong's definitions when the preacher digs into the Greek or Hebrew. See [Scripture](/docs/features/scriptures).
 
 **Songs.** Keep the whole library in one place, with bold, italic and coloured lyrics. Search by title, author or any line, even with a typo. See [Songs](/docs/features/songs).
 
