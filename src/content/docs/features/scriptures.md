@@ -24,8 +24,6 @@ Crater comes with ten English translations, all in the public domain. They're li
 
 To use another translation, such as one in your congregation's language or a modern one your church is licensed to use, add it from a file in **Settings > Scripture**. See [How to add a Bible translation](/import-bible-translations).
 
-The Passion Translation doesn't include every book yet. Exodus to Deuteronomy, 1 and 2 Samuel, 1 and 2 Kings, 1 and 2 Chronicles, Ezra, Nehemiah, Esther, Job and Ecclesiastes are missing from it.
-
 ## Two ways to search
 
 The search box at the top of the sidebar has two modes. Switch between them with **Ctrl + F**, by clicking the icon at the left of the box, or from the gear menu above the list.
