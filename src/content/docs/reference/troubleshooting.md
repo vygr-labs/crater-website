@@ -15,7 +15,7 @@ Crater isn't signed with an Apple Developer ID yet. Follow [Opening Crater the f
 
 ### The portable version complains about a missing DLL
 
-If Windows mentions `VCRUNTIME140.dll` or `MSVCP140.dll`, run `vc_redist.x64.exe` from the Crater folder once, then start Crater again. The installer version sets this up for you.
+Crater carries these files in its own folder, so a missing `VCRUNTIME140.dll` or `MSVCP140.dll` usually means the zip wasn't fully extracted. Unzip it again in full. If Windows still complains, install the [Microsoft Visual C++ Redistributable](https://aka.ms/vc14/vc_redist.x64.exe), then start Crater again. The installer version sets this up for you.
 
 ### The first start takes a few seconds
 
