@@ -26,8 +26,11 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
 	// Filled-in honeypot or a form sent faster than anyone could type: say
 	// thanks and keep nothing, so the sender learns nothing.
-	const started = Number(form.t);
-	if (form.website || (started && Date.now() - started < MIN_FILL_MS)) return reply(200, { ok: true });
+	// `t` comes from the visitor's clock. One running ahead makes the time
+	// spent look negative, and a real person must not be mistaken for a
+	// script because of it.
+	const spent = Date.now() - Number(form.t);
+	if (form.website || (Number(form.t) && spent >= 0 && spent < MIN_FILL_MS)) return reply(200, { ok: true });
 
 	const f: Record<string, string> = {};
 	for (const [k, max] of Object.entries(limits)) f[k] = (form[k] ?? "").trim().slice(0, max);

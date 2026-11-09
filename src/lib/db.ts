@@ -67,7 +67,18 @@ function init() {
 					last_seen TEXT NOT NULL DEFAULT (datetime('now'))
 				)`,
 				"CREATE INDEX IF NOT EXISTS installs_last_seen ON installs (last_seen)",
-				// How often each kind of thing went live, per install per day.
+				// Every report id an install sent. The app resends a report
+				// under the same id when it never heard back, and this key
+				// turns the resend into a no-op (see recordUsage).
+				`CREATE TABLE IF NOT EXISTS usage_reports (
+					install_id TEXT NOT NULL,
+					report TEXT NOT NULL,
+					at TEXT NOT NULL DEFAULT (datetime('now')),
+					PRIMARY KEY (install_id, report)
+				)`,
+				// How often each kind of thing went live, and how often Crater
+				// opened ("launch"), per install per day. The day is the
+				// booth's own date, from the app, not the day the report came.
 				`CREATE TABLE IF NOT EXISTS usage (
 					install_id TEXT NOT NULL,
 					day TEXT NOT NULL,
@@ -78,7 +89,13 @@ function init() {
 			],
 			"write",
 		)
-		.then(() => undefined);
+		.then(() => undefined)
+		// A failed setup (a network blip on a cold start) mustn't stick: the
+		// next request tries again instead of every request failing on it.
+		.catch((e) => {
+			ready = null;
+			throw e;
+		});
 	return ready;
 }
 
@@ -138,8 +155,10 @@ export async function recentContacts(ipHash: string): Promise<number> {
 	return Number(r.rows[0]?.n ?? 0);
 }
 
-// Sending the form again with the same email updates the row. A field left
-// empty the second time keeps what was there.
+// Sending the form again with the same email only fills fields that were
+// empty. Nothing confirms an address belongs to the sender, so a second
+// submission must not be able to replace someone's details, like putting a
+// stranger's phone number under a church's email.
 export async function saveContact(c: Contact) {
 	await init();
 	const v = (s: string) => s || null;
@@ -147,14 +166,14 @@ export async function saveContact(c: Contact) {
 		sql: `INSERT INTO contacts (email, name, church, role, size, city, country, phone, ip_country, ip_hash)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT (email) DO UPDATE SET
-				name = COALESCE(excluded.name, name),
-				church = COALESCE(excluded.church, church),
-				role = COALESCE(excluded.role, role),
-				size = COALESCE(excluded.size, size),
-				city = COALESCE(excluded.city, city),
-				country = COALESCE(excluded.country, country),
-				phone = COALESCE(excluded.phone, phone),
-				ip_country = COALESCE(excluded.ip_country, ip_country),
+				name = COALESCE(name, excluded.name),
+				church = COALESCE(church, excluded.church),
+				role = COALESCE(role, excluded.role),
+				size = COALESCE(size, excluded.size),
+				city = COALESCE(city, excluded.city),
+				country = COALESCE(country, excluded.country),
+				phone = COALESCE(phone, excluded.phone),
+				ip_country = COALESCE(ip_country, excluded.ip_country),
 				ip_hash = excluded.ip_hash,
 				updated_at = datetime('now')`,
 		args: [c.email, v(c.name), v(c.church), v(c.role), v(c.size), v(c.city), v(c.country), v(c.phone), v(c.ipCountry), c.ipHash],
@@ -163,21 +182,31 @@ export async function saveContact(c: Contact) {
 
 export type UsageReport = {
 	id: string;
+	report: string;
 	version: string;
 	os: string;
 	osVersion: string;
 	arch: string;
 	locale: string;
 	country: string;
-	launches: number;
-	events: Record<string, number>;
+	// day (YYYY-MM-DD) -> event -> count
+	days: Record<string, Record<string, number>>;
 };
 
-// One report: refresh the install's row and add its counts to today's.
-export async function recordUsage(u: UsageReport) {
+/**
+ * One report: refresh the install's row and add its counts to their days.
+ * One batch, so all of it lands or none of it does. Its first statement
+ * records the report id, so a report the install already sent fails the
+ * batch on the primary key and changes nothing. False then.
+ */
+export async function recordUsage(u: UsageReport): Promise<boolean> {
 	await init();
 	const v = (s: string) => s || null;
+	let launches = 0;
+	for (const ev of Object.values(u.days)) launches += ev.launch ?? 0;
+
 	const stmts = [
+		{ sql: "INSERT INTO usage_reports (install_id, report) VALUES (?, ?)", args: [u.id, u.report] },
 		{
 			sql: `INSERT INTO installs (id, version, os, os_version, arch, locale, country, launches)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -190,13 +219,21 @@ export async function recordUsage(u: UsageReport) {
 					country = COALESCE(excluded.country, country),
 					launches = launches + excluded.launches,
 					last_seen = datetime('now')`,
-			args: [u.id, u.version, u.os, v(u.osVersion), v(u.arch), v(u.locale), v(u.country), u.launches],
+			args: [u.id, u.version, u.os, v(u.osVersion), v(u.arch), v(u.locale), v(u.country), launches],
 		},
-		...Object.entries(u.events).map(([event, n]) => ({
-			sql: `INSERT INTO usage (install_id, day, event, n) VALUES (?, date('now'), ?, ?)
-				ON CONFLICT (install_id, day, event) DO UPDATE SET n = n + excluded.n`,
-			args: [u.id, event, n],
-		})),
+		...Object.entries(u.days).flatMap(([day, events]) =>
+			Object.entries(events).map(([event, n]) => ({
+				sql: `INSERT INTO usage (install_id, day, event, n) VALUES (?, ?, ?, ?)
+					ON CONFLICT (install_id, day, event) DO UPDATE SET n = n + excluded.n`,
+				args: [u.id, day, event, n],
+			})),
+		),
 	];
-	await db().batch(stmts, "write");
+	try {
+		await db().batch(stmts, "write");
+		return true;
+	} catch (e) {
+		if (/UNIQUE constraint failed: usage_reports/.test(String((e as Error).message))) return false;
+		throw e;
+	}
 }
