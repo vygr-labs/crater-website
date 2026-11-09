@@ -1,0 +1,126 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHead from "../components/PageHead.astro";
+import "../styles/forms.css";
+
+const roles = ["Media or tech team", "Pastor", "Worship leader", "Church admin", "Something else"];
+const sizes = ["Under 100", "100 to 500", "500 to 2,000", "Over 2,000"];
+---
+
+<Base title="Stay in touch · Crater" description="Tell us where Crater is being used, and hear first about new versions.">
+	<main>
+		<PageHead lede="Tell us where you're using Crater. We'll let you know when there's a new version or something your church should know.">
+			Using Crater? <span class="hl" data-hl>Say hello</span>.
+		</PageHead>
+
+		<section class="wrap fpage">
+			<div class="card fcard" data-report-card data-reveal="card">
+				<form class="fform" action="/api/contact" method="post" data-report-form>
+					<input type="hidden" name="t" value="" />
+					<label class="ftrap" aria-hidden="true">Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+
+					<div class="frow">
+						<label class="ffield">
+							<span class="flabel">Your name <em>Optional</em></span>
+							<input type="text" name="name" maxlength="120" autocomplete="name" />
+						</label>
+						<label class="ffield">
+							<span class="flabel">Email</span>
+							<input type="email" name="email" required maxlength="200" autocomplete="email" />
+						</label>
+					</div>
+
+					<label class="ffield">
+						<span class="flabel">Church <em>Optional</em></span>
+						<input type="text" name="church" maxlength="160" autocomplete="organization" />
+					</label>
+
+					<div class="frow">
+						<label class="ffield">
+							<span class="flabel">City <em>Optional</em></span>
+							<input type="text" name="city" maxlength="80" autocomplete="address-level2" />
+						</label>
+						<label class="ffield">
+							<span class="flabel">Country <em>Optional</em></span>
+							<input type="text" name="country" maxlength="80" autocomplete="country-name" />
+						</label>
+					</div>
+
+					<fieldset class="ffield">
+						<legend class="flabel">What do you do at church? <em>Optional</em></legend>
+						<div class="fchips">
+							{
+								roles.map((r) => (
+									<label class="fchip">
+										<input type="radio" name="role" value={r} />
+										<span>{r}</span>
+									</label>
+								))
+							}
+						</div>
+					</fieldset>
+
+					<fieldset class="ffield">
+						<legend class="flabel">How many people come on a Sunday? <em>Optional</em></legend>
+						<div class="fchips">
+							{
+								sizes.map((s) => (
+									<label class="fchip">
+										<input type="radio" name="size" value={s} />
+										<span>{s}</span>
+									</label>
+								))
+							}
+						</div>
+					</fieldset>
+
+					<label class="ffield">
+						<span class="flabel">WhatsApp number <em>Optional</em></span>
+						<span class="fhint">Only if you'd like a message when an update needs your attention.</span>
+						<input type="text" name="phone" maxlength="40" inputmode="tel" autocomplete="tel" />
+					</label>
+
+					<p class="ferror" role="alert" data-report-error hidden></p>
+
+					<div class="ffoot">
+						<p class="fnote">We only write about Crater, and not often. Reply to any email and ask, and we'll remove you.</p>
+						<button type="submit" class="btn btn-brand" data-magnetic>
+							Keep me posted
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+						</button>
+					</div>
+				</form>
+
+				<div class="fdone" data-report-done hidden>
+					<span class="fdone-mark" aria-hidden="true">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg>
+					</span>
+					<h2 tabindex="-1">Thank you. We've got it.</h2>
+					<p>It's good to know where Crater is being used. We'll be in touch when there's something worth hearing.</p>
+					<div class="fdone-row">
+						<a href="/tutorials" class="btn btn-ghost">Watch the tutorials</a>
+					</div>
+				</div>
+			</div>
+
+			<aside class="fside">
+				<div data-reveal="up">
+					<h2>Why we ask</h2>
+					<p>Crater has no accounts, so we don't know who uses it. Hearing from you tells us which churches to build for and who to tell when something changes.</p>
+				</div>
+				<div data-reveal="up">
+					<h2>What we keep</h2>
+					<p>Only what you type here. It isn't shared or sold, and it isn't tied to anything in Crater.</p>
+				</div>
+				<div data-reveal="up">
+					<h2>Need help instead?</h2>
+					<p><a href="/report" class="u-link">Tell us what went wrong</a> or <a href="/request" class="u-link">ask for a feature</a>.</p>
+				</div>
+			</aside>
+		</section>
+	</main>
+</Base>
+
+<script>
+	import "../scripts/report-form.ts";
+</script>

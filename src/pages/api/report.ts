@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
-import { createHash } from "node:crypto";
 import { recentCount, saveReport, setIssueUrl } from "../../lib/db";
 import { openIssue, quiet } from "../../lib/github";
+import { readForm, senderHash } from "../../lib/sender";
 
 export const prerender = false;
 
@@ -34,8 +34,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 	if (f.what.length < 4) return reply(400, { ok: false, error: "what" });
 	if (f.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) return reply(400, { ok: false, error: "email" });
 
-	const ip = clientAddress || request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-	const ipHash = createHash("sha256").update(`${process.env.REPORT_SALT ?? "crater"}:${ip}`).digest("hex");
+	const ipHash = senderHash(request, clientAddress);
 
 	try {
 		if ((await recentCount(ipHash)) >= PER_HOUR) return reply(429, { ok: false, error: "busy" });
@@ -49,20 +48,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 		return reply(500, { ok: false, error: "failed" });
 	}
 };
-
-async function readForm(request: Request): Promise<Record<string, string>> {
-	const type = request.headers.get("content-type") ?? "";
-	try {
-		if (type.includes("application/json")) {
-			const j = (await request.json()) as Record<string, unknown>;
-			return Object.fromEntries(Object.entries(j).map(([k, v]) => [k, String(v ?? "")]));
-		}
-		const fd = await request.formData();
-		return Object.fromEntries([...fd.entries()].map(([k, v]) => [k, typeof v === "string" ? v : ""]));
-	} catch {
-		return {};
-	}
-}
 
 // The public issue. The email address and the log never go on it.
 function issueBody(kind: Kind, f: Record<string, string>): string {
