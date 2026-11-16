@@ -1,0 +1,39 @@
+---
+// The link in the email the stay-in-touch form sends. An address goes on
+// the list only from here.
+import LinkPage from "../../components/LinkPage.astro";
+import { confirmContact, contactByConfirmToken } from "../../lib/db";
+import { handleLink } from "../../lib/link-page";
+
+export const prerender = false;
+
+// An address that unsubscribed stays off the list, even from an old link.
+const page = await handleLink(Astro.request, Astro.url, "confirm", contactByConfirmToken, confirmContact, (c) =>
+	c.unsubscribed ? "bad" : c.confirmed ? "done" : "ask",
+);
+if ("redirect" in page) return Astro.redirect(page.redirect, 303);
+---
+
+<LinkPage
+	title="Confirm your email · Crater"
+	description="Confirm you'd like to hear from Crater."
+	state={page.state}
+	token={page.token}
+	email={page.email}
+	ask={{ pre: "One more", hl: "click", post: ".", lede: "Confirm it's your address, and you're on the list." }}
+	done={{ pre: "You're on the", hl: "list", post: ".", lede: "Thank you. We'll write when there's a new version or something your church should know." }}
+	question={["Send Crater news to", "?"]}
+	button="Confirm"
+	note="Not often, and every email has a link to stop them."
+>
+	<Fragment slot="aside">
+		<div data-reveal="up">
+			<h2>Why we ask</h2>
+			<p>Anyone can type an address into a form. This makes sure the emails only go to people who asked for them.</p>
+		</div>
+		<div data-reveal="up">
+			<h2>Meanwhile</h2>
+			<p><a href="/tutorials" class="u-link">Watch the tutorials</a> or <a href="/docs" class="u-link">read the docs</a>.</p>
+		</div>
+	</Fragment>
+</LinkPage>

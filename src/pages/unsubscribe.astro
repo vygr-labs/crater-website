@@ -1,112 +1,37 @@
 ---
-import Base from "../layouts/Base.astro";
-import PageHead from "../components/PageHead.astro";
-import { UNSUBSCRIBE_TOKEN, contactByToken, unsubscribe } from "../lib/db";
-import "../styles/forms.css";
+// The link at the foot of every email to the stay-in-touch list.
+import LinkPage from "../components/LinkPage.astro";
+import { contactByToken, unsubscribe } from "../lib/db";
+import { handleLink } from "../lib/link-page";
 
 export const prerender = false;
 
-// The link at the foot of every email to the stay-in-touch list. Opening it
-// only asks. Mail scanners open links in emails to check them, and that
-// must not take anyone off the list. The button posts back here, and the
-// page then reloads the link, so a refresh doesn't post it again.
-type State = { kind: "ask"; email: string } | { kind: "done" } | { kind: "bad" } | { kind: "failed" };
-
-let state: State;
-const token = Astro.url.searchParams.get("t") ?? "";
-try {
-	if (Astro.request.method === "POST") {
-		const form = await Astro.request.formData().catch(() => null);
-		const posted = String(form?.get("t") ?? "");
-		if (UNSUBSCRIBE_TOKEN.test(posted) && (await unsubscribe(posted)))
-			return Astro.redirect(`/unsubscribe?t=${encodeURIComponent(posted)}`, 303);
-		state = { kind: "bad" };
-	} else {
-		const c = UNSUBSCRIBE_TOKEN.test(token) ? await contactByToken(token) : null;
-		state = !c ? { kind: "bad" } : c.unsubscribed ? { kind: "done" } : { kind: "ask", email: c.email };
-	}
-} catch (e) {
-	console.error(`[unsubscribe] ${(e as Error).message}`);
-	state = { kind: "failed" };
-}
-if (state.kind === "bad") Astro.response.status = 404;
-if (state.kind === "failed") Astro.response.status = 500;
-
-const head = {
-	ask: { pre: "Stop our", hl: "emails", post: "?", lede: "Emails about new versions of Crater, and things your church should know." },
-	done: { pre: "You're", hl: "unsubscribed", post: ".", lede: "We won't email you again. Crater still tells you about new versions when you open it." },
-	bad: {
-		pre: "This link doesn't",
-		hl: "work",
-		post: ".",
-		lede: "It may have been cut short when it was copied. Open it again from the email, or reply to any email from us and we'll take you off the list.",
-	},
-	failed: {
-		pre: "Something went",
-		hl: "wrong",
-		post: ".",
-		lede: "That's on our side. Try the link again in a minute, or reply to any email from us and we'll take you off the list.",
-	},
-}[state.kind];
+const page = await handleLink(Astro.request, Astro.url, "unsubscribe", contactByToken, unsubscribe, (c) =>
+	c.unsubscribed ? "done" : "ask",
+);
+if ("redirect" in page) return Astro.redirect(page.redirect, 303);
 ---
 
-<Base title="Unsubscribe · Crater" description="Stop emails from Crater." noindex>
-	<main>
-		<PageHead lede={head.lede}>
-			{`${head.pre} `}<span class="hl" data-hl>{head.hl}</span>{head.post}
-		</PageHead>
-
-		{
-			state.kind === "ask" ? (
-				<section class="wrap fpage">
-					<div class="card fcard" data-reveal="card">
-						<form class="fform" method="post">
-							<input type="hidden" name="t" value={token} />
-							<p class="fask">
-								We'll stop writing to <strong>{state.email}</strong>.
-							</p>
-							<div class="ffoot">
-								<p class="fnote">Nothing else changes, and Crater keeps working as it does.</p>
-								<button type="submit" class="btn btn-brand">
-									Unsubscribe
-								</button>
-							</div>
-						</form>
-					</div>
-					<aside class="fside">
-						<div data-reveal="up">
-							<h2>New versions</h2>
-							<p>Crater tells you itself when a new version is out, each time you open it. That doesn't need email.</p>
-						</div>
-						<div data-reveal="up">
-							<h2>Need help?</h2>
-							<p>
-								<a href="/report" class="u-link">Tell us what went wrong</a> or <a href="/docs" class="u-link">read the docs</a>.
-							</p>
-						</div>
-					</aside>
-				</section>
-			) : (
-				<section class="wrap uback">
-					<a href="/" class="btn btn-ghost">
-						Back to Crater
-					</a>
-				</section>
-			)
-		}
-	</main>
-</Base>
-
-<style>
-	.uback {
-		display: flex;
-		justify-content: center;
-		padding: 32px 0 96px;
-	}
-	.fask {
-		margin: 0;
-		font-size: 18px;
-		line-height: 1.6;
-		overflow-wrap: anywhere;
-	}
-</style>
+<LinkPage
+	title="Unsubscribe · Crater"
+	description="Stop emails from Crater."
+	state={page.state}
+	token={page.token}
+	email={page.email}
+	ask={{ pre: "Stop our", hl: "emails", post: "?", lede: "Emails about new versions of Crater, and things your church should know." }}
+	done={{ pre: "You're", hl: "unsubscribed", post: ".", lede: "We won't email you again. Crater still tells you about new versions when you open it." }}
+	question={["We'll stop writing to", "."]}
+	button="Unsubscribe"
+	note="Nothing else changes, and Crater keeps working as it does."
+>
+	<Fragment slot="aside">
+		<div data-reveal="up">
+			<h2>New versions</h2>
+			<p>Crater tells you itself when a new version is out, each time you open it. That doesn't need email.</p>
+		</div>
+		<div data-reveal="up">
+			<h2>Need help?</h2>
+			<p><a href="/report" class="u-link">Tell us what went wrong</a> or <a href="/docs" class="u-link">read the docs</a>.</p>
+		</div>
+	</Fragment>
+</LinkPage>

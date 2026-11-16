@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
-import { recentContacts, saveContact } from "../../lib/db";
+import { claimConfirmation, recentContacts, releaseConfirmation, saveContact } from "../../lib/db";
+import { sendConfirmation } from "../../lib/confirm-mail";
 import { readForm, senderCountry, senderHash } from "../../lib/sender";
 
 export const prerender = false;
@@ -47,6 +48,15 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 			ipCountry: senderCountry(request),
 			ipHash,
 		});
+		// Nothing is written to the address until its owner confirms it. The
+		// reply is the same whether or not an email went out (already on the
+		// list, unsubscribed, or one sent minutes ago), so the form can't be
+		// used to find out who is on the list.
+		const token = await claimConfirmation(f.email);
+		if (token && !(await sendConfirmation(f.email, `${new URL(request.url).origin}/stay-in-touch/confirm?t=${token}`))) {
+			await releaseConfirmation(f.email);
+			return reply(502, { ok: false, error: "failed" });
+		}
 		return reply(200, { ok: true });
 	} catch (e) {
 		console.error(`[contact] ${(e as Error).message}`);

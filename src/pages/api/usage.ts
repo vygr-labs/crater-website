@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
-import { recordUsage } from "../../lib/db";
-import { senderCountry } from "../../lib/sender";
+import { recordUsage, usageCounts } from "../../lib/db";
+import { senderCountry, senderHash } from "../../lib/sender";
 
 export const prerender = false;
 
@@ -27,6 +27,12 @@ const MAX_BYTES = 16 * 1024;
 const MAX_PER_DAY = 2_000;
 // Days the app held while it couldn't send. Older ones are dropped.
 const MAX_AGE_DAYS = 400;
+// Reports stored per hour. One install sends one at each start and one a
+// day, so 6 leaves room for restarts. One sender can be a church network
+// with several booths behind one address, or a school lab. The app keeps a
+// refused report (429) and sends it again later, so nothing is lost.
+const PER_INSTALL_HOUR = 6;
+const PER_SENDER_HOUR = 60;
 
 const clean = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const count = (v: unknown) => (Number.isInteger(v) && (v as number) > 0 && (v as number) <= MAX_PER_DAY ? (v as number) : 0);
@@ -42,7 +48,7 @@ function validDay(day: string): boolean {
 	return t <= now + 36 * 3600_000 && t >= now - MAX_AGE_DAYS * 86400_000;
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
 	// content-length can be missing (chunked) or wrong, so the body itself
 	// is measured.
 	const text = await request.text().catch(() => "");
@@ -73,7 +79,10 @@ export const POST: APIRoute = async ({ request }) => {
 		}
 	}
 
+	const ipHash = senderHash(request, clientAddress);
 	try {
+		const recent = await usageCounts(id, ipHash);
+		if (recent.install >= PER_INSTALL_HOUR || recent.sender >= PER_SENDER_HOUR) return new Response(null, { status: 429 });
 		await recordUsage({
 			id,
 			report,
@@ -83,6 +92,7 @@ export const POST: APIRoute = async ({ request }) => {
 			arch: clean(body.arch, 20),
 			locale: clean(body.locale, 20),
 			country: senderCountry(request),
+			ipHash,
 			days,
 		});
 		// A resend of a report already stored is also a success to the app.

@@ -1,0 +1,99 @@
+---
+// The look of the pages behind the links in our emails. See lib/link-page.ts.
+import Base from "../layouts/Base.astro";
+import PageHead from "./PageHead.astro";
+import type { LinkState } from "../lib/link-page";
+import "../styles/forms.css";
+
+type Head = { pre: string; hl: string; post: string; lede: string };
+
+interface Props {
+	title: string;
+	description: string;
+	state: LinkState;
+	ask: Head;
+	done: Head;
+	token: string;
+	email: string;
+	// The question on the card, around the address: "We'll stop writing to", "."
+	question: [string, string];
+	button: string;
+	note: string;
+}
+
+const { title, description, state, ask, done, token, email, question, button, note } = Astro.props;
+
+const heads: Record<LinkState, Head> = {
+	ask,
+	done,
+	bad: {
+		pre: "This link doesn't",
+		hl: "work",
+		post: ".",
+		lede: "It may have been cut short when it was copied. Open it again from the email, or reply to any email from us and we'll sort it out.",
+	},
+	failed: {
+		pre: "Something went",
+		hl: "wrong",
+		post: ".",
+		lede: "That's on our side. Try the link again in a minute, or reply to any email from us and we'll sort it out.",
+	},
+};
+const head = heads[state];
+if (state === "bad") Astro.response.status = 404;
+if (state === "failed") Astro.response.status = 500;
+---
+
+<Base title={title} description={description} noindex>
+	<main>
+		<PageHead lede={head.lede}>
+			{`${head.pre} `}<span class="hl" data-hl>{head.hl}</span>{head.post}
+		</PageHead>
+
+		{
+			state === "ask" ? (
+				<section class="wrap fpage">
+					<div class="card fcard" data-reveal="card">
+						<form class="fform" method="post">
+							<input type="hidden" name="t" value={token} />
+							<p class="fask">
+								{`${question[0]} `}
+								<strong>{email}</strong>
+								{question[1]}
+							</p>
+							<div class="ffoot">
+								<p class="fnote">{note}</p>
+								<button type="submit" class="btn btn-brand">
+									{button}
+								</button>
+							</div>
+						</form>
+					</div>
+					<aside class="fside">
+						<slot name="aside" />
+					</aside>
+				</section>
+			) : (
+				<section class="wrap uback">
+					<a href="/" class="btn btn-ghost">
+						Back to Crater
+					</a>
+				</section>
+			)
+		}
+	</main>
+</Base>
+
+<style>
+	.uback {
+		display: flex;
+		justify-content: center;
+		padding: 32px 0 96px;
+	}
+	.fask {
+		margin: 0;
+		font-size: 18px;
+		line-height: 1.6;
+		overflow-wrap: anywhere;
+	}
+</style>
