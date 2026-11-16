@@ -10,6 +10,7 @@ const page = await handleLink(Astro.request, Astro.url, "unsubscribe", contactBy
 	c.unsubscribed ? "done" : "ask",
 );
 if ("redirect" in page) return Astro.redirect(page.redirect, 303);
+Astro.response.status = page.status;
 ---
 
 <LinkPage
@@ -17,7 +18,7 @@ if ("redirect" in page) return Astro.redirect(page.redirect, 303);
 	description="Stop emails from Crater."
 	state={page.state}
 	token={page.token}
-	email={page.email}
+	email={page.contact?.email ?? ""}
 	ask={{ pre: "Stop our", hl: "emails", post: "?", lede: "Emails about new versions of Crater, and things your church should know." }}
 	done={{ pre: "You're", hl: "unsubscribed", post: ".", lede: "We won't email you again. Crater still tells you about new versions when you open it." }}
 	question={["We'll stop writing to", "."]}

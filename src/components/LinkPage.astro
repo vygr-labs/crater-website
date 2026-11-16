@@ -17,11 +17,13 @@ interface Props {
 	email: string;
 	// The question on the card, around the address: "We'll stop writing to", "."
 	question: [string, string];
+	// Shown under the question, like the details a confirmation puts on the list.
+	details?: string[];
 	button: string;
 	note: string;
 }
 
-const { title, description, state, ask, done, token, email, question, button, note } = Astro.props;
+const { title, description, state, ask, done, token, email, question, details = [], button, note } = Astro.props;
 
 const heads: Record<LinkState, Head> = {
 	ask,
@@ -40,8 +42,6 @@ const heads: Record<LinkState, Head> = {
 	},
 };
 const head = heads[state];
-if (state === "bad") Astro.response.status = 404;
-if (state === "failed") Astro.response.status = 500;
 ---
 
 <Base title={title} description={description} noindex>
@@ -61,6 +61,7 @@ if (state === "failed") Astro.response.status = 500;
 								<strong>{email}</strong>
 								{question[1]}
 							</p>
+							{details.length > 0 && <p class="fdetails">{details.join(" · ")}</p>}
 							<div class="ffoot">
 								<p class="fnote">{note}</p>
 								<button type="submit" class="btn btn-brand">
@@ -89,6 +90,11 @@ if (state === "failed") Astro.response.status = 500;
 		display: flex;
 		justify-content: center;
 		padding: 32px 0 96px;
+	}
+	.fdetails {
+		margin: -8px 0 0;
+		color: var(--ink-2);
+		overflow-wrap: anywhere;
 	}
 	.fask {
 		margin: 0;

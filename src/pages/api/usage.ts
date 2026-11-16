@@ -25,14 +25,17 @@ const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_BYTES = 16 * 1024;
 // More than this of one thing on one day is a bug or a forgery, not a church.
 const MAX_PER_DAY = 2_000;
-// Days the app held while it couldn't send. Older ones are dropped.
+// Days the app held while it couldn't send. Older ones are dropped, and
+// one report keeps at most its newest MAX_DAYS, so a forged report can't
+// turn into hundreds of writes.
 const MAX_AGE_DAYS = 400;
+const MAX_DAYS = 60;
 // Reports stored per hour. One install sends one at each start and one a
 // day, so 6 leaves room for restarts. One sender can be a church network
 // with several booths behind one address, or a school lab. The app keeps a
 // refused report (429) and sends it again later, so nothing is lost.
 const PER_INSTALL_HOUR = 6;
-const PER_SENDER_HOUR = 60;
+const PER_SENDER_HOUR = 30;
 
 const clean = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const count = (v: unknown) => (Number.isInteger(v) && (v as number) > 0 && (v as number) <= MAX_PER_DAY ? (v as number) : 0);
@@ -52,7 +55,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 	// content-length can be missing (chunked) or wrong, so the body itself
 	// is measured.
 	const text = await request.text().catch(() => "");
-	if (text.length > MAX_BYTES) return new Response(null, { status: 413 });
+	if (Buffer.byteLength(text) > MAX_BYTES) return new Response(null, { status: 413 });
 
 	let body: unknown;
 	try {
@@ -70,8 +73,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
 	const days: Record<string, Record<string, number>> = {};
 	if (isObject(body.days)) {
-		for (const [day, events] of Object.entries(body.days)) {
-			if (!validDay(day) || !isObject(events)) continue;
+		const newest = Object.keys(body.days).filter(validDay).sort().slice(-MAX_DAYS);
+		for (const day of newest) {
+			const events = body.days[day];
+			if (!isObject(events)) continue;
 			for (const [k, v] of Object.entries(events)) {
 				const n = count(v);
 				if (EVENTS.has(k) && n > 0) (days[day] ??= {})[k] = n;

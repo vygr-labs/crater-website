@@ -1,41 +1,26 @@
 import type { APIRoute } from "astro";
 import { recentCount, saveReport, setIssueUrl } from "../../lib/db";
 import { openIssue, quiet } from "../../lib/github";
-import { readForm, senderHash } from "../../lib/sender";
+import { EMAIL, formReply, looksLikeBot, pick, readForm, senderHash } from "../../lib/sender";
 
 export const prerender = false;
 
 const PER_HOUR = 5;
-// A person takes longer than this to fill in the form. Scripts usually don't.
-const MIN_FILL_MS = 3000;
 
 type Kind = "feature" | "bug";
 const limits: Record<string, number> = { what: 200, why: 4000, steps: 4000, expected: 4000, area: 60, os: 60, version: 40, log: 20000, name: 120, email: 200 };
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
-	const wantsJson = (request.headers.get("accept") ?? "").includes("application/json");
 	const form = await readForm(request);
 	const kind: Kind = form.kind === "bug" ? "bug" : "feature";
 	const page = kind === "bug" ? "/report" : "/request";
 
-	const reply = (status: number, body: { ok: boolean; error?: string; issue?: string | null }) => {
-		if (wantsJson) return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
-		const q = body.ok ? "sent=1" : `error=${encodeURIComponent(body.error ?? "failed")}`;
-		return new Response(null, { status: 303, headers: { Location: `${page}?${q}` } });
-	};
+	const reply = formReply(request, page);
+	if (looksLikeBot(form)) return reply(200, { ok: true });
 
-	// Filled-in honeypot or a form sent faster than anyone could type: say
-	// thanks and keep nothing, so the sender learns nothing.
-	// `t` comes from the visitor's clock. One running ahead makes the time
-	// spent look negative, and a real person must not be mistaken for a
-	// script because of it.
-	const spent = Date.now() - Number(form.t);
-	if (form.website || (Number(form.t) && spent >= 0 && spent < MIN_FILL_MS)) return reply(200, { ok: true });
-
-	const f: Record<string, string> = {};
-	for (const [k, max] of Object.entries(limits)) f[k] = (form[k] ?? "").trim().slice(0, max);
+	const f = pick(form, limits);
 	if (f.what.length < 4) return reply(400, { ok: false, error: "what" });
-	if (f.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) return reply(400, { ok: false, error: "email" });
+	if (f.email && !EMAIL.test(f.email)) return reply(400, { ok: false, error: "email" });
 
 	const ipHash = senderHash(request, clientAddress);
 
