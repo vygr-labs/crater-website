@@ -7,3 +7,7 @@ reports.local.db*
 .vercel/
 
 .vercel
+
+# pulled from Vercel for scripts/mailing-list.ts
+.env*.local
+*.csv

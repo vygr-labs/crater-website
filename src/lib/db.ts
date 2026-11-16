@@ -2,17 +2,26 @@
 // and the usage numbers installs chose to share, kept in Turso. Anything
 // people would rather not have on a public issue, like an email address,
 // lives only here.
+import { randomBytes } from "node:crypto";
 import { createClient, type Client } from "@libsql/client";
 
 let client: Client | null = null;
 let ready: Promise<void> | null = null;
 
+// Only the live site reaches the real database. A Vercel preview or
+// `vercel dev` never does, even if the Turso settings are shared with it
+// again by mistake, because a test sign-up must not land on the mailing list.
+// A preview gets a throwaway file in /tmp (the only place it can write),
+// and local development a file beside the project.
+function target(): { url: string; authToken?: string } {
+	const env = process.env.VERCEL_ENV;
+	const url = process.env.TURSO_DATABASE_URL;
+	if (url && (env === undefined || env === "production")) return { url, authToken: process.env.TURSO_AUTH_TOKEN };
+	return { url: env === "preview" ? "file:/tmp/crater-preview.db" : "file:reports.local.db" };
+}
+
 export function db(): Client {
-	if (!client) {
-		const url = process.env.TURSO_DATABASE_URL;
-		// Local development writes to a file beside the project.
-		client = url ? createClient({ url, authToken: process.env.TURSO_AUTH_TOKEN }) : createClient({ url: "file:reports.local.db" });
-	}
+	client ??= createClient(target());
 	return client;
 }
 
@@ -36,9 +45,14 @@ function init() {
 				)`,
 				"CREATE INDEX IF NOT EXISTS reports_ip_time ON reports (ip_hash, created_at)",
 				// One row per email address. Sending the form again updates it.
+				// unsubscribe_token goes in the link at the foot of every email
+				// (see mailingList). Unsubscribing stamps unsubscribed_at and
+				// keeps the row, so the address isn't written to again.
 				`CREATE TABLE IF NOT EXISTS contacts (
 					id INTEGER PRIMARY KEY AUTOINCREMENT,
 					email TEXT NOT NULL UNIQUE COLLATE NOCASE,
+					unsubscribe_token TEXT NOT NULL UNIQUE,
+					unsubscribed_at TEXT,
 					name TEXT,
 					church TEXT,
 					role TEXT,
@@ -158,13 +172,14 @@ export async function recentContacts(ipHash: string): Promise<number> {
 // Sending the form again with the same email only fills fields that were
 // empty. Nothing confirms an address belongs to the sender, so a second
 // submission must not be able to replace someone's details, like putting a
-// stranger's phone number under a church's email.
+// stranger's phone number under a church's email. For the same reason it
+// doesn't undo an unsubscribe, and the token stays the one already sent out.
 export async function saveContact(c: Contact) {
 	await init();
 	const v = (s: string) => s || null;
 	await db().execute({
-		sql: `INSERT INTO contacts (email, name, church, role, size, city, country, phone, ip_country, ip_hash)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		sql: `INSERT INTO contacts (email, unsubscribe_token, name, church, role, size, city, country, phone, ip_country, ip_hash)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT (email) DO UPDATE SET
 				name = COALESCE(name, excluded.name),
 				church = COALESCE(church, excluded.church),
@@ -176,8 +191,43 @@ export async function saveContact(c: Contact) {
 				ip_country = COALESCE(ip_country, excluded.ip_country),
 				ip_hash = excluded.ip_hash,
 				updated_at = datetime('now')`,
-		args: [c.email, v(c.name), v(c.church), v(c.role), v(c.size), v(c.city), v(c.country), v(c.phone), v(c.ipCountry), c.ipHash],
+		args: [c.email, randomBytes(16).toString("base64url"), v(c.name), v(c.church), v(c.role), v(c.size), v(c.city), v(c.country), v(c.phone), v(c.ipCountry), c.ipHash],
 	});
+}
+
+export const UNSUBSCRIBE_TOKEN = /^[A-Za-z0-9_-]{22}$/;
+
+/** The address an unsubscribe link is for, or null for a link that isn't ours. */
+export async function contactByToken(token: string): Promise<{ email: string; unsubscribed: boolean } | null> {
+	await init();
+	const r = await db().execute({ sql: "SELECT email, unsubscribed_at FROM contacts WHERE unsubscribe_token = ?", args: [token] });
+	const row = r.rows[0];
+	return row ? { email: String(row.email), unsubscribed: row.unsubscribed_at != null } : null;
+}
+
+/** Stops email to the address behind this token. False if no address has it. */
+export async function unsubscribe(token: string): Promise<boolean> {
+	await init();
+	const r = await db().execute({
+		sql: "UPDATE contacts SET unsubscribed_at = COALESCE(unsubscribed_at, datetime('now')) WHERE unsubscribe_token = ?",
+		args: [token],
+	});
+	return r.rowsAffected > 0;
+}
+
+/** Everyone still on the list, oldest first, with the link to leave it. */
+export async function mailingList(site = "https://getcrater.org") {
+	await init();
+	const r = await db().execute(
+		"SELECT email, name, church, country, unsubscribe_token FROM contacts WHERE unsubscribed_at IS NULL ORDER BY id",
+	);
+	return r.rows.map((row) => ({
+		email: String(row.email),
+		name: String(row.name ?? ""),
+		church: String(row.church ?? ""),
+		country: String(row.country ?? ""),
+		unsubscribe: `${site}/unsubscribe?t=${row.unsubscribe_token}`,
+	}));
 }
 
 export type UsageReport = {
