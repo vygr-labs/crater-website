@@ -21,7 +21,7 @@ The installer also sets up the Microsoft Visual C++ runtime if your computer doe
 
 1. Unzip the portable zip (like `Crater-0.7.2-win64.zip`) to any folder, for example on a USB drive.
 2. Run `crater.exe` from that folder.
-3. If Windows reports a missing `VCRUNTIME140.dll` or `MSVCP140.dll`, run `vc_redist.x64.exe` from the same folder once, then start Crater again.
+3. If Windows reports a missing `VCRUNTIME140.dll` or `MSVCP140.dll`, the folder is missing files. Unzip it again in full. If that doesn't help, install the [Microsoft Visual C++ Redistributable](https://aka.ms/vc14/vc_redist.x64.exe), then start Crater again.
 
 :::info
 The in-app updater always installs the Windows installer version. If you use the portable zip, download new versions from the [Downloads](/download) page instead.
