@@ -23,11 +23,11 @@ Very likely. Crater is built to run well on modest hardware: 4 GB of RAM and the
 
 ### Does it need the internet?
 
-No. Everything works offline. Crater only goes online if you allow it to check for updates (once a day, which you can turn off in **Settings > Updates**) or when you choose to send logs to the developer.
+No. Everything works offline. Crater only goes online to check for updates (which you can turn off in **Settings > Updates**), when you choose to send logs to the developer, or if you switch on anonymous usage sharing in **Settings > Diagnostics**.
 
 ### Is our information private?
 
-Yes. There are no accounts, no analytics and no tracking. Your songs, schedules and media stay on your computer.
+Yes. There are no accounts and no tracking. Your songs, schedules and media stay on your computer. Crater can share anonymous usage numbers, like which version you run and how often songs or verses go live, but only if you switch it on in **Settings > Diagnostics**. It never sends your songs, schedules, file names or anything that says who you are.
 
 ### Is Crater available in my language?
 

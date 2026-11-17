@@ -3,6 +3,7 @@
 // the address signs that browser in, and a cookie keeps it signed in.
 import { createHash, randomBytes } from "node:crypto";
 import { db } from "./db";
+import { mailHtml, sendMail } from "./mail";
 
 const LINK_MINUTES = 30;
 const MAX_SESSIONS = 200;
@@ -177,52 +178,9 @@ export function merge(a: StoredSession[], b: StoredSession[]): StoredSession[] {
 
 /* ── The email ───────────────────────────────────────────────────────── */
 export async function sendLink(to: string, url: string): Promise<boolean> {
-	const key = process.env.RESEND_API_KEY;
-	if (!key) {
-		// No mail service on a local copy of the site, so the link goes to
-		// the terminal instead.
-		if (import.meta.env.DEV) {
-			console.log(`[progress] sign-in link for ${to}: ${url}`);
-			return true;
-		}
-		console.error("[progress] RESEND_API_KEY is not set");
-		return false;
-	}
-	const text = [
-		"Here is your link to save your Crater practice progress:",
-		"",
-		url,
-		"",
-		`It works once, for the next ${LINK_MINUTES} minutes. Open it in the browser you practise in, and your runs will be kept with this address from then on.`,
-		"",
-		"If you didn't ask for this, you can ignore this email. Nothing is saved until the link is opened.",
-		"",
-		"Crater",
-		"https://getcrater.org",
-	].join("\n");
-	const html = `<div style="font:16px/1.55 -apple-system,Segoe UI,sans-serif;color:#121416;max-width:520px">
-<p>Here is your link to save your Crater practice progress.</p>
-<p style="margin:28px 0"><a href="${url}" style="display:inline-block;padding:14px 24px;border-radius:999px;background:#087785;color:#fff;text-decoration:none;font-weight:600">Save my progress</a></p>
-<p>It works once, for the next ${LINK_MINUTES} minutes. Open it in the browser you practise in, and your runs will be kept with this address from then on.</p>
-<p style="color:#5f686c">If you didn't ask for this, you can ignore this email. Nothing is saved until the link is opened.</p>
-<p style="color:#5f686c">Crater<br><a href="https://getcrater.org" style="color:#087785">getcrater.org</a></p>
-</div>`;
-	try {
-		const res = await fetch("https://api.resend.com/emails", {
-			method: "POST",
-			headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-			body: JSON.stringify({
-				from: process.env.MAIL_FROM ?? "Crater <practice@getcrater.org>",
-				to: [to],
-				subject: "Your link to save your Crater progress",
-				text,
-				html,
-			}),
-		});
-		if (!res.ok) throw new Error(`Resend said ${res.status}: ${(await res.text()).slice(0, 200)}`);
-		return true;
-	} catch (e) {
-		console.error(`[progress] ${(e as Error).message}`);
-		return false;
-	}
+	const after = `It works once, for the next ${LINK_MINUTES} minutes. Open it in the browser you practise in, and your runs will be kept with this address from then on.`;
+	const quiet = "If you didn't ask for this, you can ignore this email. Nothing is saved until the link is opened.";
+	const text = ["Here is your link to save your Crater practice progress:", "", url, "", after, "", quiet, "", "Crater", "https://getcrater.org"].join("\n");
+	const html = mailHtml(["Here is your link to save your Crater practice progress.", after], { href: url, label: "Save my progress" }, quiet);
+	return sendMail({ to, subject: "Your link to save your Crater progress", text, html }, "progress");
 }

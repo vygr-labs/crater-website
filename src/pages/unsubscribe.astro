@@ -1,0 +1,38 @@
+---
+// The link at the foot of every email to the stay-in-touch list.
+import LinkPage from "../components/LinkPage.astro";
+import { contactByToken, unsubscribe } from "../lib/db";
+import { handleLink } from "../lib/link-page";
+
+export const prerender = false;
+
+const page = await handleLink(Astro.request, Astro.url, "unsubscribe", contactByToken, unsubscribe, (c) =>
+	c.unsubscribed ? "done" : "ask",
+);
+if ("redirect" in page) return Astro.redirect(page.redirect, 303);
+Astro.response.status = page.status;
+---
+
+<LinkPage
+	title="Unsubscribe · Crater"
+	description="Stop emails from Crater."
+	state={page.state}
+	token={page.token}
+	email={page.contact?.email ?? ""}
+	ask={{ pre: "Stop our", hl: "emails", post: "?", lede: "Emails about new versions of Crater, and things your church should know." }}
+	done={{ pre: "You're", hl: "unsubscribed", post: ".", lede: "We won't email you again. Crater still tells you about new versions when you open it." }}
+	question={["We'll stop writing to", "."]}
+	button="Unsubscribe"
+	note="Nothing else changes, and Crater keeps working as it does."
+>
+	<Fragment slot="aside">
+		<div data-reveal="up">
+			<h2>New versions</h2>
+			<p>Crater tells you itself when a new version is out, each time you open it. That doesn't need email.</p>
+		</div>
+		<div data-reveal="up">
+			<h2>Need help?</h2>
+			<p><a href="/report" class="u-link">Tell us what went wrong</a> or <a href="/docs" class="u-link">read the docs</a>.</p>
+		</div>
+	</Fragment>
+</LinkPage>

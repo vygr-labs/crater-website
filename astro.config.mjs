@@ -31,7 +31,7 @@ export default defineConfig({
 	// The old docs had their own downloads page. The site has one now.
 	redirects: { "/docs/downloads": "/download" },
 	// The forms and the 404 page have nothing for search engines.
-	integrations: [sitemap({ filter: (page) => !/\/(404|report|request)\/?$/.test(page) })],
+	integrations: [sitemap({ filter: (page) => !/\/(404|report|request|stay-in-touch)\/?$/.test(page) })],
 	markdown: {
 		processor: unified({
 			remarkPlugins: [remarkDirective, remarkDocs],
